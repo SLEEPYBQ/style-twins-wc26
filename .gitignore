@@ -1,0 +1,17 @@
+# Reference photos (Commons + FIFA/press) are drawing references only: never published
+data/ref_photos/
+data/.avatar_status.lock
+
+# Full-size source images; the site ships the WebP versions
+web/img/avatars/*.png
+web/img/avatars/_rejected/
+web/img/gen/*.png
+
+# Local deploy target (see pipeline/deploy.sh)
+pipeline/deploy.env
+
+# Build / OS cruft
+pipeline/.bin/
+__pycache__/
+*.pyc
+.DS_Store

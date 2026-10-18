@@ -1,0 +1,11 @@
+STYLE (apply to every image) — "capsule-eye" minimalist flat 2D, matching our player avatars:
+- Minimal flat 2D illustration made of large smooth colour blocks. Almost no outlines: shapes are separated by colour differences, not black strokes.
+- Characters are cute, rounded, simplified figures with a big round head. Their eyes are exactly two near-black, solid, vertical capsule shapes (rounded bars, height about 2.5-3x width), parallel and the same size. No pupils, highlights, eyebrows or eyelashes.
+- No mouth and no nose on any character. Emotion is shown only through posture, head tilt, arms and props.
+- Each cheek has a small, low-saturation, soft oval blush with no outline.
+- Exactly one level of soft shadow per colour, no gradients, no textures, no 3D render look, no photorealism.
+- Characters are generic and must not resemble any real person.
+- Limited palette: the specified kit colour, warm skin tones, simple hair colours, white, a soft dark navy (#1d2433) for boots/details, and at most one small accent.
+- Absolutely no text, letters, words, logos, badges, brand marks or watermarks (numbers only when the prompt explicitly asks for one).
+- TRUE TRANSPARENT BACKGROUND (alpha channel). No floor, backdrop, frame or box. A small soft ellipse ground shadow under the feet is OK.
+- Subject centred, full figure visible, generous padding (~10%) on all sides. Square PNG.

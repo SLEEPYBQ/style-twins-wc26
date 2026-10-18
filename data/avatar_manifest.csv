@@ -1,0 +1,1278 @@
+player_id,display_name,team_id,team_name,position,shirt_numbers,priority,starts,appearances,pass_involvement,kit,trim,bg
+ESP_rodri,RODRI,ESP,Spain,MF,16,1,8,8,1421,#C60B1E,#FFC400,#EFC3C0
+ENG_marc_guehi,Marc GUEHI,ENG,England,DF,6,1,7,8,867,#FFFFFF,#1D2C5E,#CACACE
+FRA_dayot_upamecano,Dayot UPAMECANO,FRA,France,DF,4,1,7,8,754,#1E2A4A,#E1000F,#CACACA
+SUI_manuel_akanji,Manuel AKANJI,SUI,Switzerland,DF,5,1,6,6,760,#D52B1E,#FFFFFF,#F3CAC0
+MAR_achraf_hakimi,Achraf HAKIMI,MAR,Morocco,DF,2,1,6,6,746,#C1272D,#006233,#EEC9C4
+BEL_brandon_mechele,Brandon MECHELE,BEL,Belgium,DF,4,1,6,6,652,#C8102E,#FDDA24,#F0C4C4
+NOR_sander_berge,Sander BERGE,NOR,Norway,MF,8,1,5,5,745,#BA0C2F,#00205B,#EDC3C4
+POR_vitinha,VITINHA,POR,Portugal,MF,23,1,5,5,685,#A6192E,#006600,#E8C6C4
+BRA_gabriel_magalhaes,GABRIEL MAGALHAES,BRA,Brazil,DF,3,1,5,5,684,#FFDF00,#009C3B,#FCF2BA
+COL_davinson_sanchez,Davinson SANCHEZ,COL,Colombia,DF,23,1,5,5,538,#FCD116,#003893,#FBEFBE
+ARG_leandro_paredes,Leandro PAREDES,ARG,Argentina,MF,5,1,4,7,1005,#75AADB,#FFFFFF,#DEE6EA
+ALG_aissa_mandi,Aissa MANDI,ALG,Algeria,DF,2,1,4,4,657,#0B7A3E,#FFFFFF,#C6DCC7
+GER_jonathan_tah,Jonathan TAH,GER,Germany,DF,4,1,4,4,621,#FFFFFF,#1A1A1A,#CAC6BF
+NED_jan_paul_van_hecke,Jan Paul VAN HECKE,NED,Netherlands,DF,6,1,4,4,599,#F36C21,#1E2A4A,#F9D8C1
+EGY_marawan_attia,MARAWAN ATTIA,EGY,Egypt,MF,19,1,4,5,565,#CE1126,#1A1A1A,#F1C4C2
+USA_chris_richards,Chris RICHARDS,USA,USA,DF,3,1,4,4,543,#FFFFFF,#0A3161,#C6CBCF
+ECU_pedro_vite,Pedro VITE,ECU,Ecuador,MF,15,1,4,4,510,#FFD100,#0072CE,#FCEFBA
+SEN_moussa_niakhate,Moussa NIAKHATE,SEN,Senegal,DF,19,1,4,4,489,#FFFFFF,#00853F,#C4DEC8
+RSA_ime_okon,Ime OKON,RSA,South Africa,DF,21,1,4,4,451,#FFB81C,#007749,#FCE9C0
+CRO_josip_sutalo,Josip SUTALO,CRO,Croatia,DF,6,1,4,4,444,#D52B1E,#FFFFFF,#F3CAC0
+CAN_stephen_eustaquio,Stephen EUSTAQUIO,CAN,Canada,MF,7,1,4,5,427,#D80621,#FFFFFF,#F3C2C1
+AUT_david_alaba,David ALABA,AUT,Austria,DF,8,1,4,4,367,#ED2939,#FFFFFF,#F8CAC6
+MEX_johan_vasquez,Johan VASQUEZ,MEX,Mexico,DF,5,1,4,4,351,#006847,#CE1126,#C4D8C9
+AUS_harry_souttar,Harry SOUTTAR,AUS,Australia,DF,19,1,4,4,335,#FFCD00,#00843D,#FCEEBA
+JPN_daichi_kamada,Daichi KAMADA,JPN,Japan,MF,15,1,4,4,333,#0A3A8C,#FFFFFF,#C6CDD8
+SWE_victor_lindelof,Victor LINDELOF,SWE,Sweden,DF,3,1,4,4,319,#FECC00,#006AA7,#FCEEBA
+BIH_nikola_katic,Nikola KATIC,BIH,Bosnia and Herzegovina,DF,18,1,4,4,293,#1D3C9A,#FECB00,#CACEDC
+CPV_pico_lopes,PICO LOPES,CPV,Cabo Verde,DF,4,1,4,4,292,#003893,#CF2027,#C4CDDA
+GHA_gideon_mensah,Gideon MENSAH,GHA,Ghana,DF,14,1,4,4,275,#FFFFFF,#FCD116,#FBEFBE
+COD_axel_tuanzebe,Axel TUANZEBE,COD,Congo DR,DF,4,1,4,4,261,#007FFF,#CE1021,#C4DDF2
+PAR_omar_alderete,Omar ALDERETE,PAR,Paraguay,DF,3,1,4,4,160,#D52B1E,#FFFFFF,#F3CAC0
+KOR_lee_gihyuk,LEE Gihyuk,KOR,Korea Republic,MF,3,1,3,3,415,#C60C30,#0047A0,#EFC3C4
+TUR_abdulkerim_bardakci,Abdulkerim BARDAKCI,TUR,Türkiye,DF,14,1,3,3,374,#E30A17,#FFFFFF,#F6C3BF
+URU_mathias_olivera,Mathias OLIVERA,URU,Uruguay,DF,16,1,3,3,362,#5CBFEB,#1A1A1A,#D8EBED
+SCO_lewis_ferguson,Lewis FERGUSON,SCO,Scotland,MF,19,1,3,3,346,#0B2A5B,#FFFFFF,#C6CACE
+CIV_ibrahim_sangare,Ibrahim SANGARE,CIV,Côte d'Ivoire,MF,18,1,3,4,321,#FF8200,#009E60,#FCDDBA
+PAN_jose_cordoba,Jose CORDOBA,PAN,Panama,DF,3,1,3,3,294,#DA121A,#072357,#F4C5BF
+NZL_marko_stamenic,Marko STAMENIC,NZL,New Zealand,MF,8,1,3,3,282,#FFFFFF,#1A1A1A,#CAC6BF
+HAI_hannes_delcroix,Hannes DELCROIX,HAI,Haiti,DF,5,1,3,3,256,#00209F,#D21034,#C4C8DD
+IRQ_akam_hashim,AKAM HASHIM,IRQ,Iraq,DF,5,1,3,3,245,#007A3D,#FFFFFF,#C4DCC7
+CZE_ladislav_krejci,Ladislav KREJCI,CZE,Czechia,DF,7,1,3,3,227,#D7141A,#11457E,#F3C5BF
+TUN_montassar_talbi,Montassar TALBI,TUN,Tunisia,DF,3,1,3,3,213,#E70013,#FFFFFF,#F7C1BE
+IRN_shoja_khalilzadeh,Shoja KHALILZADEH,IRN,IR Iran,DF,4,1,3,3,212,#FFFFFF,#DA0000,#F4C1BA
+CUW_leandro_bacuna,Leandro BACUNA,CUW,Curaçao,MF,10,1,3,3,192,#002B7F,#F9E814,#C4CAD6
+QAT_boualem_khoukhi,BOUALEM KHOUKHI,QAT,Qatar,DF,16,1,3,3,168,#8A1538,#FFFFFF,#E2C5C6
+JOR_yazan_alarab,YAZAN ALARAB,JOR,Jordan,DF,5,1,3,3,156,#CE1126,#FFFFFF,#F1C4C2
+KSA_mohamed_kanno,MOHAMED KANNO,KSA,Saudi Arabia,MF,23,1,2,3,183,#006C35,#FFFFFF,#C4D8C5
+UZB_otabek_shukurov,Otabek SHUKUROV,UZB,Uzbekistan,MF,7,1,2,2,125,#0099B5,#FFFFFF,#C4E2E1
+ESP_pau_cubarsi,Pau CUBARSI,ESP,Spain,DF,22,2,8,8,1230,#C60B1E,#FFC400,#EFC3C0
+ESP_aymeric_laporte,Aymeric LAPORTE,ESP,Spain,DF,14,2,8,8,1147,#C60B1E,#FFC400,#EFC3C0
+ESP_marc_cucurella,Marc CUCURELLA,ESP,Spain,DF,24,2,8,8,739,#C60B1E,#FFC400,#EFC3C0
+FRA_michael_olise,Michael OLISE,FRA,France,FW,11,2,8,8,720,#1E2A4A,#E1000F,#CACACA
+FRA_kylian_mbappe,Kylian MBAPPE,FRA,France,FW,10,2,8,8,513,#1E2A4A,#E1000F,#CACACA
+ESP_unai_simon,Unai SIMON,ESP,Spain,GK,23,2,8,8,461,#C60B1E,#FFC400,#EFC3C0
+ARG_emiliano_martinez,Emiliano MARTINEZ,ARG,Argentina,GK,23,2,8,8,426,#75AADB,#FFFFFF,#DEE6EA
+FRA_mike_maignan,Mike MAIGNAN,FRA,France,GK,16,2,8,8,322,#1E2A4A,#E1000F,#CACACA
+ESP_mikel_oyarzabal,Mikel OYARZABAL,ESP,Spain,FW,21,2,8,8,303,#C60B1E,#FFC400,#EFC3C0
+ARG_enzo_fernandez,Enzo FERNANDEZ,ARG,Argentina,MF,24,2,7,7,857,#75AADB,#FFFFFF,#DEE6EA
+ENG_ezri_konsa,Ezri KONSA,ENG,England,DF,2,2,7,8,805,#FFFFFF,#1D2C5E,#CACACE
+ARG_lisandro_martinez,Lisandro MARTINEZ,ARG,Argentina,DF,6,2,7,7,791,#75AADB,#FFFFFF,#DEE6EA
+ARG_cristian_romero,Cristian ROMERO,ARG,Argentina,DF,13,2,7,7,787,#75AADB,#FFFFFF,#DEE6EA
+ARG_alexis_mac_allister,Alexis MAC ALLISTER,ARG,Argentina,MF,20,2,7,8,765,#75AADB,#FFFFFF,#DEE6EA
+ENG_elliot_anderson,Elliot ANDERSON,ENG,England,MF,8,2,7,8,728,#FFFFFF,#1D2C5E,#CACACE
+ARG_lionel_messi,Lionel MESSI,ARG,Argentina,FW,10,2,7,8,664,#75AADB,#FFFFFF,#DEE6EA
+FRA_adrien_rabiot,Adrien RABIOT,FRA,France,MF,14,2,7,7,590,#1E2A4A,#E1000F,#CACACA
+ENG_declan_rice,Declan RICE,ENG,England,MF,4,2,7,7,567,#FFFFFF,#1D2C5E,#CACACE
+FRA_jules_kounde,Jules KOUNDE,FRA,France,DF,5,2,7,8,541,#1E2A4A,#E1000F,#CACACA
+ESP_lamine_yamal,Lamine YAMAL,ESP,Spain,FW,19,2,7,8,535,#C60B1E,#FFC400,#EFC3C0
+ESP_alex_baena,Alex BAENA,ESP,Spain,MF,15,2,7,7,416,#C60B1E,#FFC400,#EFC3C0
+ENG_jude_bellingham,Jude BELLINGHAM,ENG,England,MF,10,2,7,8,409,#FFFFFF,#1D2C5E,#CACACE
+ENG_jordan_pickford,Jordan PICKFORD,ENG,England,GK,1,2,7,7,379,#FFFFFF,#1D2C5E,#CACACE
+ENG_harry_kane,Harry KANE,ENG,England,FW,9,2,7,7,226,#FFFFFF,#1D2C5E,#CACACE
+SUI_granit_xhaka,Granit XHAKA,SUI,Switzerland,MF,10,2,6,6,757,#D52B1E,#FFFFFF,#F3CAC0
+MAR_neil_el_aynaoui,Neil EL AYNAOUI,MAR,Morocco,MF,24,2,6,6,725,#C1272D,#006233,#EEC9C4
+ESP_pedro_porro,Pedro PORRO,ESP,Spain,DF,12,2,6,6,689,#C60B1E,#FFC400,#EFC3C0
+SUI_nico_elvedi,Nico ELVEDI,SUI,Switzerland,DF,4,2,6,6,659,#D52B1E,#FFFFFF,#F3CAC0
+ARG_rodrigo_de_paul,Rodrigo DE PAUL,ARG,Argentina,MF,7,2,6,7,583,#75AADB,#FFFFFF,#DEE6EA
+SUI_remo_freuler,Remo FREULER,SUI,Switzerland,MF,8,2,6,6,554,#D52B1E,#FFFFFF,#F3CAC0
+FRA_william_saliba,William SALIBA,FRA,France,DF,17,2,6,6,517,#1E2A4A,#E1000F,#CACACA
+FRA_ousmane_dembele,Ousmane DEMBELE,FRA,France,FW,7,2,6,7,477,#1E2A4A,#E1000F,#CACACA
+ESP_dani_olmo,Dani OLMO,ESP,Spain,FW,10,2,6,8,432,#C60B1E,#FFC400,#EFC3C0
+SUI_ricardo_rodriguez,Ricardo RODRIGUEZ,SUI,Switzerland,DF,13,2,6,6,427,#D52B1E,#FFFFFF,#F3CAC0
+MAR_bilal_el_khannouss,Bilal EL KHANNOUSS,MAR,Morocco,MF,23,2,6,6,342,#C1272D,#006233,#EEC9C4
+MAR_brahim_diaz,Brahim DIAZ,MAR,Morocco,FW,10,2,6,6,337,#C1272D,#006233,#EEC9C4
+SUI_gregor_kobel,Gregor KOBEL,SUI,Switzerland,GK,1,2,6,6,326,#D52B1E,#FFFFFF,#F3CAC0
+BEL_leandro_trossard,Leandro TROSSARD,BEL,Belgium,FW,10,2,6,6,325,#C8102E,#FDDA24,#F0C4C4
+MAR_yassine_bounou,Yassine BOUNOU,MAR,Morocco,GK,1,2,6,6,269,#C1272D,#006233,#EEC9C4
+BEL_thibaut_courtois,Thibaut COURTOIS,BEL,Belgium,GK,1,2,6,6,256,#C8102E,#FDDA24,#F0C4C4
+SUI_breel_embolo,Breel EMBOLO,SUI,Switzerland,FW,7,2,6,6,166,#D52B1E,#FFFFFF,#F3CAC0
+ESP_pedri,PEDRI,ESP,Spain,MF,20,2,5,8,846,#C60B1E,#FFC400,#EFC3C0
+NOR_martin_odegaard,Martin ODEGAARD,NOR,Norway,MF,10,2,5,5,657,#BA0C2F,#00205B,#EDC3C4
+BRA_marquinhos,MARQUINHOS,BRA,Brazil,DF,4,2,5,5,623,#FFDF00,#009C3B,#FCF2BA
+MAR_issa_diop,Issa DIOP,MAR,Morocco,DF,14,2,5,5,583,#C1272D,#006233,#EEC9C4
+POR_renato_veiga,RENATO VEIGA,POR,Portugal,DF,13,2,5,5,582,#A6192E,#006600,#E8C6C4
+COL_gustavo_puerta,Gustavo PUERTA,COL,Colombia,DF,14,2,5,5,511,#FCD116,#003893,#FBEFBE
+NOR_kristoffer_ajer,Kristoffer AJER,NOR,Norway,DF,3,2,5,5,495,#BA0C2F,#00205B,#EDC3C4
+COL_jefferson_lerma,Jefferson LERMA,COL,Colombia,MF,16,2,5,5,494,#FCD116,#003893,#FBEFBE
+COL_jhon_lucumi,Jhon LUCUMI,COL,Colombia,DF,3,2,5,5,494,#FCD116,#003893,#FBEFBE
+FRA_lucas_digne,Lucas DIGNE,FRA,France,DF,3,2,5,6,489,#1E2A4A,#E1000F,#CACACA
+NOR_torbjorn_heggem,Torbjorn HEGGEM,NOR,Norway,DF,17,2,5,5,489,#BA0C2F,#00205B,#EDC3C4
+POR_bruno_fernandes,BRUNO FERNANDES,POR,Portugal,MF,8,2,5,5,485,#A6192E,#006600,#E8C6C4
+MAR_noussair_mazraoui,Noussair MAZRAOUI,MAR,Morocco,DF,3,2,5,6,451,#C1272D,#006233,#EEC9C4
+MAR_ayyoub_bouaddi,Ayyoub BOUADDI,MAR,Morocco,MF,6,2,5,5,446,#C1272D,#006233,#EEC9C4
+BRA_douglas_santos,DOUGLAS SANTOS,BRA,Brazil,DF,16,2,5,5,432,#FFDF00,#009C3B,#FCF2BA
+EGY_mohamed_hany,MOHAMED HANY,EGY,Egypt,DF,3,2,5,5,431,#CE1126,#1A1A1A,#F1C4C2
+COL_james_rodriguez,James RODRIGUEZ,COL,Colombia,MF,10,2,5,5,428,#FCD116,#003893,#FBEFBE
+POR_nuno_mendes,NUNO MENDES,POR,Portugal,DF,25,2,5,5,420,#A6192E,#006600,#E8C6C4
+USA_weston_mckennie,Weston McKENNIE,USA,USA,MF,8,2,5,5,420,#FFFFFF,#0A3161,#C6CBCF
+COL_jhon_arias,Jhon ARIAS,COL,Colombia,MF,11,2,5,5,419,#FCD116,#003893,#FBEFBE
+ARG_nahuel_molina,Nahuel MOLINA,ARG,Argentina,DF,26,2,5,7,412,#75AADB,#FFFFFF,#DEE6EA
+BEL_youri_tielemans,Youri TIELEMANS,BEL,Belgium,MF,8,2,5,5,404,#C8102E,#FDDA24,#F0C4C4
+BRA_casemiro,CASEMIRO,BRA,Brazil,MF,5,2,5,5,387,#FFDF00,#009C3B,#FCF2BA
+ENG_nico_oreilly,Nico OREILLY,ENG,England,DF,3,2,5,7,383,#FFFFFF,#1D2C5E,#CACACE
+ARG_julian_alvarez,Julian ALVAREZ,ARG,Argentina,FW,9,2,5,8,382,#75AADB,#FFFFFF,#DEE6EA
+BRA_bruno_guimaraes,BRUNO GUIMARAES,BRA,Brazil,MF,8,2,5,5,363,#FFDF00,#009C3B,#FCF2BA
+BEL_maxim_de_cuyper,Maxim DE CUYPER,BEL,Belgium,DF,5,2,5,6,362,#C8102E,#FDDA24,#F0C4C4
+EGY_emam_ashour,EMAM ASHOUR,EGY,Egypt,MF,8,2,5,5,354,#CE1126,#1A1A1A,#F1C4C2
+ARG_nicolas_tagliafico,Nicolas TAGLIAFICO,ARG,Argentina,DF,3,2,5,7,353,#75AADB,#FFFFFF,#DEE6EA
+BEL_timothy_castagne,Timothy CASTAGNE,BEL,Belgium,DF,21,2,5,6,341,#C8102E,#FDDA24,#F0C4C4
+POR_joao_cancelo,JOAO CANCELO,POR,Portugal,DF,20,2,5,5,329,#A6192E,#006600,#E8C6C4
+NOR_david_moller_wolfe,David MOLLER WOLFE,NOR,Norway,DF,5,2,5,5,328,#BA0C2F,#00205B,#EDC3C4
+BEL_kevin_de_bruyne,Kevin DE BRUYNE,BEL,Belgium,MF,7,2,5,5,325,#C8102E,#FDDA24,#F0C4C4
+COL_luis_diaz,Luis DIAZ,COL,Colombia,FW,7,2,5,5,323,#FCD116,#003893,#FBEFBE
+MEX_roberto_alvarado,Roberto ALVARADO,MEX,Mexico,FW,25,2,5,5,314,#006847,#CE1126,#C4D8C9
+BRA_vinicius_junior,VINICIUS JUNIOR,BRA,Brazil,FW,7,2,5,5,305,#FFDF00,#009C3B,#FCF2BA
+POR_pedro_neto,PEDRO NETO,POR,Portugal,FW,18,2,5,5,296,#A6192E,#006600,#E8C6C4
+CAN_alistair_johnston,Alistair JOHNSTON,CAN,Canada,DF,2,2,5,5,295,#D80621,#FFFFFF,#F3C2C1
+CAN_richie_laryea,Richie LARYEA,CAN,Canada,DF,22,2,5,5,280,#D80621,#FFFFFF,#F3C2C1
+COL_camilo_vargas,Camilo VARGAS,COL,Colombia,GK,12,2,5,5,271,#FCD116,#003893,#FBEFBE
+NOR_orjan_nyland,Orjan NYLAND,NOR,Norway,GK,1,2,5,5,247,#BA0C2F,#00205B,#EDC3C4
+MEX_julian_quinones,Julian QUINONES,MEX,Mexico,FW,16,2,5,5,238,#006847,#CE1126,#C4D8C9
+EGY_mohamed_salah,MOHAMED SALAH,EGY,Egypt,FW,10,2,5,5,229,#CE1126,#1A1A1A,#F1C4C2
+BRA_alisson,ALISSON,BRA,Brazil,GK,1,2,5,5,216,#FFDF00,#009C3B,#FCF2BA
+MEX_raul_rangel,Raul RANGEL,MEX,Mexico,GK,1,2,5,5,213,#006847,#CE1126,#C4D8C9
+MAR_ismael_saibari,Ismael SAIBARI,MAR,Morocco,MF,11,2,5,5,209,#C1272D,#006233,#EEC9C4
+NOR_alexander_sorloth,Alexander SORLOTH,NOR,Norway,FW,7,2,5,5,208,#BA0C2F,#00205B,#EDC3C4
+ENG_anthony_gordon,Anthony GORDON,ENG,England,FW,18,2,5,6,207,#FFFFFF,#1D2C5E,#CACACE
+POR_cristiano_ronaldo,CRISTIANO RONALDO,POR,Portugal,FW,7,2,5,5,201,#A6192E,#006600,#E8C6C4
+CAN_jonathan_david,Jonathan DAVID,CAN,Canada,FW,10,2,5,5,194,#D80621,#FFFFFF,#F3C2C1
+SUI_dan_ndoye,Dan NDOYE,SUI,Switzerland,FW,11,2,5,6,193,#D52B1E,#FFFFFF,#F3CAC0
+BEL_charles_de_ketelaere,Charles DE KETELAERE,BEL,Belgium,FW,17,2,5,5,191,#C8102E,#FDDA24,#F0C4C4
+EGY_mostafa_shoubir,MOSTAFA SHOUBIR,EGY,Egypt,GK,23,2,5,5,181,#CE1126,#1A1A1A,#F1C4C2
+CAN_tajon_buchanan,Tajon BUCHANAN,CAN,Canada,FW,17,2,5,5,180,#D80621,#FFFFFF,#F3C2C1
+PAR_andres_cubas,Andres CUBAS,PAR,Paraguay,MF,14,2,5,5,158,#D52B1E,#FFFFFF,#F3CAC0
+POR_diogo_costa,DIOGO COSTA,POR,Portugal,GK,1,2,5,5,158,#A6192E,#006600,#E8C6C4
+PAR_juan_jose_caceres,Juan Jose CACERES,PAR,Paraguay,DF,4,2,5,5,157,#D52B1E,#FFFFFF,#F3CAC0
+EGY_mostafa_zico,MOSTAFA ZICO,EGY,Egypt,MF,11,2,5,5,150,#CE1126,#1A1A1A,#F1C4C2
+PAR_julio_enciso,Julio ENCISO,PAR,Paraguay,FW,19,2,5,5,147,#D52B1E,#FFFFFF,#F3CAC0
+CAN_maxime_crepeau,Maxime CREPEAU,CAN,Canada,GK,16,2,5,5,144,#D80621,#FFFFFF,#F3C2C1
+PAR_gustavo_gomez,Gustavo GOMEZ,PAR,Paraguay,DF,15,2,5,5,131,#D52B1E,#FFFFFF,#F3CAC0
+NOR_erling_haaland,Erling HAALAND,NOR,Norway,FW,9,2,5,5,118,#BA0C2F,#00205B,#EDC3C4
+PAR_orlando_gill,Orlando GILL,PAR,Paraguay,GK,12,2,5,5,81,#D52B1E,#FFFFFF,#F3CAC0
+ALG_ramy_bensebaini,Ramy BENSEBAINI,ALG,Algeria,DF,21,2,4,4,645,#0B7A3E,#FFFFFF,#C6DCC7
+GER_joshua_kimmich,Joshua KIMMICH,GER,Germany,DF,6,2,4,4,544,#FFFFFF,#1A1A1A,#CAC6BF
+NED_virgil_van_dijk,Virgil VAN DIJK,NED,Netherlands,DF,4,2,4,4,543,#F36C21,#1E2A4A,#F9D8C1
+ESP_fabian_ruiz,Fabian RUIZ,ESP,Spain,MF,8,2,4,8,511,#C60B1E,#FFC400,#EFC3C0
+MAR_azzedine_ounahi,Azzedine OUNAHI,MAR,Morocco,MF,8,2,4,5,496,#C1272D,#006233,#EEC9C4
+ECU_moises_caicedo,Moises CAICEDO,ECU,Ecuador,MF,23,2,4,4,472,#FFD100,#0072CE,#FCEFBA
+USA_tim_ream,Tim REAM,USA,USA,DF,13,2,4,4,460,#FFFFFF,#0A3161,#C6CBCF
+POR_joao_neves,JOAO NEVES,POR,Portugal,MF,15,2,4,5,457,#A6192E,#006600,#E8C6C4
+POR_ruben_dias,RUBEN DIAS,POR,Portugal,DF,3,2,4,4,452,#A6192E,#006600,#E8C6C4
+SEN_idrissa_gana_gueye,Idrissa Gana GUEYE,SEN,Senegal,MF,5,2,4,4,451,#FFFFFF,#00853F,#C4DEC8
+SEN_krepin_diatta,Krepin DIATTA,SEN,Senegal,DF,15,2,4,4,450,#FFFFFF,#00853F,#C4DEC8
+EGY_yasser_ibrahim,YASSER IBRAHIM,EGY,Egypt,DF,2,2,4,5,448,#CE1126,#1A1A1A,#F1C4C2
+BRA_danilo,DANILO,BRA,Brazil,DF,13,2,4,5,446,#FFDF00,#009C3B,#FCF2BA
+GER_florian_wirtz,Florian WIRTZ,GER,Germany,MF,17,2,4,4,444,#FFFFFF,#1A1A1A,#CAC6BF
+FRA_aurelien_tchouameni,Aurelien TCHOUAMENI,FRA,France,MF,8,2,4,4,443,#1E2A4A,#E1000F,#CACACA
+FRA_manu_kone,Manu KONE,FRA,France,MF,6,2,4,5,443,#1E2A4A,#E1000F,#CACACA
+ALG_fares_chaibi,Fares CHAIBI,ALG,Algeria,MF,10,2,4,4,436,#0B7A3E,#FFFFFF,#C6DCC7
+GER_aleksandar_pavlovic,Aleksandar PAVLOVIC,GER,Germany,MF,5,2,4,4,430,#FFFFFF,#1A1A1A,#CAC6BF
+MAR_chadi_riad,Chadi RIAD,MAR,Morocco,DF,18,2,4,4,407,#C1272D,#006233,#EEC9C4
+USA_alex_freeman,Alex FREEMAN,USA,USA,DF,16,2,4,5,398,#FFFFFF,#0A3161,#C6CBCF
+CRO_luka_modric,Luka MODRIC,CRO,Croatia,MF,10,2,4,4,382,#D52B1E,#FFFFFF,#F3CAC0
+ECU_willian_pacho,Willian PACHO,ECU,Ecuador,DF,6,2,4,4,375,#FFD100,#0072CE,#FCEFBA
+FRA_desire_doue,Desire DOUE,FRA,France,FW,20,2,4,8,375,#1E2A4A,#E1000F,#CACACA
+BEL_nathan_ngoy,Nathan NGOY,BEL,Belgium,DF,25,2,4,4,369,#C8102E,#FDDA24,#F0C4C4
+NED_frenkie_de_jong,Frenkie DE JONG,NED,Netherlands,MF,21,2,4,4,362,#F36C21,#1E2A4A,#F9D8C1
+RSA_ronwen_williams,Ronwen WILLIAMS,RSA,South Africa,GK,1,2,4,4,360,#FFB81C,#007749,#FCE9C0
+USA_tyler_adams,Tyler ADAMS,USA,USA,MF,4,2,4,4,356,#FFFFFF,#0A3161,#C6CBCF
+RSA_mbekezeli_mbokazi,Mbekezeli MBOKAZI,RSA,South Africa,DF,14,2,4,4,349,#FFB81C,#007749,#FCE9C0
+COL_daniel_munoz,Daniel MUNOZ,COL,Colombia,DF,2,2,4,5,328,#FCD116,#003893,#FBEFBE
+ENG_djed_spence,Djed SPENCE,ENG,England,DF,25,2,4,8,326,#FFFFFF,#1D2C5E,#CACACE
+ALG_rafik_belghali,Raﬁk BELGHALI,ALG,Algeria,DF,17,2,4,4,321,#0B7A3E,#FFFFFF,#C6DCC7
+MEX_erik_lira,Erik LIRA,MEX,Mexico,MF,6,2,4,4,321,#006847,#CE1126,#C4D8C9
+CIV_franck_kessie,Franck KESSIE,CIV,Côte d'Ivoire,MF,8,2,4,4,317,#FF8200,#009E60,#FCDDBA
+CAN_luc_de_fougerolles,Luc DE FOUGEROLLES,CAN,Canada,DF,4,2,4,5,312,#D80621,#FFFFFF,#F3C2C1
+GER_leroy_sane,Leroy SANE,GER,Germany,MF,19,2,4,4,308,#FFFFFF,#1A1A1A,#CAC6BF
+ECU_piero_hincapie,Piero HINCAPIE,ECU,Ecuador,DF,3,2,4,4,307,#FFD100,#0072CE,#FCEFBA
+EGY_mohanad_lashin,MOHANAD LASHIN,EGY,Egypt,MF,17,2,4,4,307,#CE1126,#1A1A1A,#F1C4C2
+USA_antonee_robinson,Antonee ROBINSON,USA,USA,DF,5,2,4,4,307,#FFFFFF,#0A3161,#C6CBCF
+NOR_patrick_berg,Patrick BERG,NOR,Norway,MF,6,2,4,6,305,#BA0C2F,#00205B,#EDC3C4
+AUS_alessandro_circati,Alessandro CIRCATI,AUS,Australia,DF,3,2,4,4,304,#FFCD00,#00843D,#FCEEBA
+BRA_lucas_paqueta,LUCAS PAQUETA,BRA,Brazil,MF,20,2,4,4,303,#FFDF00,#009C3B,#FCF2BA
+SUI_denis_zakaria,Denis ZAKARIA,SUI,Switzerland,MF,6,2,4,4,299,#D52B1E,#FFFFFF,#F3CAC0
+JPN_hiroki_ito,Hiroki ITO,JPN,Japan,DF,21,2,4,4,298,#0A3A8C,#FFFFFF,#C6CDD8
+RSA_khuliso_mudau,Khuliso MUDAU,RSA,South Africa,DF,20,2,4,4,298,#FFB81C,#007749,#FCE9C0
+CIV_yan_diomande,Yan DIOMANDE,CIV,Côte d'Ivoire,FW,11,2,4,4,295,#FF8200,#009E60,#FCDDBA
+MEX_cesar_montes,Cesar MONTES,MEX,Mexico,DF,3,2,4,4,288,#006847,#CE1126,#C4D8C9
+SWE_gustaf_lagerbielke,Gustaf LAGERBIELKE,SWE,Sweden,DF,2,2,4,4,287,#FECC00,#006AA7,#FCEEBA
+COL_johan_mojica,Johan MOJICA,COL,Colombia,DF,17,2,4,4,283,#FCD116,#003893,#FBEFBE
+CPV_diney_borges,DINEY BORGES,CPV,Cabo Verde,DF,3,2,4,4,280,#003893,#CF2027,#C4CDDA
+FRA_bradley_barcola,Bradley BARCOLA,FRA,France,FW,12,2,4,8,273,#1E2A4A,#E1000F,#CACACA
+AUT_nicolas_seiwald,Nicolas SEIWALD,AUT,Austria,MF,6,2,4,4,264,#ED2939,#FFFFFF,#F8CAC6
+SEN_sadio_mane,Sadio MANE,SEN,Senegal,FW,10,2,4,4,264,#FFFFFF,#00853F,#C4DEC8
+CRO_josip_stanisic,Josip STANISIC,CRO,Croatia,DF,2,2,4,4,263,#D52B1E,#FFFFFF,#F3CAC0
+USA_malik_tillman,Malik TILLMAN,USA,USA,MF,17,2,4,5,258,#FFFFFF,#0A3161,#C6CBCF
+NED_denzel_dumfries,Denzel DUMFRIES,NED,Netherlands,DF,22,2,4,4,257,#F36C21,#1E2A4A,#F9D8C1
+AUT_xaver_schlager,Xaver SCHLAGER,AUT,Austria,MF,4,2,4,4,255,#ED2939,#FFFFFF,#F8CAC6
+BIH_sead_kolasinac,Sead KOLASINAC,BIH,Bosnia and Herzegovina,DF,5,2,4,4,255,#1D3C9A,#FECB00,#CACEDC
+COD_samuel_moutoussamy,Samuel MOUTOUSSAMY,COD,Congo DR,MF,8,2,4,4,252,#007FFF,#CE1021,#C4DDF2
+CPV_kevin_pina,KEVIN PINA,CPV,Cabo Verde,MF,6,2,4,4,249,#003893,#CF2027,#C4CDDA
+ECU_gonzalo_plata,Gonzalo PLATA,ECU,Ecuador,FW,19,2,4,4,249,#FFD100,#0072CE,#FCEFBA
+AUS_aiden_oneill,Aiden ONEILL,AUS,Australia,MF,13,2,4,4,246,#FFCD00,#00843D,#FCEEBA
+CAN_derek_cornelius,Derek CORNELIUS,CAN,Canada,DF,13,2,4,4,245,#D80621,#FFFFFF,#F3C2C1
+CRO_ivan_perisic,Ivan PERISIC,CRO,Croatia,FW,14,2,4,4,244,#D52B1E,#FFFFFF,#F3CAC0
+ALG_ibrahim_maza,Ibrahim MAZA,ALG,Algeria,MF,22,2,4,4,236,#0B7A3E,#FFFFFF,#C6DCC7
+AUT_marcel_sabitzer,Marcel SABITZER,AUT,Austria,MF,9,2,4,4,236,#ED2939,#FFFFFF,#F8CAC6
+COD_chancel_mbemba,Chancel MBEMBA,COD,Congo DR,DF,22,2,4,4,235,#007FFF,#CE1021,#C4DDF2
+MEX_jesus_gallardo,Jesus GALLARDO,MEX,Mexico,DF,23,2,4,5,234,#006847,#CE1126,#C4D8C9
+NOR_julian_ryerson,Julian RYERSON,NOR,Norway,FW,26,2,4,4,231,#BA0C2F,#00205B,#EDC3C4
+NED_ryan_gravenberch,Ryan GRAVENBERCH,NED,Netherlands,MF,8,2,4,4,230,#F36C21,#1E2A4A,#F9D8C1
+GER_kai_havertz,Kai HAVERTZ,GER,Germany,FW,7,2,4,4,227,#FFFFFF,#1A1A1A,#CAC6BF
+GER_felix_nmecha,Felix NMECHA,GER,Germany,MF,23,2,4,4,225,#FFFFFF,#1A1A1A,#CAC6BF
+GER_manuel_neuer,Manuel NEUER,GER,Germany,GK,1,2,4,4,223,#FFFFFF,#1A1A1A,#CAC6BF
+RSA_aubrey_modiba,Aubrey MODIBA,RSA,South Africa,DF,6,2,4,4,215,#FFB81C,#007749,#FCE9C0
+CPV_vozinha,VOZINHA,CPV,Cabo Verde,GK,1,2,4,4,211,#003893,#CF2027,#C4CDDA
+ECU_alan_franco,Alan FRANCO,ECU,Ecuador,MF,21,2,4,4,210,#FFD100,#0072CE,#FCEFBA
+AUT_konrad_laimer,Konrad LAIMER,AUT,Austria,MF,20,2,4,4,209,#ED2939,#FFFFFF,#F8CAC6
+AUS_jordan_bos,Jordan BOS,AUS,Australia,DF,5,2,4,4,206,#FFCD00,#00843D,#FCEEBA
+JPN_keito_nakamura,Keito NAKAMURA,JPN,Japan,MF,13,2,4,4,205,#0A3A8C,#FFFFFF,#C6CDD8
+COD_arthur_masuaku,Arthur MASUAKU,COD,Congo DR,DF,26,2,4,4,201,#007FFF,#CE1021,#C4DDF2
+AUT_stefan_posch,Stefan POSCH,AUT,Austria,DF,5,2,4,4,200,#ED2939,#FFFFFF,#F8CAC6
+BEL_jeremy_doku,Jeremy DOKU,BEL,Belgium,FW,11,2,4,5,200,#C8102E,#FDDA24,#F0C4C4
+CRO_dominik_livakovic,Dominik LIVAKOVIC,CRO,Croatia,GK,1,2,4,4,195,#D52B1E,#FFFFFF,#F3CAC0
+ENG_noni_madueke,Noni MADUEKE,ENG,England,FW,20,2,4,5,192,#FFFFFF,#1D2C5E,#CACACE
+MEX_jorge_sanchez,Jorge SANCHEZ,MEX,Mexico,DF,2,2,4,4,191,#006847,#CE1126,#C4D8C9
+USA_sergino_dest,Sergino DEST,USA,USA,DF,2,2,4,5,191,#FFFFFF,#0A3161,#C6CBCF
+MEX_luis_romo,Luis ROMO,MEX,Mexico,MF,7,2,4,4,189,#006847,#CE1126,#C4D8C9
+BRA_matheus_cunha,MATHEUS CUNHA,BRA,Brazil,FW,9,2,4,5,187,#FFDF00,#009C3B,#FCF2BA
+ECU_john_yeboah,John YEBOAH,ECU,Ecuador,FW,9,2,4,4,182,#FFD100,#0072CE,#FCEFBA
+SWE_gabriel_gudmundsson,Gabriel GUDMUNDSSON,SWE,Sweden,DF,5,2,4,4,182,#FECC00,#006AA7,#FCEEBA
+AUT_alexander_schlager,Alexander SCHLAGER,AUT,Austria,GK,1,2,4,4,181,#ED2939,#FFFFFF,#F8CAC6
+NED_cody_gakpo,Cody GAKPO,NED,Netherlands,FW,11,2,4,4,179,#F36C21,#1E2A4A,#F9D8C1
+JPN_ritsu_doan,Ritsu DOAN,JPN,Japan,MF,10,2,4,4,175,#0A3A8C,#FFFFFF,#C6CDD8
+COD_aaron_wan_bissaka,Aaron WAN-BISSAKA,COD,Congo DR,DF,2,2,4,4,170,#007FFF,#CE1021,#C4DDF2
+SWE_yasin_ayari,Yasin AYARI,SWE,Sweden,MF,18,2,4,4,164,#FECC00,#006AA7,#FCEEBA
+NED_bart_verbruggen,Bart VERBRUGGEN,NED,Netherlands,GK,1,2,4,4,163,#F36C21,#1E2A4A,#F9D8C1
+ARG_lautaro_martinez,Lautaro MARTINEZ,ARG,Argentina,FW,22,2,4,7,160,#75AADB,#FFFFFF,#DEE6EA
+BIH_nikola_vasilj,Nikola VASILJ,BIH,Bosnia and Herzegovina,GK,1,2,4,4,159,#1D3C9A,#FECB00,#CACEDC
+COD_lionel_mpasi,Lionel MPASI,COD,Congo DR,GK,1,2,4,4,159,#007FFF,#CE1021,#C4DDF2
+CRO_martin_baturina,Martin BATURINA,CRO,Croatia,MF,16,2,4,4,159,#D52B1E,#FFFFFF,#F3CAC0
+JPN_zion_suzuki,Zion SUZUKI,JPN,Japan,GK,1,2,4,4,152,#0A3A8C,#FFFFFF,#C6CDD8
+SWE_alexander_isak,Alexander ISAK,SWE,Sweden,FW,9,2,4,4,151,#FECC00,#006AA7,#FCEEBA
+CIV_yahia_fofana,Yahia FOFANA,CIV,Côte d'Ivoire,GK,1,2,4,4,150,#FF8200,#009E60,#FCDDBA
+NOR_antonio_nusa,Antonio NUSA,NOR,Norway,FW,20,2,4,6,147,#BA0C2F,#00205B,#EDC3C4
+COD_yoane_wissa,Yoane WISSA,COD,Congo DR,FW,20,2,4,4,143,#007FFF,#CE1021,#C4DDF2
+CPV_ryan_mendes,RYAN MENDES,CPV,Cabo Verde,FW,20,2,4,4,143,#003893,#CF2027,#C4CDDA
+PAR_diego_gomez,Diego GOMEZ,PAR,Paraguay,MF,8,2,4,4,137,#D52B1E,#FFFFFF,#F3CAC0
+SEN_ismaila_sarr,Ismaila SARR,SEN,Senegal,FW,18,2,4,4,136,#FFFFFF,#00853F,#C4DEC8
+AUT_romano_schmid,Romano SCHMID,AUT,Austria,MF,18,2,4,4,134,#ED2939,#FFFFFF,#F8CAC6
+MEX_raul_jimenez,Raul JIMENEZ,MEX,Mexico,FW,9,2,4,4,131,#006847,#CE1126,#C4D8C9
+PAR_matias_galarza,Matias GALARZA,PAR,Paraguay,MF,23,2,4,4,130,#D52B1E,#FFFFFF,#F3CAC0
+PAR_junior_alonso,Junior ALONSO,PAR,Paraguay,DF,6,2,4,5,127,#D52B1E,#FFFFFF,#F3CAC0
+USA_matt_freese,Matt FREESE,USA,USA,GK,24,2,4,4,127,#FFFFFF,#0A3161,#C6CBCF
+ECU_hernan_galindez,Hernan GALINDEZ,ECU,Ecuador,GK,1,2,4,4,125,#FFD100,#0072CE,#FCEFBA
+PAR_miguel_almiron,Miguel ALMIRON,PAR,Paraguay,MF,10,2,4,4,124,#D52B1E,#FFFFFF,#F3CAC0
+SWE_viktor_gyokeres,Viktor GYOKERES,SWE,Sweden,FW,17,2,4,4,124,#FECC00,#006AA7,#FCEEBA
+AUS_patrick_beach,Patrick BEACH,AUS,Australia,GK,18,2,4,4,123,#FFCD00,#00843D,#FCEEBA
+GHA_antoine_semenyo,Antoine SEMENYO,GHA,Ghana,MF,11,2,4,4,123,#FFFFFF,#FCD116,#FBEFBE
+ECU_enner_valencia,Enner VALENCIA,ECU,Ecuador,FW,13,2,4,4,114,#FFD100,#0072CE,#FCEFBA
+GHA_marvin_senaya,Marvin SENAYA,GHA,Ghana,DF,26,2,4,4,104,#FFFFFF,#FCD116,#FBEFBE
+BIH_ermedin_demirovic,Ermedin DEMIROVIC,BIH,Bosnia and Herzegovina,FW,10,2,4,4,96,#1D3C9A,#FECB00,#CACEDC
+JPN_ayase_ueda,Ayase UEDA,JPN,Japan,FW,18,2,4,4,85,#0A3A8C,#FFFFFF,#C6CDD8
+GHA_jordan_ayew,Jordan AYEW,GHA,Ghana,FW,9,2,4,4,82,#FFFFFF,#FCD116,#FBEFBE
+USA_folarin_balogun,Folarin BALOGUN,USA,USA,FW,20,2,4,4,78,#FFFFFF,#0A3161,#C6CBCF
+ALG_nabil_bentaleb,Nabil BENTALEB,ALG,Algeria,MF,19,2,3,4,470,#0B7A3E,#FFFFFF,#C6DCC7
+EGY_ramy_rabia,RAMY RABIA,EGY,Egypt,DF,5,2,3,5,427,#CE1126,#1A1A1A,#F1C4C2
+CRO_marin_pongracic,Marin PONGRACIC,CRO,Croatia,DF,3,2,3,3,372,#D52B1E,#FFFFFF,#F3CAC0
+TUR_arda_guler,Arda GULER,TUR,Türkiye,FW,8,2,3,3,372,#E30A17,#FFFFFF,#F6C3BF
+KOR_kim_minjae,KIM Minjae,KOR,Korea Republic,DF,4,2,3,3,371,#C60C30,#0047A0,#EFC3C4
+KOR_lee_hanbeom,LEE Hanbeom,KOR,Korea Republic,DF,2,2,3,3,364,#C60C30,#0047A0,#EFC3C4
+BEL_nicolas_raskin,Nicolas RASKIN,BEL,Belgium,MF,23,2,3,6,348,#C8102E,#FDDA24,#F0C4C4
+CRO_mateo_kovacic,Mateo KOVACIC,CRO,Croatia,MF,8,2,3,4,348,#D52B1E,#FFFFFF,#F3CAC0
+KOR_hwang_inbeom,HWANG Inbeom,KOR,Korea Republic,MF,6,2,3,3,347,#C60C30,#0047A0,#EFC3C4
+ALG_rayan_ait_nouri,Rayan AIT-NOURI,ALG,Algeria,DF,15,2,3,4,342,#0B7A3E,#FFFFFF,#C6DCC7
+ENG_john_stones,John STONES,ENG,England,DF,5,2,3,5,336,#FFFFFF,#1D2C5E,#CACACE
+RSA_teboho_mokoena,Teboho MOKOENA,RSA,South Africa,MF,4,2,3,3,335,#FFB81C,#007749,#FCE9C0
+ARG_thiago_almada,Thiago ALMADA,ARG,Argentina,FW,16,2,3,5,319,#75AADB,#FFFFFF,#DEE6EA
+SCO_jack_hendry,Jack HENDRY,SCO,Scotland,DF,13,2,3,3,309,#0B2A5B,#FFFFFF,#C6CACE
+EGY_ahmed_fatouh,AHMED FATOUH,EGY,Egypt,DF,13,2,3,3,290,#CE1126,#1A1A1A,#F1C4C2
+NOR_fredrik_aursnes,Fredrik AURSNES,NOR,Norway,MF,14,2,3,6,287,#BA0C2F,#00205B,#EDC3C4
+URU_sebastian_caceres,Sebastian CACERES,URU,Uruguay,DF,3,2,3,3,286,#5CBFEB,#1A1A1A,#D8EBED
+BEL_hans_vanaken,Hans VANAKEN,BEL,Belgium,MF,20,2,3,6,277,#C8102E,#FDDA24,#F0C4C4
+URU_rodrigo_bentancur,Rodrigo BENTANCUR,URU,Uruguay,MF,6,2,3,3,276,#5CBFEB,#1A1A1A,#D8EBED
+ENG_reece_james,Reece JAMES,ENG,England,DF,24,2,3,5,275,#FFFFFF,#1D2C5E,#CACACE
+KOR_lee_kangin,LEE Kangin,KOR,Korea Republic,MF,19,2,3,3,269,#C60C30,#0047A0,#EFC3C4
+SEN_pape_gueye,Pape GUEYE,SEN,Senegal,MF,26,2,3,4,264,#FFFFFF,#00853F,#C4DEC8
+ARG_facundo_medina,Facundo MEDINA,ARG,Argentina,DF,25,2,3,5,256,#75AADB,#FFFFFF,#DEE6EA
+GHA_thomas_partey,Thomas PARTEY,GHA,Ghana,MF,5,2,3,3,251,#FFFFFF,#FCD116,#FBEFBE
+ALG_riyad_mahrez,Riyad MAHREZ,ALG,Algeria,FW,7,2,3,4,248,#0B7A3E,#FFFFFF,#C6DCC7
+FRA_theo_hernandez,Theo HERNANDEZ,FRA,France,DF,19,2,3,5,247,#1E2A4A,#E1000F,#CACACA
+CIV_emmanuel_agbadou,Emmanuel AGBADOU,CIV,Côte d'Ivoire,DF,20,2,3,3,246,#FF8200,#009E60,#FCDDBA
+CIV_odilon_kossounou,Odilon KOSSOUNOU,CIV,Côte d'Ivoire,DF,7,2,3,4,245,#FF8200,#009E60,#FCDDBA
+GER_nathaniel_brown,Nathaniel BROWN,GER,Germany,DF,18,2,3,3,242,#FFFFFF,#1A1A1A,#CAC6BF
+KOR_paik_seungho,PAIK Seungho,KOR,Korea Republic,MF,8,2,3,3,240,#C60C30,#0047A0,#EFC3C4
+NZL_finn_surman,Finn SURMAN,NZL,New Zealand,DF,16,2,3,3,240,#FFFFFF,#1A1A1A,#CAC6BF
+URU_manuel_ugarte,Manuel UGARTE,URU,Uruguay,MF,5,2,3,3,237,#5CBFEB,#1A1A1A,#D8EBED
+BIH_tarik_muharemovic,Tarik MUHAREMOVIC,BIH,Bosnia and Herzegovina,DF,4,2,3,3,236,#1D3C9A,#FECB00,#CACEDC
+EGY_hamdy_fathy,HAMDY FATHY,EGY,Egypt,MF,14,2,3,4,236,#CE1126,#1A1A1A,#F1C4C2
+HAI_ricardo_ade,Ricardo ADE,HAI,Haiti,DF,4,2,3,3,234,#00209F,#D21034,#C4C8DD
+CIV_guela_doue,Guela DOUE,CIV,Côte d'Ivoire,DF,17,2,3,4,233,#FF8200,#009E60,#FCDDBA
+ENG_marcus_rashford,Marcus RASHFORD,ENG,England,FW,11,2,3,6,229,#FFFFFF,#1D2C5E,#CACACE
+GER_jamal_musiala,Jamal MUSIALA,GER,Germany,MF,10,2,3,4,229,#FFFFFF,#1A1A1A,#CAC6BF
+ENG_bukayo_saka,Bukayo SAKA,ENG,England,FW,7,2,3,7,225,#FFFFFF,#1D2C5E,#CACACE
+ENG_morgan_rogers,Morgan ROGERS,ENG,England,MF,17,2,3,7,225,#FFFFFF,#1D2C5E,#CACACE
+USA_christian_pulisic,Christian PULISIC,USA,USA,FW,10,2,3,4,223,#FFFFFF,#0A3161,#C6CBCF
+NZL_joe_bell,Joe BELL,NZL,New Zealand,MF,6,2,3,3,221,#FFFFFF,#1A1A1A,#CAC6BF
+HAI_jean_ricner_bellegarde,Jean-Ricner BELLEGARDE,HAI,Haiti,MF,10,2,3,3,220,#00209F,#D21034,#C4C8DD
+SCO_andy_robertson,Andy ROBERTSON,SCO,Scotland,DF,3,2,3,3,220,#0B2A5B,#FFFFFF,#C6CACE
+SEN_lamine_camara,Lamine CAMARA,SEN,Senegal,MF,8,2,3,4,220,#FFFFFF,#00853F,#C4DEC8
+CIV_ghislain_konan,Ghislain KONAN,CIV,Côte d'Ivoire,DF,3,2,3,3,217,#FF8200,#009E60,#FCDDBA
+PAN_andres_andrade,Andres ANDRADE,PAN,Panama,DF,16,2,3,3,217,#DA121A,#072357,#F4C5BF
+JPN_kaishu_sano,Kaishu SANO,JPN,Japan,MF,24,2,3,3,215,#0A3A8C,#FFFFFF,#C6CDD8
+RSA_sphephelo_sithole,Sphephelo SITHOLE,RSA,South Africa,MF,13,2,3,3,214,#FFB81C,#007749,#FCE9C0
+CRO_petar_sucic,Petar SUCIC,CRO,Croatia,MF,17,2,3,4,207,#D52B1E,#FFFFFF,#F3CAC0
+TUN_hannibal_mejbri,Hannibal MEJBRI,TUN,Tunisia,MF,10,2,3,3,204,#E70013,#FFFFFF,#F7C1BE
+URU_federico_valverde,Federico VALVERDE,URU,Uruguay,MF,8,2,3,3,202,#5CBFEB,#1A1A1A,#D8EBED
+URU_guillermo_varela,Guillermo VARELA,URU,Uruguay,DF,13,2,3,3,202,#5CBFEB,#1A1A1A,#D8EBED
+ECU_joel_ordonez,Joel ORDONEZ,ECU,Ecuador,DF,4,2,3,3,200,#FFD100,#0072CE,#FCEFBA
+GHA_jonas_adjetey,Jonas ADJETEY,GHA,Ghana,DF,4,2,3,3,199,#FFFFFF,#FCD116,#FBEFBE
+NED_micky_van_de_ven,Micky VAN DE VEN,NED,Netherlands,DF,15,2,3,3,197,#F36C21,#1E2A4A,#F9D8C1
+SWE_isak_hien,Isak HIEN,SWE,Sweden,DF,4,2,3,3,196,#FECC00,#006AA7,#FCEEBA
+IRN_ali_nemati,Ali NEMATI,IRN,IR Iran,DF,19,2,3,3,195,#FFFFFF,#DA0000,#F4C1BA
+IRQ_amir_alammari,AMIR ALAMMARI,IRQ,Iraq,MF,16,2,3,3,193,#007A3D,#FFFFFF,#C4DCC7
+CZE_robin_hranac,Robin HRANAC,CZE,Czechia,DF,4,2,3,3,191,#D7141A,#11457E,#F3C5BF
+IRQ_merchas_doski,MERCHAS DOSKI,IRQ,Iraq,DF,23,2,3,3,189,#007A3D,#FFFFFF,#C4DCC7
+CIV_nicolas_pepe,Nicolas PEPE,CIV,Côte d'Ivoire,FW,19,2,3,4,187,#FF8200,#009E60,#FCDDBA
+PAN_edgar_yoel_barcenas,Edgar Yoel BARCENAS,PAN,Panama,MF,11,2,3,3,187,#DA121A,#072357,#F4C5BF
+BIH_kerim_alajbegovic,Kerim ALAJBEGOVIC,BIH,Bosnia and Herzegovina,FW,19,2,3,4,184,#1D3C9A,#FECB00,#CACEDC
+TUN_ellyes_skhiri,Ellyes SKHIRI,TUN,Tunisia,MF,17,2,3,3,183,#E70013,#FFFFFF,#F7C1BE
+KOR_kim_seunggyu,KIM Seunggyu,KOR,Korea Republic,GK,1,2,3,3,179,#C60C30,#0047A0,#EFC3C4
+HAI_danley_jean_jacques,Danley JEAN JACQUES,HAI,Haiti,MF,17,2,3,3,178,#00209F,#D21034,#C4C8DD
+SCO_scott_mctominay,Scott McTOMINAY,SCO,Scotland,MF,4,2,3,3,178,#0B2A5B,#FFFFFF,#C6CACE
+CPV_jamiro_monteiro,JAMIRO MONTEIRO,CPV,Cabo Verde,MF,10,2,3,4,177,#003893,#CF2027,#C4CDDA
+NZL_elijah_just,Elijah JUST,NZL,New Zealand,MF,11,2,3,3,176,#FFFFFF,#1A1A1A,#CAC6BF
+BRA_rayan,RAYAN,BRA,Brazil,FW,26,2,3,4,174,#FFDF00,#009C3B,#FCF2BA
+CUW_sherel_floranus,Sherel FLORANUS,CUW,Curaçao,DF,5,2,3,3,174,#002B7F,#F9E814,#C4CAD6
+BIH_ivan_sunjic,Ivan SUNJIC,BIH,Bosnia and Herzegovina,MF,14,2,3,4,169,#1D3C9A,#FECB00,#CACEDC
+MEX_gilberto_mora,Gilberto MORA,MEX,Mexico,MF,19,2,3,4,163,#006847,#CE1126,#C4D8C9
+RSA_oswin_appollis,Oswin APPOLLIS,RSA,South Africa,FW,7,2,3,4,162,#FFB81C,#007749,#FCE9C0
+GHA_jerome_opoku,Jerome OPOKU,GHA,Ghana,DF,18,2,3,3,161,#FFFFFF,#FCD116,#FBEFBE
+KOR_seol_youngwoo,SEOL Youngwoo,KOR,Korea Republic,DF,22,2,3,3,160,#C60C30,#0047A0,#EFC3C4
+QAT_akram_afif,AKRAM AFIF,QAT,Qatar,FW,11,2,3,3,159,#8A1538,#FFFFFF,#E2C5C6
+SCO_angus_gunn,Angus GUNN,SCO,Scotland,GK,1,2,3,3,159,#0B2A5B,#FFFFFF,#C6CACE
+PAN_carlos_harvey,Carlos HARVEY,PAN,Panama,DF,14,2,3,3,158,#DA121A,#072357,#F4C5BF
+ALG_luca_zidane,Luca ZIDANE,ALG,Algeria,GK,23,2,3,3,157,#0B7A3E,#FFFFFF,#C6DCC7
+KSA_saud_abdulhamid,SAUD ABDULHAMID,KSA,Saudi Arabia,DF,12,2,3,3,156,#006C35,#FFFFFF,#C4D8C5
+CPV_steven_moreira,STEVEN MOREIRA,CPV,Cabo Verde,DF,22,2,3,4,154,#003893,#CF2027,#C4CDDA
+KSA_abdulelah_alamri,ABDULELAH ALAMRI,KSA,Saudi Arabia,DF,4,2,3,3,154,#006C35,#FFFFFF,#C4D8C5
+NZL_tim_payne,Tim PAYNE,NZL,New Zealand,DF,2,2,3,3,153,#FFFFFF,#1A1A1A,#CAC6BF
+SUI_fabian_rieder,Fabian RIEDER,SUI,Switzerland,MF,22,2,3,5,153,#D52B1E,#FFFFFF,#F3CAC0
+GHA_kwasi_sibo,Kwasi SIBO,GHA,Ghana,MF,8,2,3,4,152,#FFFFFF,#FCD116,#FBEFBE
+QAT_issa_laye,ISSA LAYE,QAT,Qatar,DF,4,2,3,3,151,#8A1538,#FFFFFF,#E2C5C6
+EGY_omar_marmoush,OMAR MARMOUSH,EGY,Egypt,FW,22,2,3,5,149,#CE1126,#1A1A1A,#F1C4C2
+KSA_hassan_altambakti,HASSAN ALTAMBAKTI,KSA,Saudi Arabia,DF,5,2,3,3,149,#006C35,#FFFFFF,#C4D8C5
+TUR_ugurcan_cakir,Ugurcan CAKIR,TUR,Türkiye,GK,23,2,3,3,149,#E30A17,#FFFFFF,#F6C3BF
+CUW_armando_obispo,Armando OBISPO,CUW,Curaçao,DF,18,2,3,3,148,#002B7F,#F9E814,#C4CAD6
+CPV_sidny_lopes_cabral,SIDNY LOPES CABRAL,CPV,Cabo Verde,DF,13,2,3,3,147,#003893,#CF2027,#C4CDDA
+HAI_johny_placide,Johny PLACIDE,HAI,Haiti,GK,1,2,3,3,145,#00209F,#D21034,#C4C8DD
+KSA_salem_aldawsari,SALEM ALDAWSARI,KSA,Saudi Arabia,FW,10,2,3,3,145,#006C35,#FFFFFF,#C4D8C5
+SUI_ruben_vargas,Ruben VARGAS,SUI,Switzerland,FW,17,2,3,6,144,#D52B1E,#FFFFFF,#F3CAC0
+IRN_saeid_ezatolahi,Saeid EZATOLAHI,IRN,IR Iran,MF,6,2,3,3,143,#FFFFFF,#DA0000,#F4C1BA
+NZL_sarpreet_singh,Sarpreet SINGH,NZL,New Zealand,MF,10,2,3,3,143,#FFFFFF,#1A1A1A,#CAC6BF
+JOR_noor_alrawabdeh,NOOR ALRAWABDEH,JOR,Jordan,MF,8,2,3,3,142,#CE1126,#FFFFFF,#F1C4C2
+ALG_amine_gouiri,Amine GOUIRI,ALG,Algeria,FW,9,2,3,4,140,#0B7A3E,#FFFFFF,#C6DCC7
+HAI_martin_experience,Martin EXPERIENCE,HAI,Haiti,DF,8,2,3,3,140,#00209F,#D21034,#C4C8DD
+PAN_jose_luis_rodriguez,Jose Luis RODRIGUEZ,PAN,Panama,MF,7,2,3,3,137,#DA121A,#072357,#F4C5BF
+PAN_amir_murillo,Amir MURILLO,PAN,Panama,DF,23,2,3,3,136,#DA121A,#072357,#F4C5BF
+CZE_vladimir_coufal,Vladimir COUFAL,CZE,Czechia,DF,5,2,3,3,133,#D7141A,#11457E,#F3C5BF
+ENG_jarell_quansah,Jarell QUANSAH,ENG,England,DF,26,2,3,3,131,#FFFFFF,#1D2C5E,#CACACE
+IRN_ramin_rezaeian,Ramin REZAEIAN,IRN,IR Iran,DF,23,2,3,3,128,#FFFFFF,#DA0000,#F4C1BA
+AUS_connor_metcalfe,Connor METCALFE,AUS,Australia,MF,8,2,3,4,127,#FFCD00,#00843D,#FCEEBA
+PAN_orlando_mosquera,Orlando MOSQUERA,PAN,Panama,GK,22,2,3,3,126,#DA121A,#072357,#F4C5BF
+CUW_juninho_bacuna,Juninho BACUNA,CUW,Curaçao,MF,7,2,3,3,123,#002B7F,#F9E814,#C4CAD6
+IRN_mehdi_taremi,Mehdi TAREMI,IRN,IR Iran,FW,9,2,3,3,123,#FFFFFF,#DA0000,#F4C1BA
+NZL_liberato_cacace,Liberato CACACE,NZL,New Zealand,DF,13,2,3,3,122,#FFFFFF,#1A1A1A,#CAC6BF
+BIH_amar_dedic,Amar DEDIC,BIH,Bosnia and Herzegovina,DF,7,2,3,3,120,#1D3C9A,#FECB00,#CACEDC
+PAN_cristian_martinez,Cristian MARTINEZ,PAN,Panama,MF,6,2,3,3,120,#DA121A,#072357,#F4C5BF
+RSA_thapelo_maseko,Thapelo MASEKO,RSA,South Africa,FW,12,2,3,3,120,#FFB81C,#007749,#FCE9C0
+COD_ngalayel_mukau,Ngalayel MUKAU,COD,Congo DR,MF,6,2,3,4,117,#007FFF,#CE1021,#C4DDF2
+JOR_abdallah_nasib,ABDALLAH NASIB,JOR,Jordan,DF,3,2,3,3,116,#CE1126,#FFFFFF,#F1C4C2
+SCO_john_mcginn,John McGINN,SCO,Scotland,MF,7,2,3,3,116,#0B2A5B,#FFFFFF,#C6CACE
+IRN_alireza_beiranvand,Alireza BEIRANVAND,IRN,IR Iran,GK,1,2,3,3,115,#FFFFFF,#DA0000,#F4C1BA
+CZE_matej_kovar,Matej KOVAR,CZE,Czechia,GK,1,2,3,3,114,#D7141A,#11457E,#F3C5BF
+JOR_ehsan_haddad,EHSAN HADDAD,JOR,Jordan,DF,23,2,3,3,114,#CE1126,#FFFFFF,#F1C4C2
+CUW_livano_comenencia,Livano COMENENCIA,CUW,Curaçao,MF,8,2,3,3,113,#002B7F,#F9E814,#C4CAD6
+POR_joao_felix,JOAO FELIX,POR,Portugal,FW,11,2,3,3,111,#A6192E,#006600,#E8C6C4
+URU_fernando_muslera,Fernando MUSLERA,URU,Uruguay,GK,23,2,3,3,111,#5CBFEB,#1A1A1A,#D8EBED
+URU_maxi_araujo,Maxi ARAUJO,URU,Uruguay,MF,20,2,3,3,111,#5CBFEB,#1A1A1A,#D8EBED
+CAN_ali_ahmed,Ali AHMED,CAN,Canada,FW,20,2,3,4,108,#D80621,#FFFFFF,#F3C2C1
+GHA_caleb_yirenkyi,Caleb YIRENKYI,GHA,Ghana,MF,3,2,3,4,108,#FFFFFF,#FCD116,#FBEFBE
+NED_donyell_malen,Donyell MALEN,NED,Netherlands,FW,18,2,3,3,108,#F36C21,#1E2A4A,#F9D8C1
+QAT_pedro_miguel,PEDRO MIGUEL,QAT,Qatar,DF,2,2,3,3,107,#8A1538,#FFFFFF,#E2C5C6
+JOR_nizar_alrashdan,NIZAR ALRASHDAN,JOR,Jordan,MF,21,2,3,3,106,#CE1126,#FFFFFF,#F1C4C2
+NED_tijjani_reijnders,Tijjani REIJNDERS,NED,Netherlands,MF,14,2,3,3,105,#F36C21,#1E2A4A,#F9D8C1
+COL_luis_suarez,Luis SUAREZ,COL,Colombia,FW,25,2,3,5,104,#FCD116,#003893,#FBEFBE
+JOR_ali_olwan,ALI OLWAN,JOR,Jordan,FW,9,2,3,3,103,#CE1126,#FFFFFF,#F1C4C2
+NZL_max_crocombe,Max CROCOMBE,NZL,New Zealand,GK,1,2,3,3,103,#FFFFFF,#1A1A1A,#CAC6BF
+CUW_eloy_room,Eloy ROOM,CUW,Curaçao,GK,1,2,3,3,102,#002B7F,#F9E814,#C4CAD6
+CUW_tahith_chong,Tahith CHONG,CUW,Curaçao,MF,21,2,3,3,102,#002B7F,#F9E814,#C4CAD6
+KSA_abdullah_alkhaibari,ABDULLAH ALKHAIBARI,KSA,Saudi Arabia,MF,15,2,3,3,102,#006C35,#FFFFFF,#C4D8C5
+TUN_anis_slimane,Anis SLIMANE,TUN,Tunisia,MF,25,2,3,3,102,#E70013,#FFFFFF,#F7C1BE
+JOR_mohannad_abutaha,MOHANNAD ABUTAHA,JOR,Jordan,MF,20,2,3,3,101,#CE1126,#FFFFFF,#F1C4C2
+IRN_mohammad_mohebbi,Mohammad MOHEBBI,IRN,IR Iran,MF,8,2,3,3,100,#FFFFFF,#DA0000,#F4C1BA
+CAN_tani_oluwaseyi,Tani OLUWASEYI,CAN,Canada,FW,12,2,3,5,99,#D80621,#FFFFFF,#F3C2C1
+IRN_saman_ghoddos,Saman GHODDOS,IRN,IR Iran,MF,14,2,3,3,99,#FFFFFF,#DA0000,#F4C1BA
+CUW_deveron_fonville,Deveron FONVILLE,CUW,Curaçao,DF,24,2,3,3,98,#002B7F,#F9E814,#C4CAD6
+CUW_juergen_locadia,Juergen LOCADIA,CUW,Curaçao,FW,9,2,3,3,95,#002B7F,#F9E814,#C4CAD6
+NZL_chris_wood,Chris WOOD,NZL,New Zealand,FW,9,2,3,3,95,#FFFFFF,#1A1A1A,#CAC6BF
+SWE_alexander_bernhardsson,Alexander BERNHARDSSON,SWE,Sweden,DF,21,2,3,3,95,#FECC00,#006AA7,#FCEEBA
+TUN_yan_valery,Yan VALERY,TUN,Tunisia,DF,20,2,3,3,91,#E70013,#FFFFFF,#F7C1BE
+TUN_ali_abdi,Ali ABDI,TUN,Tunisia,DF,2,2,3,3,90,#E70013,#FFFFFF,#F7C1BE
+HAI_ruben_providence,Ruben PROVIDENCE,HAI,Haiti,FW,15,2,3,3,88,#00209F,#D21034,#C4C8DD
+JPN_daizen_maeda,Daizen MAEDA,JPN,Japan,MF,11,2,3,3,87,#0A3A8C,#FFFFFF,#C6CDD8
+IRQ_ibrahim_bayesh,IBRAHIM BAYESH,IRQ,Iraq,MF,8,2,3,3,78,#007A3D,#FFFFFF,#C4DCC7
+KSA_mohammed_alowais,MOHAMMED ALOWAIS,KSA,Saudi Arabia,GK,21,2,3,3,78,#006C35,#FFFFFF,#C4D8C5
+QAT_mahmoud_abunada,MAHMOUD ABUNADA,QAT,Qatar,GK,1,2,3,3,75,#8A1538,#FFFFFF,#E2C5C6
+BIH_edin_dzeko,Edin DZEKO,BIH,Bosnia and Herzegovina,FW,11,2,3,3,71,#1D3C9A,#FECB00,#CACEDC
+JOR_yazeed_abulaila,YAZEED ABULAILA,JOR,Jordan,GK,1,2,3,3,71,#CE1126,#FFFFFF,#F1C4C2
+KSA_feras_albrikan,FERAS ALBRIKAN,KSA,Saudi Arabia,FW,9,2,3,3,70,#006C35,#FFFFFF,#C4D8C5
+CIV_ange_yoan_bonny,Ange-Yoan BONNY,CIV,Côte d'Ivoire,FW,9,2,3,4,69,#FF8200,#009E60,#FCDDBA
+QAT_edmilson_junior,EDMILSON JUNIOR,QAT,Qatar,FW,8,2,3,3,69,#8A1538,#FFFFFF,#E2C5C6
+AUS_nestory_irankunda,Nestory IRANKUNDA,AUS,Australia,FW,17,2,3,4,68,#FFCD00,#00843D,#FCEEBA
+COD_cedric_bakambu,Cedric BAKAMBU,COD,Congo DR,FW,17,2,3,3,62,#007FFF,#CE1021,#C4DDF2
+QAT_jassem_gaber,JASSEM GABER,QAT,Qatar,DF,5,2,3,3,53,#8A1538,#FFFFFF,#E2C5C6
+NED_brian_brobbey,Brian BROBBEY,NED,Netherlands,FW,19,2,3,4,50,#F36C21,#1E2A4A,#F9D8C1
+GER_antonio_ruediger,Antonio RUEDIGER,GER,Germany,DF,2,2,2,4,425,#FFFFFF,#1A1A1A,#CAC6BF
+TUR_hakan_calhanoglu,Hakan CALHANOGLU,TUR,Türkiye,MF,10,2,2,2,326,#E30A17,#FFFFFF,#F6C3BF
+AUT_kevin_danso,Kevin DANSO,AUT,Austria,DF,3,2,2,4,283,#ED2939,#FFFFFF,#F8CAC6
+JPN_ao_tanaka,Ao TANAKA,JPN,Japan,MF,7,2,2,3,269,#0A3A8C,#FFFFFF,#C6CDD8
+MAR_anass_salah_eddine,Anass SALAH EDDINE,MAR,Morocco,DF,26,2,2,4,264,#C1272D,#006233,#EEC9C4
+TUR_ferdi_kadioglu,Ferdi KADIOGLU,TUR,Türkiye,DF,20,2,2,2,261,#E30A17,#FFFFFF,#F6C3BF
+ESP_marcos_llorente,Marcos LLORENTE,ESP,Spain,DF,5,2,2,3,258,#C60B1E,#FFC400,#EFC3C0
+BIH_stjepan_radeljic,Stjepan RADELJIC,BIH,Bosnia and Herzegovina,DF,21,2,2,2,253,#1D3C9A,#FECB00,#CACEDC
+MEX_edson_alvarez,Edson ALVAREZ,MEX,Mexico,DF,4,2,2,4,248,#006847,#CE1126,#C4D8C9
+BEL_arthur_theate,Arthur THEATE,BEL,Belgium,DF,3,2,2,3,245,#C8102E,#FDDA24,#F0C4C4
+AUT_philipp_lienhart,Philipp LIENHART,AUT,Austria,DF,15,2,2,2,243,#ED2939,#FFFFFF,#F8CAC6
+TUR_merih_demiral,Merih DEMIRAL,TUR,Türkiye,DF,3,2,2,2,230,#E30A17,#FFFFFF,#F6C3BF
+PAN_jiovany_ramos,Jiovany RAMOS,PAN,Panama,DF,13,2,2,2,228,#DA121A,#072357,#F4C5BF
+IRQ_zidane_iqbal,ZIDANE IQBAL,IRQ,Iraq,MF,14,2,2,3,223,#007A3D,#FFFFFF,#C4DCC7
+CIV_christ_inao_oulai,Christ Inao OULAI,CIV,Côte d'Ivoire,MF,26,2,2,4,220,#FF8200,#009E60,#FCDDBA
+FRA_maxence_lacroix,Maxence LACROIX,FRA,France,DF,26,2,2,3,217,#1E2A4A,#E1000F,#CACACA
+TUR_kenan_yildiz,Kenan YILDIZ,TUR,Türkiye,FW,11,2,2,3,217,#E30A17,#FFFFFF,#F6C3BF
+JPN_shogo_taniguchi,Shogo TANIGUCHI,JPN,Japan,DF,3,2,2,3,209,#0A3A8C,#FFFFFF,#C6CDD8
+GHA_derrick_luckassen,Derrick LUCKASSEN,GHA,Ghana,DF,23,2,2,2,206,#FFFFFF,#FCD116,#FBEFBE
+MAR_redouane_halhal,Redouane HALHAL,MAR,Morocco,DF,25,2,2,2,202,#C1272D,#006233,#EEC9C4
+BEL_thomas_meunier,Thomas MEUNIER,BEL,Belgium,DF,15,2,2,3,200,#C8102E,#FDDA24,#F0C4C4
+JPN_takehiro_tomiyasu,Takehiro TOMIYASU,JPN,Japan,DF,22,2,2,3,198,#0A3A8C,#FFFFFF,#C6CDD8
+AUS_jackson_irvine,Jackson IRVINE,AUS,Australia,MF,22,2,2,4,197,#FFCD00,#00843D,#FCEEBA
+NED_nathan_ake,Nathan AKE,NED,Netherlands,DF,5,2,2,3,193,#F36C21,#1E2A4A,#F9D8C1
+GER_nico_schlotterbeck,Nico SCHLOTTERBECK,GER,Germany,DF,15,2,2,2,192,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_michael_boxall,Michael BOXALL,NZL,New Zealand,DF,5,2,2,3,192,#FFFFFF,#1A1A1A,#CAC6BF
+JPN_kou_itakura,Kou ITAKURA,JPN,Japan,DF,4,2,2,2,190,#0A3A8C,#FFFFFF,#C6CDD8
+SCO_grant_hanley,Grant HANLEY,SCO,Scotland,DF,5,2,2,2,185,#0B2A5B,#FFFFFF,#C6CACE
+ALG_ramiz_zerrouki,Ramiz ZERROUKI,ALG,Algeria,MF,6,2,2,3,182,#0B7A3E,#FFFFFF,#C6DCC7
+TUR_ismail_yuksek,Ismail YUKSEK,TUR,Türkiye,MF,16,2,2,2,181,#E30A17,#FFFFFF,#F6C3BF
+CAN_moise_bombito,Moise BOMBITO,CAN,Canada,DF,15,2,2,3,179,#D80621,#FFFFFF,#F3C2C1
+CAN_ismael_kone,Ismael KONE,CAN,Canada,MF,8,2,2,2,176,#D80621,#FFFFFF,#F3C2C1
+EGY_karim_hafez,KARIM HAFEZ,EGY,Egypt,DF,15,2,2,3,176,#CE1126,#1A1A1A,#F1C4C2
+MEX_israel_reyes,Israel REYES,MEX,Mexico,DF,15,2,2,4,175,#006847,#CE1126,#C4D8C9
+NOR_andreas_schjelderup,Andreas SCHJELDERUP,NOR,Norway,MF,21,2,2,6,175,#BA0C2F,#00205B,#EDC3C4
+AUS_lucas_herrington,Lucas HERRINGTON,AUS,Australia,DF,25,2,2,2,174,#FFCD00,#00843D,#FCEEBA
+BIH_benjamin_tahirovic,Benjamin TAHIROVIC,BIH,Bosnia and Herzegovina,MF,6,2,2,4,171,#1D3C9A,#FECB00,#CACEDC
+COD_noah_sadiki,Noah SADIKI,COD,Congo DR,MF,14,2,2,4,171,#007FFF,#CE1021,#C4DDF2
+KSA_nasser_aldawsari,NASSER ALDAWSARI,KSA,Saudi Arabia,MF,6,2,2,3,171,#006C35,#FFFFFF,#C4D8C5
+ALG_houssem_aouar,Houssem AOUAR,ALG,Algeria,MF,8,2,2,3,170,#0B7A3E,#FFFFFF,#C6DCC7
+ARG_gonzalo_montiel,Gonzalo MONTIEL,ARG,Argentina,DF,4,2,2,6,161,#75AADB,#FFFFFF,#DEE6EA
+BIH_ivan_basic,Ivan BASIC,BIH,Bosnia and Herzegovina,MF,13,2,2,3,161,#1D3C9A,#FECB00,#CACEDC
+ECU_nilson_angulo,Nilson ANGULO,ECU,Ecuador,FW,20,2,2,4,161,#FFD100,#0072CE,#FCEFBA
+SEN_ismail_jakobs,Ismail JAKOBS,SEN,Senegal,DF,14,2,2,3,159,#FFFFFF,#00853F,#C4DEC8
+CPV_deroy_duarte,DEROY DUARTE,CPV,Cabo Verde,MF,14,2,2,4,155,#003893,#CF2027,#C4CDDA
+ALG_hicham_boudaoui,Hicham BOUDAOUI,ALG,Algeria,MF,14,2,2,3,153,#0B7A3E,#FFFFFF,#C6DCC7
+ARG_giuliano_simeone,Giuliano SIMEONE,ARG,Argentina,FW,17,2,2,3,153,#75AADB,#FFFFFF,#DEE6EA
+AUS_paul_okon_engstler,Paul OKON-ENGSTLER,AUS,Australia,MF,24,2,2,4,153,#FFCD00,#00843D,#FCEEBA
+RSA_thalente_mbatha,Thalente MBATHA,RSA,South Africa,MF,5,2,2,4,153,#FFB81C,#007749,#FCE9C0
+NZL_callum_mccowatt,Callum McCOWATT,NZL,New Zealand,MF,20,2,2,3,150,#FFFFFF,#1A1A1A,#CAC6BF
+SUI_djibril_sow,Djibril SOW,SUI,Switzerland,MF,15,2,2,4,150,#D52B1E,#FFFFFF,#F3CAC0
+CIV_amad_diallo,Amad DIALLO,CIV,Côte d'Ivoire,FW,15,2,2,4,149,#FF8200,#009E60,#FCDDBA
+CIV_wilfried_singo,Wilfried SINGO,CIV,Côte d'Ivoire,DF,5,2,2,2,148,#FF8200,#009E60,#FCDDBA
+SCO_nathan_patterson,Nathan PATTERSON,SCO,Scotland,DF,22,2,2,3,148,#0B2A5B,#FFFFFF,#C6CACE
+JPN_junya_ito,Junya ITO,JPN,Japan,MF,14,2,2,4,147,#0A3A8C,#FFFFFF,#C6CDD8
+CRO_josko_gvardiol,Josko GVARDIOL,CRO,Croatia,DF,4,2,2,4,146,#D52B1E,#FFFFFF,#F3CAC0
+CAN_nathan_saliba,Nathan SALIBA,CAN,Canada,MF,25,2,2,3,144,#D80621,#FFFFFF,#F3C2C1
+URU_juan_manuel_sanabria,Juan Manuel SANABRIA,URU,Uruguay,MF,25,2,2,3,144,#5CBFEB,#1A1A1A,#D8EBED
+AUT_paul_wanner,Paul WANNER,AUT,Austria,MF,24,2,2,4,141,#ED2939,#FFFFFF,#F8CAC6
+KOR_son_heungmin,SON Heungmin,KOR,Korea Republic,FW,7,2,2,3,141,#C60C30,#0047A0,#EFC3C4
+SEN_kalidou_koulibaly,Kalidou KOULIBALY,SEN,Senegal,DF,3,2,2,2,141,#FFFFFF,#00853F,#C4DEC8
+TUN_mohamed_amine_ben_hmida,Mohamed Amine BEN HMIDA,TUN,Tunisia,DF,21,2,2,3,139,#E70013,#FFFFFF,#F7C1BE
+AUS_cristian_volpato,Cristian VOLPATO,AUS,Australia,FW,20,2,2,3,138,#FFCD00,#00843D,#FCEEBA
+TUR_orkun_kokcu,Orkun KOKCU,TUR,Türkiye,MF,6,2,2,3,136,#E30A17,#FFFFFF,#F6C3BF
+SWE_anthony_elanga,Anthony ELANGA,SWE,Sweden,FW,11,2,2,4,135,#FECC00,#006AA7,#FCEEBA
+BIH_esmir_bajraktarevic,Esmir BAJRAKTAREVIC,BIH,Bosnia and Herzegovina,FW,20,2,2,4,130,#1D3C9A,#FECB00,#CACEDC
+CZE_michal_sadilek,Michal SADILEK,CZE,Czechia,MF,18,2,2,3,130,#D7141A,#11457E,#F3C5BF
+SEN_el_hadji_malick_diouf,El Hadji Malick DIOUF,SEN,Senegal,DF,25,2,2,3,128,#FFFFFF,#00853F,#C4DEC8
+TUN_omar_rekik,Omar REKIK,TUN,Tunisia,DF,4,2,2,2,127,#E70013,#FFFFFF,#F7C1BE
+KSA_musab_aljuwayr,MUSAB ALJUWAYR,KSA,Saudi Arabia,MF,7,2,2,3,125,#006C35,#FFFFFF,#C4D8C5
+SEN_mory_diaw,Mory DIAW,SEN,Senegal,GK,23,2,2,3,123,#FFFFFF,#00853F,#C4DEC8
+SUI_michel_aebischer,Michel AEBISCHER,SUI,Switzerland,MF,20,2,2,4,123,#D52B1E,#FFFFFF,#F3CAC0
+SUI_johan_manzambi,Johan MANZAMBI,SUI,Switzerland,MF,9,2,2,4,122,#D52B1E,#FFFFFF,#F3CAC0
+URU_agustin_canobbio,Agustin CANOBBIO,URU,Uruguay,MF,14,2,2,3,122,#5CBFEB,#1A1A1A,#D8EBED
+PAN_cesar_blackman,Cesar BLACKMAN,PAN,Panama,DF,2,2,2,2,121,#DA121A,#072357,#F4C5BF
+CAN_liam_millar,Liam MILLAR,CAN,Canada,MF,11,2,2,3,120,#D80621,#FFFFFF,#F3C2C1
+SCO_ben_gannon_doak,Ben GANNON-DOAK,SCO,Scotland,FW,17,2,2,3,119,#0B2A5B,#FFFFFF,#C6CACE
+IRN_milad_mohammadi,Milad MOHAMMADI,IRN,IR Iran,DF,5,2,2,3,118,#FFFFFF,#DA0000,#F4C1BA
+MEX_brian_gutierrez,Brian GUTIERREZ,MEX,Mexico,MF,26,2,2,4,117,#006847,#CE1126,#C4D8C9
+PAR_gustavo_velazquez,Gustavo VELAZQUEZ,PAR,Paraguay,DF,2,2,2,5,114,#D52B1E,#FFFFFF,#F3CAC0
+HAI_carlens_arcus,Carlens ARCUS,HAI,Haiti,DF,2,2,2,3,112,#00209F,#D21034,#C4C8DD
+BEL_amadou_onana,Amadou ONANA,BEL,Belgium,MF,24,2,2,4,111,#C8102E,#FDDA24,#F0C4C4
+TUR_zeki_celik,Zeki CELIK,TUR,Türkiye,DF,2,2,2,2,110,#E30A17,#FFFFFF,#F6C3BF
+CZE_tomas_holes,Tomas HOLES,CZE,Czechia,DF,3,2,2,2,108,#D7141A,#11457E,#F3C5BF
+IRQ_zaid_ismael,ZAID ISMAEL,IRQ,Iraq,MF,24,2,2,2,108,#007A3D,#FFFFFF,#C4DCC7
+UZB_rustam_ashurmatov,Rustam ASHURMATOV,UZB,Uzbekistan,DF,5,2,2,2,107,#0099B5,#FFFFFF,#C4E2E1
+IRQ_zaid_tahseen,ZAID TAHSEEN,IRQ,Iraq,DF,4,2,2,2,105,#007A3D,#FFFFFF,#C4DCC7
+UZB_abdukodir_khusanov,Abdukodir KHUSANOV,UZB,Uzbekistan,DF,2,2,2,2,105,#0099B5,#FFFFFF,#C4E2E1
+SEN_habib_diarra,Habib DIARRA,SEN,Senegal,MF,21,2,2,3,103,#FFFFFF,#00853F,#C4DEC8
+SEN_edouard_mendy,Edouard MENDY,SEN,Senegal,GK,16,2,2,2,102,#FFFFFF,#00853F,#C4DEC8
+AUS_aziz_behich,Aziz BEHICH,AUS,Australia,DF,16,2,2,3,101,#FFCD00,#00843D,#FCEEBA
+CZE_alexandr_sojka,Alexandr SOJKA,CZE,Czechia,MF,24,2,2,3,100,#D7141A,#11457E,#F3C5BF
+GHA_elisha_owusu,Elisha OWUSU,GHA,Ghana,MF,15,2,2,3,99,#FFFFFF,#FCD116,#FBEFBE
+USA_ricardo_pepi,Ricardo PEPI,USA,USA,FW,9,2,2,5,99,#FFFFFF,#0A3161,#C6CBCF
+HAI_josue_casimir,Josue CASIMIR,HAI,Haiti,FW,21,2,2,3,98,#00209F,#D21034,#C4C8DD
+SWE_kristoffer_nordfeldt,Kristoffer NORDFELDT,SWE,Sweden,GK,23,2,2,2,97,#FECC00,#006AA7,#FCEEBA
+AUT_phillip_mwene,Phillip MWENE,AUT,Austria,DF,16,2,2,2,96,#ED2939,#FFFFFF,#F8CAC6
+KSA_moteb_alharbi,MOTEB ALHARBI,KSA,Saudi Arabia,DF,24,2,2,3,96,#006C35,#FFFFFF,#C4D8C5
+HAI_jean_kevin_duverne,Jean-Kevin DUVERNE,HAI,Haiti,DF,22,2,2,2,95,#00209F,#D21034,#C4C8DD
+TUR_baris_alper_yilmaz,Baris Alper YILMAZ,TUR,Türkiye,FW,21,2,2,3,95,#E30A17,#FFFFFF,#F6C3BF
+SWE_benjamin_nygren,Benjamin NYGREN,SWE,Sweden,MF,10,2,2,4,94,#FECC00,#006AA7,#FCEEBA
+UZB_akmal_mozgovoy,Akmal MOZGOVOY,UZB,Uzbekistan,MF,6,2,2,2,94,#0099B5,#FFFFFF,#C4E2E1
+COD_nathanael_mbuku,Nathanael MBUKU,COD,Congo DR,MF,7,2,2,3,90,#007FFF,#CE1021,#C4DDF2
+JOR_husam_abudahab,HUSAM ABUDAHAB,JOR,Jordan,DF,4,2,2,2,90,#CE1126,#FFFFFF,#F1C4C2
+RSA_relebohile_mofokeng,Relebohile MOFOKENG,RSA,South Africa,FW,10,2,2,3,89,#FFB81C,#007749,#FCE9C0
+SEN_nicolas_jackson,Nicolas JACKSON,SEN,Senegal,FW,11,2,2,4,89,#FFFFFF,#00853F,#C4DEC8
+KOR_lee_jaesung,LEE Jaesung,KOR,Korea Republic,MF,10,2,2,2,88,#C60C30,#0047A0,#EFC3C4
+AUS_cameron_burgess,Cameron BURGESS,AUS,Australia,DF,21,2,2,2,86,#FFCD00,#00843D,#FCEEBA
+BRA_raphinha,RAPHINHA,BRA,Brazil,FW,11,2,2,2,86,#FFDF00,#009C3B,#FCF2BA
+COD_brian_cipenga,Brian CIPENGA,COD,Congo DR,FW,9,2,2,2,86,#007FFF,#CE1021,#C4DDF2
+CRO_nikola_vlasic,Nikola VLASIC,CRO,Croatia,MF,13,2,2,3,86,#D52B1E,#FFFFFF,#F3CAC0
+AUS_jacob_italiano,Jacob ITALIANO,AUS,Australia,DF,4,2,2,2,85,#FFCD00,#00843D,#FCEEBA
+JOR_mousa_altamari,MOUSA ALTAMARI,JOR,Jordan,FW,10,2,2,3,83,#CE1126,#FFFFFF,#F1C4C2
+CUW_jurien_gaari,Jurien GAARI,CUW,Curaçao,DF,3,2,2,2,82,#002B7F,#F9E814,#C4CAD6
+URU_darwin_nunez,Darwin NUNEZ,URU,Uruguay,FW,9,2,2,3,82,#5CBFEB,#1A1A1A,#D8EBED
+COD_steve_kapuadi,Steve KAPUADI,COD,Congo DR,DF,3,2,2,2,81,#007FFF,#CE1021,#C4DDF2
+KOR_lee_taeseok,LEE Taeseok,KOR,Korea Republic,DF,13,2,2,2,81,#C60C30,#0047A0,#EFC3C4
+COD_edo_kayembe,Edo KAYEMBE,COD,Congo DR,MF,25,2,2,3,80,#007FFF,#CE1021,#C4DDF2
+CUW_joshua_brenet,Joshua BRENET,CUW,Curaçao,DF,20,2,2,2,80,#002B7F,#F9E814,#C4CAD6
+BIH_amar_memic,Amar MEMIC,BIH,Bosnia and Herzegovina,MF,15,2,2,4,79,#1D3C9A,#FECB00,#CACEDC
+SWE_elliot_stroud,Elliot STROUD,SWE,Sweden,DF,24,2,2,4,77,#FECC00,#006AA7,#FCEEBA
+CZE_pavel_sulc,Pavel SULC,CZE,Czechia,FW,15,2,2,3,75,#D7141A,#11457E,#F3C5BF
+IRQ_ahmed_basil,AHMED BASIL,IRQ,Iraq,GK,22,2,2,2,74,#007A3D,#FFFFFF,#C4DCC7
+CZE_lukas_cerv,Lukas CERV,CZE,Czechia,MF,12,2,2,2,73,#D7141A,#11457E,#F3C5BF
+GHA_benjamin_asare,Benjamin ASARE,GHA,Ghana,GK,16,2,2,3,73,#FFFFFF,#FCD116,#FBEFBE
+GHA_kamaldeen_sulemana,Kamaldeen SULEMANA,GHA,Ghana,FW,22,2,2,2,73,#FFFFFF,#FCD116,#FBEFBE
+CAN_cyle_larin,Cyle LARIN,CAN,Canada,FW,9,2,2,4,72,#D80621,#FFFFFF,#F3C2C1
+RSA_jayden_adams,Jayden ADAMS,RSA,South Africa,MF,23,2,2,3,72,#FFB81C,#007749,#FCE9C0
+CPV_laros_duarte,LAROS DUARTE,CPV,Cabo Verde,MF,15,2,2,4,71,#003893,#CF2027,#C4CDDA
+SWE_jacob_widell_zetterstrom,Jacob WIDELL ZETTERSTROM,SWE,Sweden,GK,1,2,2,2,71,#FECC00,#006AA7,#FCEEBA
+UZB_eldor_shomurodov,Eldor SHOMURODOV,UZB,Uzbekistan,FW,14,2,2,2,70,#0099B5,#FFFFFF,#C4E2E1
+GHA_lawrence_ati_zigi,Lawrence Ati ZIGI,GHA,Ghana,GK,1,2,2,2,67,#FFFFFF,#FCD116,#FBEFBE
+IRN_hossein_kanani,Hossein KANANI,IRN,IR Iran,DF,13,2,2,2,67,#FFFFFF,#DA0000,#F4C1BA
+RSA_iqraam_rayners,Iqraam RAYNERS,RSA,South Africa,FW,15,2,2,4,66,#FFB81C,#007749,#FCE9C0
+COL_jhon_cordoba,Jhon CORDOBA,COL,Colombia,FW,9,2,2,3,62,#FCD116,#003893,#FBEFBE
+RSA_evidence_makgopa,Evidence MAKGOPA,RSA,South Africa,FW,17,2,2,4,62,#FFB81C,#007749,#FCE9C0
+AUT_michael_gregoritsch,Michael GREGORITSCH,AUT,Austria,FW,11,2,2,3,60,#ED2939,#FFFFFF,#F8CAC6
+TUN_rani_khedira,Rani KHEDIRA,TUN,Tunisia,MF,13,2,2,3,60,#E70013,#FFFFFF,#F7C1BE
+CZE_patrik_schick,Patrik SCHICK,CZE,Czechia,FW,10,2,2,3,59,#D7141A,#11457E,#F3C5BF
+SWE_jesper_karlstrom,Jesper KARLSTROM,SWE,Sweden,MF,16,2,2,2,59,#FECC00,#006AA7,#FCEEBA
+IRQ_hussein_ali,HUSSEIN ALI,IRQ,Iraq,DF,3,2,2,2,58,#007A3D,#FFFFFF,#C4DCC7
+IRQ_ali_alhamadi,ALI ALHAMADI,IRQ,Iraq,FW,9,2,2,3,57,#007A3D,#FFFFFF,#C4DCC7
+TUN_elias_saad,Elias SAAD,TUN,Tunisia,FW,8,2,2,2,56,#E70013,#FFFFFF,#F7C1BE
+CZE_adam_hlozek,Adam HLOZEK,CZE,Czechia,FW,9,2,2,3,55,#D7141A,#11457E,#F3C5BF
+PAR_damian_bobadilla,Damian BOBADILLA,PAR,Paraguay,MF,16,2,2,4,55,#D52B1E,#FFFFFF,#F3CAC0
+UZB_sherzod_nasrullaev,Sherzod NASRULLAEV,UZB,Uzbekistan,DF,13,2,2,2,55,#0099B5,#FFFFFF,#C4E2E1
+CPV_jovane_cabral,JOVANE CABRAL,CPV,Cabo Verde,MF,7,2,2,2,53,#003893,#CF2027,#C4CDDA
+IRQ_ali_jasim,ALI JASIM,IRQ,Iraq,FW,17,2,2,2,53,#007A3D,#FFFFFF,#C4DCC7
+TUN_aymen_dahmen,Aymen DAHMEN,TUN,Tunisia,GK,16,2,2,2,53,#E70013,#FFFFFF,#F7C1BE
+SCO_lawrence_shankland,Lawrence SHANKLAND,SCO,Scotland,FW,20,2,2,2,52,#0B2A5B,#FFFFFF,#C6CACE
+IRQ_ahmed_qasem,AHMED QASEM,IRQ,Iraq,FW,11,2,2,3,51,#007A3D,#FFFFFF,#C4DCC7
+PAR_gabriel_avalos,Gabriel AVALOS,PAR,Paraguay,FW,21,2,2,4,48,#D52B1E,#FFFFFF,#F3CAC0
+CRO_ante_budimir,Ante BUDIMIR,CRO,Croatia,FW,11,2,2,3,47,#D52B1E,#FFFFFF,#F3CAC0
+HAI_frantzdy_pierrot,Frantzdy PIERROT,HAI,Haiti,FW,20,2,2,3,45,#00209F,#D21034,#C4C8DD
+QAT_assim_madibo,ASSIM MADIBO,QAT,Qatar,MF,23,2,2,2,44,#8A1538,#FFFFFF,#E2C5C6
+QAT_homam_ahmed,HOMAM AHMED,QAT,Qatar,DF,14,2,2,2,43,#8A1538,#FFFFFF,#E2C5C6
+TUR_kerem_akturkoglu,Kerem AKTURKOGLU,TUR,Türkiye,FW,7,2,2,2,43,#E30A17,#FFFFFF,#F6C3BF
+URU_federico_vinas,Federico VINAS,URU,Uruguay,FW,21,2,2,3,41,#5CBFEB,#1A1A1A,#D8EBED
+AUS_mohamed_toure,Mohamed TOURE,AUS,Australia,FW,9,2,2,3,39,#FFCD00,#00843D,#FCEEBA
+HAI_wilson_isidor,Wilson ISIDOR,HAI,Haiti,FW,18,2,2,3,39,#00209F,#D21034,#C4C8DD
+JOR_odeh_fakhoury,ODEH FAKHOURY,JOR,Jordan,FW,11,2,2,3,39,#CE1126,#FFFFFF,#F1C4C2
+GHA_inaki_williams,Inaki WILLIAMS,GHA,Ghana,FW,19,2,2,2,35,#FFFFFF,#FCD116,#FBEFBE
+SCO_che_adams,Che ADAMS,SCO,Scotland,FW,10,2,2,3,33,#0B2A5B,#FFFFFF,#C6CACE
+CPV_dailon_livramento,DAILON LIVRAMENTO,CPV,Cabo Verde,FW,19,2,2,3,31,#003893,#CF2027,#C4CDDA
+IRQ_aymen_hussein,AYMEN HUSSEIN,IRQ,Iraq,FW,18,2,2,2,28,#007A3D,#FFFFFF,#C4DCC7
+QAT_ayoub_aloui,AYOUB ALOUI,QAT,Qatar,DF,13,2,2,2,28,#8A1538,#FFFFFF,#E2C5C6
+UZB_abbosbek_fayzullaev,Abbosbek FAYZULLAEV,UZB,Uzbekistan,MF,22,2,2,2,27,#0099B5,#FFFFFF,#C4E2E1
+QAT_yusuf_abdurisag,YUSUF ABDURISAG,QAT,Qatar,FW,15,2,2,2,21,#8A1538,#FFFFFF,#E2C5C6
+CRO_petar_musa,Petar MUSA,CRO,Croatia,FW,26,2,2,2,19,#D52B1E,#FFFFFF,#F3CAC0
+ARG_nicolas_otamendi,Nicolas OTAMENDI,ARG,Argentina,DF,19,2,1,7,348,#75AADB,#FFFFFF,#DEE6EA
+SEN_pathe_ciss,Pathe CISS,SEN,Senegal,MF,6,2,1,4,251,#FFFFFF,#00853F,#C4DEC8
+NOR_oscar_bobb,Oscar BOBB,NOR,Norway,MF,22,2,1,6,246,#BA0C2F,#00205B,#EDC3C4
+USA_sebastian_berhalter,Sebastian BERHALTER,USA,USA,MF,14,2,1,5,223,#FFFFFF,#0A3161,#C6CBCF
+FRA_rayan_cherki,Rayan CHERKI,FRA,France,MF,24,2,1,7,200,#1E2A4A,#E1000F,#CACACA
+ARG_nico_gonzalez,Nico GONZALEZ,ARG,Argentina,MF,15,2,1,7,196,#75AADB,#FFFFFF,#DEE6EA
+MAR_sofyan_amrabat,Sofyan AMRABAT,MAR,Morocco,MF,4,2,1,3,188,#C1272D,#006233,#EEC9C4
+POR_tomas_araujo,TOMAS ARAUJO,POR,Portugal,DF,4,2,1,1,188,#A6192E,#006600,#E8C6C4
+ENG_eberechi_eze,Eberechi EZE,ENG,England,MF,21,2,1,5,187,#FFFFFF,#1D2C5E,#CACACE
+ESP_mikel_merino,Mikel MERINO,ESP,Spain,MF,6,2,1,8,186,#C60B1E,#FFC400,#EFC3C0
+NOR_leo_ostigard,Leo OSTIGARD,NOR,Norway,DF,4,2,1,5,173,#BA0C2F,#00205B,#EDC3C4
+POR_rafael_leao,RAFAEL LEAO,POR,Portugal,FW,17,2,1,5,171,#A6192E,#006600,#E8C6C4
+ESP_ferran_torres,Ferran TORRES,ESP,Spain,FW,7,2,1,8,161,#C60B1E,#FFC400,#EFC3C0
+ARG_exequiel_palacios,Exequiel PALACIOS,ARG,Argentina,MF,14,2,1,1,160,#75AADB,#FFFFFF,#DEE6EA
+EGY_trezeguet,TREZEGUET,EGY,Egypt,FW,7,2,1,4,155,#CE1126,#1A1A1A,#F1C4C2
+NOR_marcus_holmgren_pedersen,Marcus HOLMGREN PEDERSEN,NOR,Norway,DF,16,2,1,4,152,#BA0C2F,#00205B,#EDC3C4
+USA_giovanni_reyna,Giovanni REYNA,USA,USA,MF,7,2,1,5,143,#FFFFFF,#0A3161,#C6CBCF
+MEX_alvaro_fidalgo,Alvaro FIDALGO,MEX,Mexico,MF,8,2,1,3,140,#006847,#CE1126,#C4D8C9
+FRA_malo_gusto,Malo GUSTO,FRA,France,DF,2,2,1,5,138,#1E2A4A,#E1000F,#CACACA
+SWE_lucas_bergvall,Lucas BERGVALL,SWE,Sweden,MF,7,2,1,4,138,#FECC00,#006AA7,#FCEEBA
+ARG_marcos_senesi,Marcos SENESI,ARG,Argentina,DF,2,2,1,2,137,#75AADB,#FFFFFF,#DEE6EA
+SEN_ibrahim_mbaye,Ibrahim MBAYE,SEN,Senegal,FW,20,2,1,4,137,#FFFFFF,#00853F,#C4DEC8
+QAT_karim_boudiaf,KARIM BOUDIAF,QAT,Qatar,MF,12,2,1,2,131,#8A1538,#FFFFFF,#E2C5C6
+BRA_gabriel_martinelli,GABRIEL MARTINELLI,BRA,Brazil,FW,22,2,1,4,130,#FFDF00,#009C3B,#FCF2BA
+FRA_warren_zaire_emery,Warren ZAIRE-EMERY,FRA,France,MF,18,2,1,2,126,#1E2A4A,#E1000F,#CACACA
+TUR_mert_muldur,Mert MULDUR,TUR,Türkiye,DF,18,2,1,3,125,#E30A17,#FFFFFF,#F6C3BF
+CIV_christopher_operi,Christopher OPERI,CIV,Côte d'Ivoire,DF,13,2,1,1,124,#FF8200,#009E60,#FCDDBA
+MAR_chemsdine_talbi,Chemsdine TALBI,MAR,Morocco,MF,7,2,1,5,123,#C1272D,#006233,#EEC9C4
+SCO_kenny_mclean,Kenny McLEAN,SCO,Scotland,MF,23,2,1,3,123,#0B2A5B,#FFFFFF,#C6CACE
+ALG_jaouen_hadjam,Jaouen HADJAM,ALG,Algeria,DF,13,2,1,3,122,#0B7A3E,#FFFFFF,#C6DCC7
+CIV_ousmane_diomande,Ousmane DIOMANDE,CIV,Côte d'Ivoire,DF,2,2,1,1,121,#FF8200,#009E60,#FCDDBA
+KSA_mohammed_abu_alshamat,MOHAMMED ABU ALSHAMAT,KSA,Saudi Arabia,DF,26,2,1,3,121,#006C35,#FFFFFF,#C4D8C5
+ARG_nico_paz,Nico PAZ,ARG,Argentina,FW,18,2,1,2,117,#75AADB,#FFFFFF,#DEE6EA
+BEL_dodi_lukebakio,Dodi LUKEBAKIO,BEL,Belgium,FW,14,2,1,3,112,#C8102E,#FDDA24,#F0C4C4
+POR_bernardo_silva,BERNARDO SILVA,POR,Portugal,MF,10,2,1,4,109,#A6192E,#006600,#E8C6C4
+BEL_romelu_lukaku,Romelu LUKAKU,BEL,Belgium,FW,9,2,1,6,107,#C8102E,#FDDA24,#F0C4C4
+BEL_alexis_saelemaekers,Alexis SAELEMAEKERS,BEL,Belgium,MF,22,2,1,4,105,#C8102E,#FDDA24,#F0C4C4
+SEN_iliman_ndiaye,Iliman NDIAYE,SEN,Senegal,FW,13,2,1,3,105,#FFFFFF,#00853F,#C4DEC8
+ECU_pervis_estupinan,Pervis ESTUPINAN,ECU,Ecuador,DF,7,2,1,2,102,#FFD100,#0072CE,#FCEFBA
+JPN_yukinari_sugawara,Yukinari SUGAWARA,JPN,Japan,DF,2,2,1,4,101,#0A3A8C,#FFFFFF,#C6CDD8
+NZL_tyler_bindon,Tyler BINDON,NZL,New Zealand,DF,4,2,1,3,101,#FFFFFF,#1A1A1A,#CAC6BF
+TUR_yunus_akgun,Yunus AKGUN,TUR,Türkiye,FW,19,2,1,2,101,#E30A17,#FFFFFF,#F6C3BF
+KSA_ali_lajami,ALI LAJAMI,KSA,Saudi Arabia,DF,3,2,1,3,99,#006C35,#FFFFFF,#C4D8C5
+QAT_ahmed_fathy,AHMED FATHY,QAT,Qatar,MF,20,2,1,3,99,#8A1538,#FFFFFF,#E2C5C6
+SUI_silvan_widmer,Silvan WIDMER,SUI,Switzerland,DF,3,2,1,5,96,#D52B1E,#FFFFFF,#F3CAC0
+USA_miles_robinson,Miles ROBINSON,USA,USA,DF,12,2,1,1,96,#FFFFFF,#0A3161,#C6CBCF
+CAN_niko_sigur,Niko SIGUR,CAN,Canada,DF,23,2,1,3,95,#D80621,#FFFFFF,#F3C2C1
+CRO_mario_pasalic,Mario PASALIC,CRO,Croatia,MF,15,2,1,4,95,#D52B1E,#FFFFFF,#F3CAC0
+GER_deniz_undav,Deniz UNDAV,GER,Germany,FW,26,2,1,4,95,#FFFFFF,#1A1A1A,#CAC6BF
+SCO_scott_mckenna,Scott McKENNA,SCO,Scotland,DF,26,2,1,1,93,#0B2A5B,#FFFFFF,#C6CACE
+NED_crysencio_summerville,Crysencio SUMMERVILLE,NED,Netherlands,FW,24,2,1,3,92,#F36C21,#1E2A4A,#F9D8C1
+ARG_giovani_lo_celso,Giovani LO CELSO,ARG,Argentina,MF,11,2,1,1,91,#75AADB,#FFFFFF,#DEE6EA
+TUR_salih_ozcan,Salih OZCAN,TUR,Türkiye,MF,5,2,1,2,90,#E30A17,#FFFFFF,#F6C3BF
+USA_mark_mckenzie,Mark McKENZIE,USA,USA,DF,22,2,1,1,90,#FFFFFF,#0A3161,#C6CBCF
+JPN_ayumu_seko,Ayumu SEKO,JPN,Japan,DF,20,2,1,2,89,#0A3A8C,#FFFFFF,#C6CDD8
+RSA_nkosinathi_sibisi,Nkosinathi SIBISI,RSA,South Africa,DF,19,2,1,1,89,#FFB81C,#007749,#FCE9C0
+CPV_joao_paulo,JOAO PAULO,CPV,Cabo Verde,MF,8,2,1,2,88,#003893,#CF2027,#C4CDDA
+GER_david_raum,David RAUM,GER,Germany,DF,22,2,1,2,87,#FFFFFF,#1A1A1A,#CAC6BF
+TUR_eren_elmali,Eren ELMALI,TUR,Türkiye,DF,13,2,1,2,81,#E30A17,#FFFFFF,#F6C3BF
+CZE_tomas_soucek,Tomas SOUCEK,CZE,Czechia,MF,22,2,1,3,80,#D7141A,#11457E,#F3C5BF
+SCO_kieran_tierney,Kieran TIERNEY,SCO,Scotland,DF,6,2,1,2,79,#0B2A5B,#FFFFFF,#C6CACE
+CIV_seko_fofana,Seko FOFANA,CIV,Côte d'Ivoire,MF,6,2,1,2,78,#FF8200,#009E60,#FCDDBA
+CRO_marco_pasalic,Marco PASALIC,CRO,Croatia,FW,24,2,1,3,78,#D52B1E,#FFFFFF,#F3CAC0
+EGY_mahmoud_saber,MAHMOUD SABER,EGY,Egypt,MF,21,2,1,2,77,#CE1126,#1A1A1A,#F1C4C2
+ENG_dean_henderson,Dean HENDERSON,ENG,England,GK,13,2,1,1,77,#FFFFFF,#1D2C5E,#CACACE
+KOR_hwang_heechan,HWANG Heechan,KOR,Korea Republic,MF,11,2,1,3,77,#C60C30,#0047A0,#EFC3C4
+COL_santiago_arias,Santiago ARIAS,COL,Colombia,DF,4,2,1,1,76,#FCD116,#003893,#FBEFBE
+EGY_haissem_hassan,HAISSEM HASSAN,EGY,Egypt,FW,12,2,1,2,76,#CE1126,#1A1A1A,#F1C4C2
+ESP_gavi,GAVI,ESP,Spain,MF,9,2,1,2,76,#C60B1E,#FFC400,#EFC3C0
+MAR_ounahi,OUNAHI,MAR,Morocco,MF,8,2,1,1,75,#C1272D,#006233,#EEC9C4
+SEN_abdoulaye_seck,Abdoulaye SECK,SEN,Senegal,DF,4,2,1,1,75,#FFFFFF,#00853F,#C4DEC8
+TUN_ismael_gharbi,Ismael GHARBI,TUN,Tunisia,MF,11,2,1,3,75,#E70013,#FFFFFF,#F7C1BE
+NOR_thelo_aasgaard,Thelo AASGAARD,NOR,Norway,MF,19,2,1,1,74,#BA0C2F,#00205B,#EDC3C4
+POR_ruben_neves,RUBEN NEVES,POR,Portugal,MF,21,2,1,2,74,#A6192E,#006600,#E8C6C4
+CZE_lukas_provod,Lukas PROVOD,CZE,Czechia,MF,17,2,1,3,73,#D7141A,#11457E,#F3C5BF
+CRO_luka_vuskovic,Luka VUSKOVIC,CRO,Croatia,DF,22,2,1,1,72,#D52B1E,#FFFFFF,#F3CAC0
+JOR_mahmoud_almardi,MAHMOUD ALMARDI,JOR,Jordan,FW,13,2,1,3,72,#CE1126,#FFFFFF,#F1C4C2
+USA_auston_trusty,Auston TRUSTY,USA,USA,DF,6,2,1,2,71,#FFFFFF,#0A3161,#C6CBCF
+USA_timothy_weah,Timothy WEAH,USA,USA,FW,21,2,1,2,70,#FFFFFF,#0A3161,#C6CBCF
+USA_joe_scally,Joe SCALLY,USA,USA,DF,23,2,1,2,69,#FFFFFF,#0A3161,#C6CBCF
+CPV_willy_semedo,WILLY SEMEDO,CPV,Cabo Verde,MF,17,2,1,3,67,#003893,#CF2027,#C4CDDA
+FRA_dembele,DEMBELE,FRA,France,FW,7,2,1,1,67,#1E2A4A,#E1000F,#CACACA
+GHA_rustam_ashurmatov,Rustam ASHURMATOV,GHA,Ghana,DF,5,2,1,1,67,#FFFFFF,#FCD116,#FBEFBE
+CZE_jaroslav_zeleny,Jaroslav ZELENY,CZE,Czechia,DF,20,2,1,2,66,#D7141A,#11457E,#F3C5BF
+GHA_otabek_shukurov,Otabek SHUKUROV,GHA,Ghana,MF,7,2,1,1,66,#FFFFFF,#FCD116,#FBEFBE
+SWE_daniel_svensson,Daniel SVENSSON,SWE,Sweden,DF,8,2,1,3,66,#FECC00,#006AA7,#FCEEBA
+ECU_jordy_alcivar,Jordy ALCIVAR,ECU,Ecuador,MF,5,2,1,1,64,#FFD100,#0072CE,#FCEFBA
+SUI_luca_jaquez,Luca JAQUEZ,SUI,Switzerland,DF,25,2,1,2,64,#D52B1E,#FFFFFF,#F3CAC0
+UZB_jakhongir_urozov,Jakhongir UROZOV,UZB,Uzbekistan,DF,26,2,1,2,63,#0099B5,#FFFFFF,#C4E2E1
+FRA_ibrahima_konate,Ibrahima KONATE,FRA,France,DF,15,2,1,2,61,#1E2A4A,#E1000F,#CACACA
+ALG_anis_hadj_moussa,Anis HADJ MOUSSA,ALG,Algeria,FW,11,2,1,3,60,#0B7A3E,#FFFFFF,#C6DCC7
+JPN_tsuyoshi_watanabe,Tsuyoshi WATANABE,JPN,Japan,DF,16,2,1,2,60,#0A3A8C,#FFFFFF,#C6CDD8
+SCO_aaron_hickey,Aaron HICKEY,SCO,Scotland,DF,2,2,1,1,60,#0B2A5B,#FFFFFF,#C6CACE
+CZE_david_doudera,David DOUDERA,CZE,Czechia,DF,21,2,1,1,59,#D7141A,#11457E,#F3C5BF
+SCO_ryan_christie,Ryan CHRISTIE,SCO,Scotland,MF,11,2,1,3,59,#0B2A5B,#FFFFFF,#C6CACE
+SUI_ardon_jashari,Ardon JASHARI,SUI,Switzerland,MF,14,2,1,3,59,#D52B1E,#FFFFFF,#F3CAC0
+CPV_wagner_pina,WAGNER PINA,CPV,Cabo Verde,DF,24,2,1,1,56,#003893,#CF2027,#C4CDDA
+CUW_riechedly_bazoer,Riechedly BAZOER,CUW,Curaçao,DF,23,2,1,1,55,#002B7F,#F9E814,#C4CAD6
+QAT_sultan_albrake,SULTAN ALBRAKE,QAT,Qatar,DF,18,2,1,2,55,#8A1538,#FFFFFF,#E2C5C6
+TUR_oguz_aydin,Oguz AYDIN,TUR,Türkiye,FW,24,2,1,1,55,#E30A17,#FFFFFF,#F6C3BF
+UZB_dostonbek_khamdamov,Dostonbek KHAMDAMOV,UZB,Uzbekistan,MF,17,2,1,2,55,#0099B5,#FFFFFF,#C4E2E1
+CPV_nuno_da_costa,NUNO DA COSTA,CPV,Cabo Verde,MF,21,2,1,4,54,#003893,#CF2027,#C4CDDA
+GHA_abdulla_abdullaev,Abdulla ABDULLAEV,GHA,Ghana,DF,18,2,1,1,54,#FFFFFF,#FCD116,#FBEFBE
+GHA_azizjon_ganiev,Azizjon GANIEV,GHA,Ghana,MF,19,2,1,1,54,#FFFFFF,#FCD116,#FBEFBE
+USA_brenden_aaronson,Brenden AARONSON,USA,USA,FW,11,2,1,1,53,#FFFFFF,#0A3161,#C6CBCF
+UZB_abdulla_abdullaev,Abdulla ABDULLAEV,UZB,Uzbekistan,DF,18,2,1,1,53,#0099B5,#FFFFFF,#C4E2E1
+KSA_nawaf_bu_washl,NAWAF BU WASHL,KSA,Saudi Arabia,DF,13,2,1,2,52,#006C35,#FFFFFF,#C4D8C5
+NOR_kristian_thorstvedt,Kristian THORSTVEDT,NOR,Norway,MF,18,2,1,2,52,#BA0C2F,#00205B,#EDC3C4
+TUR_ozan_kabak,Ozan KABAK,TUR,Türkiye,DF,15,2,1,1,52,#E30A17,#FFFFFF,#F6C3BF
+GHA_ernest_nuamah,Ernest NUAMAH,GHA,Ghana,FW,24,2,1,3,51,#FFFFFF,#FCD116,#FBEFBE
+NZL_ryan_thomas,Ryan THOMAS,NZL,New Zealand,MF,23,2,1,3,51,#FFFFFF,#1A1A1A,#CAC6BF
+AUT_sasa_kalajdzic,Sasa KALAJDZIC,AUT,Austria,FW,14,2,1,3,50,#ED2939,#FFFFFF,#F8CAC6
+CIV_bazoumana_toure,Bazoumana TOURE,CIV,Côte d'Ivoire,FW,24,2,1,3,50,#FF8200,#009E60,#FCDDBA
+USA_matt_turner,Matt TURNER,USA,USA,GK,1,2,1,1,50,#FFFFFF,#0A3161,#C6CBCF
+UZB_khojiakbar_alijonov,Khojiakbar ALIJONOV,UZB,Uzbekistan,DF,3,2,1,1,50,#0099B5,#FFFFFF,#C4E2E1
+IRQ_jalal_hassan,JALAL HASSAN,IRQ,Iraq,GK,12,2,1,2,49,#007A3D,#FFFFFF,#C4DCC7
+KOR_oh_hyeongyu,OH Hyeongyu,KOR,Korea Republic,FW,18,2,1,3,49,#C60C30,#0047A0,#EFC3C4
+ENG_ivan_toney,Ivan TONEY,ENG,England,FW,22,2,1,2,48,#FFFFFF,#1D2C5E,#CACACE
+IRN_shahriyar_moghanloo,Shahriyar MOGHANLOO,IRN,IR Iran,FW,20,2,1,3,47,#FFFFFF,#DA0000,#F4C1BA
+TUN_sebastian_tounekti,Sebastian TOUNEKTI,TUN,Tunisia,MF,26,2,1,3,47,#E70013,#FFFFFF,#F7C1BE
+HAI_louicius_deedson,Louicius DEEDSON,HAI,Haiti,FW,11,2,1,3,46,#00209F,#D21034,#C4C8DD
+NED_crysencio,Crysencio,NED,Netherlands,FW,24,2,1,1,46,#F36C21,#1E2A4A,#F9D8C1
+GHA_behruzjon_karimov,Behruzjon KARIMOV,GHA,Ghana,DF,24,2,1,1,45,#FFFFFF,#FCD116,#FBEFBE
+IRQ_rebin_sulaka,REBIN SULAKA,IRQ,Iraq,DF,2,2,1,2,45,#007A3D,#FFFFFF,#C4DCC7
+NOR_jorgen_strand_larsen,Jorgen STRAND LARSEN,NOR,Norway,FW,11,2,1,2,45,#BA0C2F,#00205B,#EDC3C4
+URU_matias_vina,Matias VINA,URU,Uruguay,DF,17,2,1,1,45,#5CBFEB,#1A1A1A,#D8EBED
+CIV_elye_wahi,Elye WAHI,CIV,Côte d'Ivoire,FW,12,2,1,3,44,#FF8200,#009E60,#FCDDBA
+PAN_fidel_escobar,Fidel ESCOBAR,PAN,Panama,DF,4,2,1,1,43,#DA121A,#072357,#F4C5BF
+GHA_eldor_shomurodov,Eldor SHOMURODOV,GHA,Ghana,FW,14,2,1,1,42,#FFFFFF,#FCD116,#FBEFBE
+ALG_oussama_benbot,Oussama BENBOT,ALG,Algeria,GK,16,2,1,1,41,#0B7A3E,#FFFFFF,#C6DCC7
+CAN_mathieu_choiniere,Mathieu CHOINIERE,CAN,Canada,MF,6,2,1,1,41,#D80621,#FFFFFF,#F3C2C1
+IRN_saleh_hardani,Saleh HARDANI,IRN,IR Iran,DF,2,2,1,2,41,#FFFFFF,#DA0000,#F4C1BA
+AUT_marko_arnautovic,Marko ARNAUTOVIC,AUT,Austria,FW,7,2,1,4,40,#ED2939,#FFFFFF,#F8CAC6
+ECU_alan_minda,Alan MINDA,ECU,Ecuador,MF,14,2,1,1,40,#FFD100,#0072CE,#FCEFBA
+IRQ_frans_putros,FRANS PUTROS,IRQ,Iraq,DF,26,2,1,1,40,#007A3D,#FFFFFF,#C4DCC7
+JOR_ali_azaizeh,ALI AZAIZEH,JOR,Jordan,FW,24,2,1,3,38,#CE1126,#FFFFFF,#F1C4C2
+GHA_odiljon_xamrobekov,Odiljon XAMROBEKOV,GHA,Ghana,MF,9,2,1,1,37,#FFFFFF,#FCD116,#FBEFBE
+NOR_fredrik_andre_bjorkan,Fredrik Andre BJORKAN,NOR,Norway,DF,15,2,1,1,37,#BA0C2F,#00205B,#EDC3C4
+BIH_arjan_malic,Arjan MALIC,BIH,Bosnia and Herzegovina,DF,24,2,1,1,36,#1D3C9A,#FECB00,#CACEDC
+COL_deiver_machado,Deiver MACHADO,COL,Colombia,DF,22,2,1,1,36,#FCD116,#003893,#FBEFBE
+NOR_henrik_falchener,Henrik FALCHENER,NOR,Norway,DF,25,2,1,1,36,#BA0C2F,#00205B,#EDC3C4
+PAR_alexandro_maidana,Alexandro MAIDANA,PAR,Paraguay,DF,26,2,1,2,36,#D52B1E,#FFFFFF,#F3CAC0
+PAR_jose_canale,Jose CANALE,PAR,Paraguay,DF,13,2,1,4,36,#D52B1E,#FFFFFF,#F3CAC0
+UZB_abduvohid_nematov,Abduvohid NEMATOV,UZB,Uzbekistan,GK,12,2,1,1,36,#0099B5,#FFFFFF,#C4E2E1
+KOR_kim_moonhwan,KIM Moonhwan,KOR,Korea Republic,DF,15,2,1,1,35,#C60C30,#0047A0,#EFC3C4
+NOR_egil_selvik,Egil SELVIK,NOR,Norway,GK,13,2,1,1,35,#BA0C2F,#00205B,#EDC3C4
+UZB_behruzjon_karimov,Behruzjon KARIMOV,UZB,Uzbekistan,DF,24,2,1,1,35,#0099B5,#FFFFFF,#C4E2E1
+CZE_denis_visinsky,Denis VISINSKY,CZE,Czechia,FW,26,2,1,1,33,#D7141A,#11457E,#F3C5BF
+CZE_stepan_chaloupek,Stepan CHALOUPEK,CZE,Czechia,DF,6,2,1,1,32,#D7141A,#11457E,#F3C5BF
+GHA_abdukodir_khusanov,Abdukodir KHUSANOV,GHA,Ghana,DF,2,2,1,1,32,#FFFFFF,#FCD116,#FBEFBE
+HAI_lenny_joseph,Lenny JOSEPH,HAI,Haiti,FW,16,2,1,3,32,#00209F,#D21034,#C4C8DD
+JOR_mohammad_abualnadi,MOHAMMAD ABUALNADI,JOR,Jordan,DF,16,2,1,1,32,#CE1126,#FFFFFF,#F1C4C2
+MEX_mateo_chavez,Mateo CHAVEZ,MEX,Mexico,DF,20,2,1,1,32,#006847,#CE1126,#C4D8C9
+QAT_hassan_alhaydos,HASSAN ALHAYDOS,QAT,Qatar,FW,10,2,1,2,32,#8A1538,#FFFFFF,#E2C5C6
+GHA_abduvohid_nematov,Abduvohid NEMATOV,GHA,Ghana,GK,12,2,1,1,31,#FFFFFF,#FCD116,#FBEFBE
+MEX_guillermo_martinez,Guillermo MARTINEZ,MEX,Mexico,FW,22,2,1,2,30,#006847,#CE1126,#C4D8C9
+IRN_mohammad_ghorbani,Mohammad GHORBANI,IRN,IR Iran,MF,21,2,1,1,29,#FFFFFF,#DA0000,#F4C1BA
+BIH_armin_gigovic,Armin GIGOVIC,BIH,Bosnia and Herzegovina,MF,8,2,1,2,28,#1D3C9A,#FECB00,#CACEDC
+CPV_gilson_benchimol,GILSON BENCHIMOL,CPV,Cabo Verde,FW,9,2,1,2,28,#003893,#CF2027,#C4CDDA
+CZE_vladimir_darida,Vladimir DARIDA,CZE,Czechia,MF,8,2,1,1,27,#D7141A,#11457E,#F3C5BF
+PAN_jorge_gutierrez,Jorge GUTIERREZ,PAN,Panama,DF,26,2,1,1,27,#DA121A,#072357,#F4C5BF
+CPV_telmo_arcanjo,TELMO ARCANJO,CPV,Cabo Verde,MF,18,2,1,2,26,#003893,#CF2027,#C4CDDA
+EGY_mohamed_abdelmoneim,MOHAMED ABDELMONEIM,EGY,Egypt,DF,6,2,1,2,26,#CE1126,#1A1A1A,#F1C4C2
+IRN_arya_yousefi,Arya YOUSEFI,IRN,IR Iran,DF,17,2,1,1,26,#FFFFFF,#DA0000,#F4C1BA
+JPN_takefusa_kubo,Takefusa KUBO,JPN,Japan,MF,8,2,1,1,26,#0A3A8C,#FFFFFF,#C6CDD8
+MAR_ayoub_el_kaabi,Ayoub EL KAABI,MAR,Morocco,FW,20,2,1,1,26,#C1272D,#006233,#EEC9C4
+TUN_mouhib_chamakh,Mouhib CHAMAKH,TUN,Tunisia,GK,1,2,1,1,26,#E70013,#FFFFFF,#F7C1BE
+UZB_oston_urunov,Oston URUNOV,UZB,Uzbekistan,MF,11,2,1,2,26,#0099B5,#FFFFFF,#C4E2E1
+IRN_ehsan_hajisafi,Ehsan HAJISAFI,IRN,IR Iran,DF,3,2,1,2,25,#FFFFFF,#DA0000,#F4C1BA
+UZB_utkir_yusupov,Utkir YUSUPOV,UZB,Uzbekistan,GK,1,2,1,1,25,#0099B5,#FFFFFF,#C4E2E1
+PAN_jose_fajardo,Jose FAJARDO,PAN,Panama,FW,17,2,1,3,24,#DA121A,#072357,#F4C5BF
+AUS_nishan_velupillay,Nishan VELUPILLAY,AUS,Australia,FW,23,2,1,2,23,#FFCD00,#00843D,#FCEEBA
+PAN_cecilio_waterman,Cecilio WATERMAN,PAN,Panama,FW,18,2,1,2,23,#DA121A,#072357,#F4C5BF
+TUN_dylan_bronn,Dylan BRONN,TUN,Tunisia,DF,6,2,1,1,23,#E70013,#FFFFFF,#F7C1BE
+AUS_mathew_leckie,Mathew LECKIE,AUS,Australia,FW,7,2,1,1,22,#FFCD00,#00843D,#FCEEBA
+GHA_abbosbek_fayzullaev,Abbosbek FAYZULLAEV,GHA,Ghana,MF,22,2,1,1,22,#FFFFFF,#FCD116,#FBEFBE
+GHA_sherzod_nasrullaev,Sherzod NASRULLAEV,GHA,Ghana,DF,13,2,1,1,22,#FFFFFF,#FCD116,#FBEFBE
+BRA_igor_thiago,IGOR THIAGO,BRA,Brazil,FW,25,2,1,1,21,#FFDF00,#009C3B,#FCF2BA
+BRA_roger_ibanez,ROGER IBANEZ,BRA,Brazil,DF,24,2,1,1,21,#FFDF00,#009C3B,#FCF2BA
+CPV_garry_rodrigues,GARRY RODRIGUES,CPV,Cabo Verde,MF,11,2,1,2,20,#003893,#CF2027,#C4CDDA
+PAN_tomas_rodriguez,Tomas RODRIGUEZ,PAN,Panama,FW,9,2,1,2,20,#DA121A,#072357,#F4C5BF
+PAR_antonio_sanabria,Antonio SANABRIA,PAR,Paraguay,FW,9,2,1,2,19,#D52B1E,#FFFFFF,#F3CAC0
+CUW_sontje_hansen,Sontje HANSEN,CUW,Curaçao,FW,12,2,1,1,18,#002B7F,#F9E814,#C4CAD6
+KSA_sultan_mandash,SULTAN MANDASH,KSA,Saudi Arabia,FW,20,2,1,1,16,#006C35,#FFFFFF,#C4D8C5
+BIH_jovo_lukic,Jovo LUKIC,BIH,Bosnia and Herzegovina,FW,25,2,1,2,15,#1D3C9A,#FECB00,#CACEDC
+RSA_lyle_foster,Lyle FOSTER,RSA,South Africa,FW,9,2,1,1,12,#FFB81C,#007749,#FCE9C0
+TUN_hazem_mastouri,Hazem MASTOURI,TUN,Tunisia,FW,9,2,1,1,12,#E70013,#FFFFFF,#F7C1BE
+PAR_isidro_pitta,Isidro PITTA,PAR,Paraguay,FW,25,2,1,1,8,#D52B1E,#FFFFFF,#F3CAC0
+MAR_samir_el_mourabet,Samir EL MOURABET,MAR,Morocco,MF,15,3,0,5,208,#C1272D,#006233,#EEC9C4
+COL_juan_quintero,Juan QUINTERO,COL,Colombia,MF,20,3,0,4,168,#FCD116,#003893,#FBEFBE
+POR_francisco_conceicao,FRANCISCO CONCEICAO,POR,Portugal,FW,26,3,0,4,162,#A6192E,#006600,#E8C6C4
+POR_nelson_semedo,NELSON SEMEDO,POR,Portugal,DF,2,3,0,4,152,#A6192E,#006600,#E8C6C4
+ESP_nico_williams,Nico WILLIAMS,ESP,Spain,FW,17,3,0,6,124,#C60B1E,#FFC400,#EFC3C0
+NED_teun_koopmeiners,Teun KOOPMEINERS,NED,Netherlands,MF,20,3,0,4,112,#F36C21,#1E2A4A,#F9D8C1
+KOR_kim_jingyu,KIM Jingyu,KOR,Korea Republic,MF,24,3,0,2,111,#C60C30,#0047A0,#EFC3C4
+PAR_mauricio,MAURICIO,PAR,Paraguay,MF,11,3,0,4,102,#D52B1E,#FFFFFF,#F3CAC0
+AUT_florian_grillitsch,Florian GRILLITSCH,AUT,Austria,MF,10,3,0,2,100,#ED2939,#FFFFFF,#F8CAC6
+COL_richard_rios,Richard RIOS,COL,Colombia,MF,6,3,0,5,94,#FCD116,#003893,#FBEFBE
+KOR_park_jinseob,PARK Jinseob,KOR,Korea Republic,DF,16,3,0,2,89,#C60C30,#0047A0,#EFC3C4
+CAN_jacob_shaffelburg,Jacob SHAFFELBURG,CAN,Canada,MF,14,3,0,5,88,#D80621,#FFFFFF,#F3C2C1
+URU_nicolas_de_la_cruz,Nicolas DE LA CRUZ,URU,Uruguay,MF,7,3,0,3,85,#5CBFEB,#1A1A1A,#D8EBED
+ALG_zineddine_belaid,Zineddine BELAID,ALG,Algeria,DF,5,3,0,2,81,#0B7A3E,#FFFFFF,#C6DCC7
+CPV_helio_varela,HELIO VARELA,CPV,Cabo Verde,MF,26,3,0,3,79,#003893,#CF2027,#C4CDDA
+BRA_fabinho,FABINHO,BRA,Brazil,MF,17,3,0,3,78,#FFDF00,#009C3B,#FCF2BA
+MAR_gessime_yassine,Gessime YASSINE,MAR,Morocco,MF,16,3,0,3,78,#C1272D,#006233,#EEC9C4
+SEN_pape_matar_sarr,Pape Matar SARR,SEN,Senegal,MF,17,3,0,2,78,#FFFFFF,#00853F,#C4DEC8
+ECU_angelo_preciado,Angelo PRECIADO,ECU,Ecuador,DF,17,3,0,4,73,#FFD100,#0072CE,#FCEFBA
+EGY_zizo,ZIZO,EGY,Egypt,FW,25,3,0,4,73,#CE1126,#1A1A1A,#F1C4C2
+MAR_soufiane_rahimi,Souﬁane RAHIMI,MAR,Morocco,FW,9,3,0,6,72,#C1272D,#006233,#EEC9C4
+AUT_marco_friedl,Marco FRIEDL,AUT,Austria,DF,23,3,0,1,69,#ED2939,#FFFFFF,#F8CAC6
+BEL_matias_fernandez_pardo,Matias FERNANDEZ-PARDO,BEL,Belgium,FW,26,3,0,3,67,#C8102E,#FDDA24,#F0C4C4
+BIH_ermin_mahmic,Ermin MAHMIC,BIH,Bosnia and Herzegovina,MF,26,3,0,3,67,#1D3C9A,#FECB00,#CACEDC
+URU_brian_rodriguez,Brian RODRIGUEZ,URU,Uruguay,FW,18,3,0,3,67,#5CBFEB,#1A1A1A,#D8EBED
+MEX_luis_chavez,Luis CHAVEZ,MEX,Mexico,MF,24,3,0,1,65,#006847,#CE1126,#C4D8C9
+BRA_danilo_santos,DANILO SANTOS,BRA,Brazil,MF,18,3,0,4,63,#FFDF00,#009C3B,#FCF2BA
+GER_malick_thiaw,Malick THIAW,GER,Germany,DF,24,3,0,2,62,#FFFFFF,#1A1A1A,#CAC6BF
+POR_diogo_dalot,DIOGO DALOT,POR,Portugal,DF,5,3,0,2,62,#A6192E,#006600,#E8C6C4
+AUT_carney_chukwuemeka,Carney CHUKWUEMEKA,AUT,Austria,MF,17,3,0,3,61,#ED2939,#FFFFFF,#F8CAC6
+PAN_azarias_londono,Azarias LONDONO,PAN,Panama,FW,24,3,0,3,61,#DA121A,#072357,#F4C5BF
+SWE_besfort_zeneli,Besfort ZENELI,SWE,Sweden,MF,22,3,0,2,61,#FECC00,#006AA7,#FCEEBA
+COL_jaminton_campaz,Jaminton CAMPAZ,COL,Colombia,FW,21,3,0,3,59,#FCD116,#003893,#FBEFBE
+AUS_kai_trewin,Kai TREWIN,AUS,Australia,DF,15,3,0,1,55,#FFCD00,#00843D,#FCEEBA
+CAN_promise_david,Promise DAVID,CAN,Canada,FW,24,3,0,4,54,#D80621,#FFFFFF,#F3C2C1
+EGY_hossam_abdelmaguid,HOSSAM ABDELMAGUID,EGY,Egypt,DF,4,3,0,2,54,#CE1126,#1A1A1A,#F1C4C2
+GER_angelo_stiller,Angelo STILLER,GER,Germany,MF,16,3,0,1,54,#FFFFFF,#1A1A1A,#CAC6BF
+GHA_abdul_fatawu,Abdul FATAWU,GHA,Ghana,FW,7,3,0,4,54,#FFFFFF,#FCD116,#FBEFBE
+GHA_kojo_peprah_oppong,Kojo Peprah OPPONG,GHA,Ghana,DF,21,3,0,2,54,#FFFFFF,#FCD116,#FBEFBE
+HAI_dominique_simon,Dominique SIMON,HAI,Haiti,MF,25,3,0,2,54,#00209F,#D21034,#C4C8DD
+ALG_adil_boulbina,Adil BOULBINA,ALG,Algeria,FW,20,3,0,2,52,#0B7A3E,#FFFFFF,#C6DCC7
+CUW_gervane_kastaneer,Gervane KASTANEER,CUW,Curaçao,FW,19,3,0,3,52,#002B7F,#F9E814,#C4CAD6
+CPV_yannick_semedo,YANNICK SEMEDO,CPV,Cabo Verde,MF,16,3,0,2,51,#003893,#CF2027,#C4CDDA
+ESP_yeremy_pino,Yeremy PINO,ESP,Spain,FW,11,3,0,2,51,#C60B1E,#FFC400,#EFC3C0
+GER_waldemar_anton,Waldemar ANTON,GER,Germany,DF,3,3,0,2,51,#FFFFFF,#1A1A1A,#CAC6BF
+AUT_alexander_prass,Alexander PRASS,AUT,Austria,MF,22,3,0,2,50,#ED2939,#FFFFFF,#F8CAC6
+ECU_kevin_rodriguez,Kevin RODRIGUEZ,ECU,Ecuador,FW,11,3,0,4,50,#FFD100,#0072CE,#FCEFBA
+ALG_samir_chergui,Samir CHERGUI,ALG,Algeria,DF,26,3,0,1,49,#0B7A3E,#FFFFFF,#C6DCC7
+AUS_ajdin_hrustic,Ajdin HRUSTIC,AUS,Australia,FW,10,3,0,2,49,#FFCD00,#00843D,#FCEEBA
+KSA_abdullah_alhamddan,ABDULLAH ALHAMDDAN,KSA,Saudi Arabia,FW,19,3,0,3,49,#006C35,#FFFFFF,#C4D8C5
+NZL_ben_old,Ben OLD,NZL,New Zealand,MF,19,3,0,3,49,#FFFFFF,#1A1A1A,#CAC6BF
+TUR_can_uzun,Can UZUN,TUR,Türkiye,FW,26,3,0,2,49,#E30A17,#FFFFFF,#F6C3BF
+BRA_endrick,ENDRICK,BRA,Brazil,FW,19,3,0,4,48,#FFDF00,#009C3B,#FCF2BA
+MEX_obed_vargas,Obed VARGAS,MEX,Mexico,MF,18,3,0,3,48,#006847,#CE1126,#C4D8C9
+SUI_zeki_amdouni,Zeki AMDOUNI,SUI,Switzerland,FW,23,3,0,4,47,#D52B1E,#FFFFFF,#F3CAC0
+BRA_neymar_jr,NEYMAR JR,BRA,Brazil,FW,10,3,0,2,46,#FFDF00,#009C3B,#FCF2BA
+IRQ_aimar_sher,AIMAR SHER,IRQ,Iraq,MF,20,3,0,1,46,#007A3D,#FFFFFF,#C4DCC7
+QAT_abdulaziz_hatem,ABDULAZIZ HATEM,QAT,Qatar,MF,6,3,0,1,46,#8A1538,#FFFFFF,#E2C5C6
+QAT_mohamed_manai,MOHAMED MANAI,QAT,Qatar,FW,26,3,0,3,46,#8A1538,#FFFFFF,#E2C5C6
+SWE_taha_ali,Taha ALI,SWE,Sweden,FW,26,3,0,2,46,#FECC00,#006AA7,#FCEEBA
+GER_leon_goretzka,Leon GORETZKA,GER,Germany,MF,8,3,0,3,45,#FFFFFF,#1A1A1A,#CAC6BF
+GHA_alidu_seidu,Alidu SEIDU,GHA,Ghana,DF,2,3,0,1,45,#FFFFFF,#FCD116,#FBEFBE
+CIV_oumar_diakite,Oumar DIAKITE,CIV,Côte d'Ivoire,FW,14,3,0,2,44,#FF8200,#009E60,#FCDDBA
+ECU_yaimar_medina,Yaimar MEDINA,ECU,Ecuador,DF,26,3,0,1,44,#FFD100,#0072CE,#FCEFBA
+GER_nadiem_amiri,Nadiem AMIRI,GER,Germany,MF,20,3,0,2,44,#FFFFFF,#1A1A1A,#CAC6BF
+SUI_miro_muheim,Miro MUHEIM,SUI,Switzerland,DF,2,3,0,3,44,#D52B1E,#FFFFFF,#F3CAC0
+ESP_martin_zubimendi,Martin ZUBIMENDI,ESP,Spain,MF,18,3,0,1,43,#C60B1E,#FFC400,#EFC3C0
+IRQ_marko_farji,MARKO FARJI,IRQ,Iraq,FW,21,3,0,2,42,#007A3D,#FFFFFF,#C4DCC7
+KOR_castrop_jens,CASTROP Jens,KOR,Korea Republic,DF,23,3,0,1,42,#C60C30,#0047A0,#EFC3C4
+ARG_valentin_barco,Valentin BARCO,ARG,Argentina,MF,8,3,0,1,41,#75AADB,#FFFFFF,#DEE6EA
+CRO_igor_matanovic,Igor MATANOVIC,CRO,Croatia,FW,20,3,0,3,39,#D52B1E,#FFFFFF,#F3CAC0
+CUW_jeremy_antonisse,Jeremy ANTONISSE,CUW,Curaçao,FW,11,3,0,2,39,#002B7F,#F9E814,#C4CAD6
+NED_quinten_timber,Quinten TIMBER,NED,Netherlands,MF,26,3,0,2,39,#F36C21,#1E2A4A,#F9D8C1
+IRN_amirhossein_hosseinzadeh,Amirhossein HOSSEINZADEH,IRN,IR Iran,FW,18,3,0,2,38,#FFFFFF,#DA0000,#F4C1BA
+COD_charles_pickel,Charles PICKEL,COD,Congo DR,MF,18,3,0,2,37,#007FFF,#CE1021,#C4DDF2
+UZB_azizjon_ganiev,Azizjon GANIEV,UZB,Uzbekistan,MF,19,3,0,1,37,#0099B5,#FFFFFF,#C4E2E1
+COD_fiston_mayele,Fiston MAYELE,COD,Congo DR,FW,19,3,0,2,35,#007FFF,#CE1021,#C4DDF2
+IRN_mehdi_torabi,Mehdi TORABI,IRN,IR Iran,MF,16,3,0,1,35,#FFFFFF,#DA0000,#F4C1BA
+NZL_jesse_randall,Jesse RANDALL,NZL,New Zealand,FW,21,3,0,3,35,#FFFFFF,#1A1A1A,#CAC6BF
+POR_goncalo_ramos,GONCALO RAMOS,POR,Portugal,FW,9,3,0,2,35,#A6192E,#006600,#E8C6C4
+SUI_cedric_itten,Cedric ITTEN,SUI,Switzerland,FW,26,3,0,3,35,#D52B1E,#FFFFFF,#F3CAC0
+CIV_jean_michael_seri,Jean Michael SERI,CIV,Côte d'Ivoire,MF,4,3,0,1,34,#FF8200,#009E60,#FCDDBA
+JPN_junnosuke_suzuki,Junnosuke SUZUKI,JPN,Japan,DF,25,3,0,2,34,#0A3A8C,#FFFFFF,#C6CDD8
+KSA_ala_alhajji,ALA ALHAJJI,KSA,Saudi Arabia,MF,18,3,0,2,34,#006C35,#FFFFFF,#C4D8C5
+COD_joris_kayembe,Joris KAYEMBE,COD,Congo DR,DF,12,3,0,4,33,#007FFF,#CE1021,#C4DDF2
+COD_meschack_elia,Meschack ELIA,COD,Congo DR,FW,13,3,0,2,33,#007FFF,#CE1021,#C4DDF2
+NOR_morten_thorsby,Morten THORSBY,NOR,Norway,MF,2,3,0,1,33,#BA0C2F,#00205B,#EDC3C4
+UZB_odiljon_xamrobekov,Odiljon XAMROBEKOV,UZB,Uzbekistan,MF,9,3,0,1,33,#0099B5,#FFFFFF,#C4E2E1
+CRO_andrej_kramaric,Andrej KRAMARIC,CRO,Croatia,FW,9,3,0,3,32,#D52B1E,#FFFFFF,#F3CAC0
+JOR_saleem_obaid,SALEEM OBAID,JOR,Jordan,DF,17,3,0,3,32,#CE1126,#FFFFFF,#F1C4C2
+BRA_luiz_henrique,LUIZ HENRIQUE,BRA,Brazil,FW,21,3,0,1,31,#FFDF00,#009C3B,#FCF2BA
+ECU_jackson_porozo,Jackson POROZO,ECU,Ecuador,DF,25,3,0,1,31,#FFD100,#0072CE,#FCEFBA
+NED_memphis_depay,Memphis DEPAY,NED,Netherlands,FW,10,3,0,3,31,#F36C21,#1E2A4A,#F9D8C1
+SWE_carl_starfelt,Carl STARFELT,SWE,Sweden,DF,15,3,0,1,31,#FECC00,#006AA7,#FCEEBA
+EGY_hamza_abdelkarim,HAMZA ABDELKARIM,EGY,Egypt,FW,9,3,0,4,30,#CE1126,#1A1A1A,#F1C4C2
+ENG_ollie_watkins,Ollie WATKINS,ENG,England,FW,19,3,0,2,30,#FFFFFF,#1D2C5E,#CACACE
+GER_pascal_gross,Pascal GROSS,GER,Germany,MF,13,3,0,1,30,#FFFFFF,#1A1A1A,#CAC6BF
+IRQ_kevin_yakob,KEVIN YAKOB,IRQ,Iraq,MF,19,3,0,1,30,#007A3D,#FFFFFF,#C4DCC7
+IRQ_munaf_younus,MUNAF YOUNUS,IRQ,Iraq,DF,6,3,0,1,30,#007A3D,#FFFFFF,#C4DCC7
+AUS_tete_yengi,Tete YENGI,AUS,Australia,FW,26,3,0,2,29,#FFCD00,#00843D,#FCEEBA
+POR_samu_costa,SAMU COSTA,POR,Portugal,DF,24,3,0,1,29,#A6192E,#006600,#E8C6C4
+GHA_prince_adu,Prince ADU,GHA,Ghana,FW,25,3,0,3,28,#FFFFFF,#FCD116,#FBEFBE
+PAR_gustavo_caballero,Gustavo CABALLERO,PAR,Paraguay,MF,24,3,0,2,28,#D52B1E,#FFFFFF,#F3CAC0
+COD_simon_banza,Simon BANZA,COD,Congo DR,FW,23,3,0,2,27,#007FFF,#CE1021,#C4DDF2
+KOR_eom_jisung,EOM Jisung,KOR,Korea Republic,MF,25,3,0,2,27,#C60C30,#0047A0,#EFC3C4
+PAN_ismael_diaz,Ismael DIAZ,PAN,Panama,MF,10,3,0,2,27,#DA121A,#072357,#F4C5BF
+PAR_alex_arce,Alex ARCE,PAR,Paraguay,FW,18,3,0,2,27,#D52B1E,#FFFFFF,#F3CAC0
+BEL_diego_moreira,Diego MOREIRA,BEL,Belgium,MF,19,3,0,1,26,#C8102E,#FDDA24,#F0C4C4
+NOR_sondre_langas,Sondre LANGAS,NOR,Norway,DF,24,3,0,1,26,#BA0C2F,#00205B,#EDC3C4
+POR_francisco_trincao,FRANCISCO TRINCAO,POR,Portugal,FW,16,3,0,1,26,#A6192E,#006600,#E8C6C4
+SWE_mattias_svanberg,Mattias SVANBERG,SWE,Sweden,MF,19,3,0,2,26,#FECC00,#006AA7,#FCEEBA
+AUT_patrick_wimmer,Patrick WIMMER,AUT,Austria,FW,21,3,0,2,25,#ED2939,#FFFFFF,#F8CAC6
+GHA_akmal_mozgovoy,Akmal MOZGOVOY,GHA,Ghana,MF,6,3,0,1,25,#FFFFFF,#FCD116,#FBEFBE
+KOR_cho_guesung,CHO Guesung,KOR,Korea Republic,FW,9,3,0,2,25,#C60C30,#0047A0,#EFC3C4
+MAR_ayoube_amaimouni,Ayoube AMAIMOUNI,MAR,Morocco,FW,21,3,0,2,25,#C1272D,#006233,#EEC9C4
+MEX_santiago_gimenez,Santiago GIMENEZ,MEX,Mexico,FW,11,3,0,4,25,#006847,#CE1126,#C4D8C9
+PAN_anibal_godoy,Anibal GODOY,PAN,Panama,MF,20,3,0,1,25,#DA121A,#072357,#F4C5BF
+SEN_assane_diao,Assane DIAO,SEN,Senegal,FW,7,3,0,1,25,#FFFFFF,#00853F,#C4DEC8
+TUN_firas_chaouat,Firas CHAOUAT,TUN,Tunisia,FW,19,3,0,3,25,#E70013,#FFFFFF,#F7C1BE
+BRA_alex_sandro,ALEX SANDRO,BRA,Brazil,DF,6,3,0,1,24,#FFDF00,#009C3B,#FCF2BA
+COL_kevin_castano,Kevin CASTANO,COL,Colombia,MF,5,3,0,2,24,#FCD116,#003893,#FBEFBE
+CZE_tomas_chory,Tomas CHORY,CZE,Czechia,FW,19,3,0,2,24,#D7141A,#11457E,#F3C5BF
+ENG_jordan_henderson,Jordan HENDERSON,ENG,England,MF,14,3,0,1,24,#FFFFFF,#1D2C5E,#CACACE
+GER_maximilian_beier,Maximilian BEIER,GER,Germany,FW,14,3,0,1,24,#FFFFFF,#1A1A1A,#CAC6BF
+SCO_findlay_curtis,Findlay CURTIS,SCO,Scotland,FW,25,3,0,2,24,#0B2A5B,#FFFFFF,#C6CACE
+SEN_bara_sapoko_ndiaye,Bara Sapoko NDIAYE,SEN,Senegal,MF,22,3,0,1,24,#FFFFFF,#00853F,#C4DEC8
+BIH_dzenis_burnic,Dzenis BURNIC,BIH,Bosnia and Herzegovina,MF,17,3,0,2,23,#1D3C9A,#FECB00,#CACEDC
+COD_theo_bongonda,Theo BONGONDA,COD,Congo DR,MF,10,3,0,2,23,#007FFF,#CE1021,#C4DDF2
+GER_jamie_leweling,Jamie LEWELING,GER,Germany,MF,9,3,0,1,23,#FFFFFF,#1A1A1A,#CAC6BF
+AUS_jason_geria,Jason GERIA,AUS,Australia,DF,6,3,0,2,22,#FFCD00,#00843D,#FCEEBA
+CAN_jayden_nelson,Jayden NELSON,CAN,Canada,FW,26,3,0,1,22,#D80621,#FFFFFF,#F3C2C1
+FRA_maghnes_akliouche,Maghnes AKLIOUCHE,FRA,France,MF,25,3,0,1,22,#1E2A4A,#E1000F,#CACACA
+IRN_alireza_jahanbakhsh,Alireza JAHANBAKHSH,IRN,IR Iran,MF,7,3,0,2,22,#FFFFFF,#DA0000,#F4C1BA
+MEX_alexis_vega,Alexis VEGA,MEX,Mexico,FW,10,3,0,1,22,#006847,#CE1126,#C4D8C9
+UZB_farrukh_sayfiev,Farrukh SAYFIEV,UZB,Uzbekistan,DF,4,3,0,1,22,#0099B5,#FFFFFF,#C4E2E1
+CUW_jearl_margaritha,Jearl MARGARITHA,CUW,Curaçao,FW,16,3,0,2,21,#002B7F,#F9E814,#C4CAD6
+FRA_jean_philippe_mateta,Jean-Philippe MATETA,FRA,France,FW,22,3,0,3,21,#1E2A4A,#E1000F,#CACACA
+JPN_koki_ogawa,Koki OGAWA,JPN,Japan,FW,19,3,0,3,21,#0A3A8C,#FFFFFF,#C6CDD8
+MEX_cesar_huerta,Cesar HUERTA,MEX,Mexico,FW,21,3,0,1,21,#006847,#CE1126,#C4D8C9
+NED_justin_kluivert,Justin KLUIVERT,NED,Netherlands,MF,7,3,0,2,21,#F36C21,#1E2A4A,#F9D8C1
+USA_alex_zendejas,Alex ZENDEJAS,USA,USA,FW,26,3,0,1,21,#FFFFFF,#0A3161,#C6CBCF
+CAN_jonathan_osorio,Jonathan OSORIO,CAN,Canada,MF,21,3,0,2,20,#D80621,#FFFFFF,#F3C2C1
+CIV_evann_guessand,Evann GUESSAND,CIV,Côte d'Ivoire,FW,22,3,0,2,20,#FF8200,#009E60,#FCDDBA
+GHA_brandon_thomas_asante,Brandon THOMAS-ASANTE,GHA,Ghana,FW,10,3,0,2,20,#FFFFFF,#FCD116,#FBEFBE
+JOR_saed_alrosan,SAED ALROSAN,JOR,Jordan,DF,19,3,0,1,20,#CE1126,#FFFFFF,#F1C4C2
+RSA_kamogelo_sebelebele,Kamogelo SEBELEBELE,RSA,South Africa,FW,25,3,0,1,20,#FFB81C,#007749,#FCE9C0
+UZB_jamshid_iskanderov,Jamshid ISKANDEROV,UZB,Uzbekistan,MF,8,3,0,1,20,#0099B5,#FFFFFF,#C4E2E1
+CAN_alphonso_davies,Alphonso DAVIES,CAN,Canada,DF,19,3,0,1,19,#D80621,#FFFFFF,#F3C2C1
+IRN_mehdi_ghayedi,Mehdi GHAYEDI,IRN,IR Iran,FW,10,3,0,1,19,#FFFFFF,#DA0000,#F4C1BA
+JOR_mohammad_aldaoud,MOHAMMAD ALDAOUD,JOR,Jordan,MF,25,3,0,1,19,#CE1126,#FFFFFF,#F1C4C2
+NZL_callan_elliot,Callan ELLIOT,NZL,New Zealand,DF,24,3,0,1,19,#FFFFFF,#1A1A1A,#CAC6BF
+TUN_mohamed_hadj_mahmoud,Mohamed HADJ MAHMOUD,TUN,Tunisia,MF,15,3,0,2,19,#E70013,#FFFFFF,#F7C1BE
+URU_sergio_rochet,Sergio ROCHET,URU,Uruguay,GK,1,3,0,1,19,#5CBFEB,#1A1A1A,#D8EBED
+USA_haji_wright,Haji WRIGHT,USA,USA,FW,19,3,0,2,19,#FFFFFF,#0A3161,#C6CBCF
+CIV_simon_adingra,Simon ADINGRA,CIV,Côte d'Ivoire,FW,10,3,0,1,18,#FF8200,#009E60,#FCDDBA
+COD_gedeon_kalulu,Gedeon KALULU,COD,Congo DR,DF,24,3,0,1,18,#007FFF,#CE1021,#C4DDF2
+ESP_eric_garcia,Eric GARCIA,ESP,Spain,DF,4,3,0,1,18,#C60B1E,#FFC400,#EFC3C0
+NED_guus_til,Guus TIL,NED,Netherlands,MF,16,3,0,1,18,#F36C21,#1E2A4A,#F9D8C1
+NZL_francis_de_vries,Francis DE VRIES,NZL,New Zealand,DF,3,3,0,2,18,#FFFFFF,#1A1A1A,#CAC6BF
+ALG_mohamed_amoura,Mohamed AMOURA,ALG,Algeria,FW,18,3,0,1,17,#0B7A3E,#FFFFFF,#C6DCC7
+ALG_nadhir_benbouali,Nadhir BENBOUALI,ALG,Algeria,FW,12,3,0,1,17,#0B7A3E,#FFFFFF,#C6DCC7
+RSA_themba_zwane,Themba ZWANE,RSA,South Africa,MF,11,3,0,1,17,#FFB81C,#007749,#FCE9C0
+SUI_noah_okafor,Noah OKAFOR,SUI,Switzerland,FW,19,3,0,1,17,#D52B1E,#FFFFFF,#F3CAC0
+BEL_axel_witsel,Axel WITSEL,BEL,Belgium,MF,6,3,0,2,16,#C8102E,#FDDA24,#F0C4C4
+CRO_luka_sucic,Luka SUCIC,CRO,Croatia,MF,21,3,0,1,16,#D52B1E,#FFFFFF,#F3CAC0
+CUW_tyrese_noslin,Tyrese NOSLIN,CUW,Curaçao,FW,13,3,0,1,16,#002B7F,#F9E814,#C4CAD6
+ECU_kendry_paez,Kendry PAEZ,ECU,Ecuador,MF,10,3,0,1,16,#FFD100,#0072CE,#FCEFBA
+KOR_yang_hyunjun,YANG Hyunjun,KOR,Korea Republic,MF,20,3,0,1,16,#C60C30,#0047A0,#EFC3C4
+NED_noa_lang,Noa LANG,NED,Netherlands,FW,17,3,0,2,16,#F36C21,#1E2A4A,#F9D8C1
+PAR_alejandro_romero_gamarra,Alejandro ROMERO GAMARRA,PAR,Paraguay,FW,17,3,0,1,16,#D52B1E,#FFFFFF,#F3CAC0
+RSA_tshepang_moremi,Tshepang MOREMI,RSA,South Africa,FW,8,3,0,2,16,#FFB81C,#007749,#FCE9C0
+ECU_jordy_caicedo,Jordy CAICEDO,ECU,Ecuador,FW,16,3,0,3,15,#FFD100,#0072CE,#FCEFBA
+ARG_jose_manuel_lopez,Jose Manuel LOPEZ,ARG,Argentina,FW,21,3,0,2,14,#75AADB,#FFFFFF,#DEE6EA
+BIH_dennis_hadzikadunic,Dennis HADZIKADUNIC,BIH,Bosnia and Herzegovina,DF,3,3,0,1,14,#1D3C9A,#FECB00,#CACEDC
+BRA_ederson_silva,EDERSON SILVA,BRA,Brazil,MF,2,3,0,2,14,#FFDF00,#009C3B,#FCF2BA
+COL_cucho_hernandez,Cucho HERNANDEZ,COL,Colombia,FW,19,3,0,2,14,#FCD116,#003893,#FBEFBE
+GHA_khojiakbar_alijonov,Khojiakbar ALIJONOV,GHA,Ghana,DF,3,3,0,1,14,#FFFFFF,#FCD116,#FBEFBE
+IRN_ali_alipour,Ali ALIPOUR,IRN,IR Iran,FW,11,3,0,1,14,#FFFFFF,#DA0000,#F4C1BA
+MAR_amine_sbai,Amine SBAI,MAR,Morocco,FW,17,3,0,1,14,#C1272D,#006233,#EEC9C4
+MAR_zakaria_el_ouahdi,Zakaria EL OUAHDI,MAR,Morocco,DF,13,3,0,1,14,#C1272D,#006233,#EEC9C4
+PAN_alberto_quintero,Alberto QUINTERO,PAN,Panama,MF,19,3,0,1,14,#DA121A,#072357,#F4C5BF
+SCO_lyndon_dykes,Lyndon DYKES,SCO,Scotland,FW,9,3,0,2,14,#0B2A5B,#FFFFFF,#C6CACE
+TUN_elias_achouri,Elias ACHOURI,TUN,Tunisia,FW,7,3,0,3,14,#E70013,#FFFFFF,#F7C1BE
+UZB_igor_sergeev,Igor SERGEEV,UZB,Uzbekistan,FW,21,3,0,2,14,#0099B5,#FFFFFF,#C4E2E1
+BEL_senne_lammens,Senne LAMMENS,BEL,Belgium,GK,12,3,0,1,13,#C8102E,#FDDA24,#F0C4C4
+JPN_kento_shiogai,Kento SHIOGAI,JPN,Japan,FW,26,3,0,1,13,#0A3A8C,#FFFFFF,#C6CDD8
+QAT_ahmed_alganehi,AHMED ALGANEHI,QAT,Qatar,MF,17,3,0,1,13,#8A1538,#FFFFFF,#E2C5C6
+TUR_deniz_gul,Deniz GUL,TUR,Türkiye,FW,9,3,0,2,13,#E30A17,#FFFFFF,#F6C3BF
+BEL_joaquin_seys,Joaquin SEYS,BEL,Belgium,DF,18,3,0,1,12,#C8102E,#FDDA24,#F0C4C4
+CUW_brandley_kuwas,Brandley KUWAS,CUW,Curaçao,FW,17,3,0,1,12,#002B7F,#F9E814,#C4CAD6
+EGY_ibrahim_adel,IBRAHIM ADEL,EGY,Egypt,FW,20,3,0,1,12,#CE1126,#1A1A1A,#F1C4C2
+ENG_dan_burn,Dan BURN,ENG,England,DF,15,3,0,3,12,#FFFFFF,#1D2C5E,#CACACE
+GHA_igor_sergeev,Igor SERGEEV,GHA,Ghana,FW,21,3,0,1,12,#FFFFFF,#FCD116,#FBEFBE
+IRQ_ahmed_maknazi,AHMED MAKNAZI,IRQ,Iraq,DF,15,3,0,1,12,#007A3D,#FFFFFF,#C4DCC7
+IRQ_youssef_amyn,YOUSSEF AMYN,IRQ,Iraq,MF,7,3,0,1,12,#007A3D,#FFFFFF,#C4DCC7
+NED_jorrel_hato,Jorrel HATO,NED,Netherlands,DF,25,3,0,1,12,#F36C21,#1E2A4A,#F9D8C1
+PAR_braian_ojeda,Braian OJEDA,PAR,Paraguay,MF,20,3,0,1,12,#D52B1E,#FFFFFF,#F3CAC0
+SWE_ken_sema,Ken SEMA,SWE,Sweden,MF,13,3,0,1,12,#FECC00,#006AA7,#FCEEBA
+UZB_azizbek_amonov,Azizbek AMONOV,UZB,Uzbekistan,FW,20,3,0,1,12,#0099B5,#FFFFFF,#C4E2E1
+JPN_yuto_nagatomo,Yuto NAGATOMO,JPN,Japan,DF,5,3,0,1,11,#0A3A8C,#FFFFFF,#C6CDD8
+SCO_anthony_ralston,Anthony RALSTON,SCO,Scotland,DF,24,3,0,2,11,#0B2A5B,#FFFFFF,#C6CACE
+AUS_awer_mabil,Awer MABIL,AUS,Australia,FW,11,3,0,1,10,#FFCD00,#00843D,#FCEEBA
+CZE_david_zima,David ZIMA,CZE,Czechia,DF,2,3,0,1,10,#D7141A,#11457E,#F3C5BF
+HAI_derrick_etienne,Derrick ETIENNE,HAI,Haiti,FW,7,3,0,1,10,#00209F,#D21034,#C4C8DD
+MEX_armando_gonzalez,Armando GONZALEZ,MEX,Mexico,FW,14,3,0,1,10,#006847,#CE1126,#C4D8C9
+MEX_orbelin_pineda,Orbelin PINEDA,MEX,Mexico,MF,17,3,0,2,10,#006847,#CE1126,#C4D8C9
+NED_wout_weghorst,Wout WEGHORST,NED,Netherlands,FW,9,3,0,1,10,#F36C21,#1E2A4A,#F9D8C1
+SUI_eray_coemert,Eray COEMERT,SUI,Switzerland,DF,18,3,0,1,10,#D52B1E,#FFFFFF,#F3CAC0
+ESP_marc_pubill,Marc PUBILL,ESP,Spain,DF,2,3,0,1,9,#C60B1E,#FFC400,#EFC3C0
+GHA_sherzod_esanov,Sherzod ESANOV,GHA,Ghana,MF,23,3,0,1,9,#FFFFFF,#FCD116,#FBEFBE
+HAI_yassin_fortune,Yassin FORTUNE,HAI,Haiti,FW,19,3,0,1,9,#00209F,#D21034,#C4C8DD
+JPN_yuito_suzuki,Yuito SUZUKI,JPN,Japan,MF,17,3,0,1,9,#0A3A8C,#FFFFFF,#C6CDD8
+NOR_jens_petter_hauge,Jens Petter HAUGE,NOR,Norway,MF,23,3,0,1,9,#BA0C2F,#00205B,#EDC3C4
+QAT_ahmed_alaaeldin,AHMED ALAAELDIN,QAT,Qatar,FW,7,3,0,2,9,#8A1538,#FFFFFF,#E2C5C6
+QAT_almoez_ali,ALMOEZ ALI,QAT,Qatar,FW,19,3,0,1,9,#8A1538,#FFFFFF,#E2C5C6
+SUI_christian_fassnacht,Christian FASSNACHT,SUI,Switzerland,FW,16,3,0,1,9,#D52B1E,#FFFFFF,#F3CAC0
+SWE_gustaf_nilsson,Gustaf NILSSON,SWE,Sweden,FW,25,3,0,1,9,#FECC00,#006AA7,#FCEEBA
+BIH_haris_tabakovic,Haris TABAKOVIC,BIH,Bosnia and Herzegovina,FW,23,3,0,1,8,#1D3C9A,#FECB00,#CACEDC
+BIH_samed_bazdar,Samed BAZDAR,BIH,Bosnia and Herzegovina,FW,9,3,0,1,8,#1D3C9A,#FECB00,#CACEDC
+IRQ_mohanad_ali,MOHANAD ALI,IRQ,Iraq,FW,10,3,0,1,8,#007A3D,#FFFFFF,#C4DCC7
+JOR_amer_jamous,AMER JAMOUS,JOR,Jordan,MF,6,3,0,1,8,#CE1126,#FFFFFF,#F1C4C2
+JOR_mohammad_abuzraiq,MOHAMMAD ABUZRAIQ,JOR,Jordan,FW,7,3,0,2,8,#CE1126,#FFFFFF,#F1C4C2
+JPN_shuto_machino,Shuto MACHINO,JPN,Japan,FW,6,3,0,1,8,#0A3A8C,#FFFFFF,#C6CDD8
+MEX_guillermo_ochoa,Guillermo OCHOA,MEX,Mexico,GK,13,3,0,1,8,#006847,#CE1126,#C4D8C9
+PAN_eric_davis,Eric DAVIS,PAN,Panama,DF,15,3,0,2,8,#DA121A,#072357,#F4C5BF
+COL_andres_gomez,Andres GOMEZ,COL,Colombia,FW,26,3,0,1,7,#FCD116,#003893,#FBEFBE
+TUR_caglar_soyuncu,Caglar SOYUNCU,TUR,Türkiye,DF,4,3,0,1,7,#E30A17,#FFFFFF,#F6C3BF
+ALG_fares_ghedjemis,Fares GHEDJEMIS,ALG,Algeria,FW,25,3,0,1,6,#0B7A3E,#FFFFFF,#C6DCC7
+BIH_amir_hadziahmetovic,Amir HADZIAHMETOVIC,BIH,Bosnia and Herzegovina,MF,16,3,0,1,6,#1D3C9A,#FECB00,#CACEDC
+ECU_felix_torres,Felix TORRES,ECU,Ecuador,DF,2,3,0,1,6,#FFD100,#0072CE,#FCEFBA
+ESP_borja_iglesias,Borja IGLESIAS,ESP,Spain,FW,26,3,0,1,6,#C60B1E,#FFC400,#EFC3C0
+IRQ_ali_yousif,ALI YOUSIF,IRQ,Iraq,FW,13,3,0,1,6,#007A3D,#FFFFFF,#C4DCC7
+IRQ_mustafa_saadoon,MUSTAFA SAADOON,IRQ,Iraq,DF,25,3,0,1,6,#007A3D,#FFFFFF,#C4DCC7
+PAR_ramon_sosa,Ramon SOSA,PAR,Paraguay,MF,7,3,0,1,6,#D52B1E,#FFFFFF,#F3CAC0
+POR_matheus_nunes,MATHEUS NUNES,POR,Portugal,MF,6,3,0,1,6,#A6192E,#006600,#E8C6C4
+TUR_irfan_can_kahveci,Irfan Can KAHVECI,TUR,Türkiye,FW,17,3,0,1,6,#E30A17,#FFFFFF,#F6C3BF
+URU_rodrigo_aguirre,Rodrigo AGUIRRE,URU,Uruguay,FW,19,3,0,1,6,#5CBFEB,#1A1A1A,#D8EBED
+COL_yerry_mina,Yerry MINA,COL,Colombia,DF,13,3,0,1,5,#FCD116,#003893,#FBEFBE
+CZE_mojmir_chytil,Mojmir CHYTIL,CZE,Czechia,FW,13,3,0,1,5,#D7141A,#11457E,#F3C5BF
+GER_nick_woltemade,Nick WOLTEMADE,GER,Germany,FW,11,3,0,1,5,#FFFFFF,#1A1A1A,#CAC6BF
+TUN_mortadha_ben_ouanes,Mortadha BEN OUANES,TUN,Tunisia,DF,12,3,0,1,5,#E70013,#FFFFFF,#F7C1BE
+CUW_shurandy_sambo,Shurandy SAMBO,CUW,Curaçao,DF,2,3,0,1,4,#002B7F,#F9E814,#C4CAD6
+FRA_marcus_thuram,Marcus THURAM,FRA,France,FW,9,3,0,1,4,#1E2A4A,#E1000F,#CACACA
+SEN_bamba_dieng,Bamba DIENG,SEN,Senegal,FW,9,3,0,1,4,#FFFFFF,#00853F,#C4DEC8
+HAI_duckens_nazon,Duckens NAZON,HAI,Haiti,FW,9,3,0,1,3,#00209F,#D21034,#C4C8DD
+JPN_keisuke_goto,Keisuke GOTO,JPN,Japan,FW,9,3,0,1,3,#0A3A8C,#FFFFFF,#C6CDD8
+TUR_kaan_ayhan,Kaan AYHAN,TUR,Türkiye,MF,22,3,0,1,3,#E30A17,#FFFFFF,#F6C3BF
+USA_max_arfsten,Max ARFSTEN,USA,USA,DF,18,3,0,1,3,#FFFFFF,#0A3161,#C6CBCF
+AUS_mathew_ryan,Mathew RYAN,AUS,Australia,GK,1,3,0,1,2,#FFCD00,#00843D,#FCEEBA
+CUW_godfried_roemeratoe,Godfried ROEMERATOE,CUW,Curaçao,MF,6,3,0,1,2,#002B7F,#F9E814,#C4CAD6
+CUW_kenji_gorre,Kenji GORRE,CUW,Curaçao,FW,14,3,0,1,2,#002B7F,#F9E814,#C4CAD6
+CUW_roshon_van_eijma,Roshon VAN EIJMA,CUW,Curaçao,DF,4,3,0,1,2,#002B7F,#F9E814,#C4CAD6
+JOR_mohammad_abuhasheesh,MOHAMMAD ABUHASHEESH,JOR,Jordan,DF,2,3,0,1,2,#CE1126,#FFFFFF,#F1C4C2
+NED_marten_de_roon,Marten DE ROON,NED,Netherlands,MF,3,3,0,1,1,#F36C21,#1E2A4A,#F9D8C1
+PAR_fabian_balbuena,Fabian BALBUENA,PAR,Paraguay,DF,5,3,0,1,1,#D52B1E,#FFFFFF,#F3CAC0
+QAT_alhashmi_alhussein,ALHASHMI ALHUSSEIN,QAT,Qatar,DF,25,3,0,1,1,#8A1538,#FFFFFF,#E2C5C6
+QAT_lucas_mendes,LUCAS MENDES,QAT,Qatar,DF,3,3,0,1,1,#8A1538,#FFFFFF,#E2C5C6
+ENG_trevoh_chalobah,Trevoh CHALOBAH,ENG,England,DF,12,3,0,1,0,#FFFFFF,#1D2C5E,#CACACE
+GHA_baba_rahman,Baba RAHMAN,GHA,Ghana,DF,17,3,0,1,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_ruslanbek_jiyanov,Ruslanbek JIYANOV,GHA,Ghana,MF,10,3,0,1,0,#FFFFFF,#FCD116,#FBEFBE
+KSA_khalid_alghannam,KHALID ALGHANNAM,KSA,Saudi Arabia,FW,17,3,0,1,0,#006C35,#FFFFFF,#C4D8C5
+MAR_marwane_saadane,Marwane SAADANE,MAR,Morocco,DF,5,3,0,1,0,#C1272D,#006233,#EEC9C4
+SCO_ross_stewart,Ross STEWART,SCO,Scotland,FW,14,3,0,1,0,#0B2A5B,#FFFFFF,#C6CACE
+ALG_achref_abada,Achref ABADA,ALG,Algeria,DF,3,4,0,0,0,#0B7A3E,#FFFFFF,#C6DCC7
+ALG_melvin_mastil,Melvin MASTIL,ALG,Algeria,GK,1,4,0,0,0,#0B7A3E,#FFFFFF,#C6DCC7
+ALG_mohamed_amine_tougai,Mohamed Amine TOUGAI,ALG,Algeria,DF,4,4,0,0,0,#0B7A3E,#FFFFFF,#C6DCC7
+ALG_yassine_titraoui,Yassine TITRAOUI,ALG,Algeria,MF,24,4,0,0,0,#0B7A3E,#FFFFFF,#C6DCC7
+ARG_geronimo_rulli,Geronimo RULLI,ARG,Argentina,GK,12,4,0,0,0,#75AADB,#FFFFFF,#DEE6EA
+ARG_juan_musso,Juan MUSSO,ARG,Argentina,GK,1,4,0,0,0,#75AADB,#FFFFFF,#DEE6EA
+AUS_cameron_devlin,Cameron DEVLIN,AUS,Australia,MF,14,4,0,0,0,#FFCD00,#00843D,#FCEEBA
+AUS_milos_degenek,Milos DEGENEK,AUS,Australia,DF,2,4,0,0,0,#FFCD00,#00843D,#FCEEBA
+AUS_paul_izzo,Paul IZZO,AUS,Australia,GK,12,4,0,0,0,#FFCD00,#00843D,#FCEEBA
+AUT_alessandro_schoepf,Alessandro SCHOEPF,AUT,Austria,MF,26,4,0,0,0,#ED2939,#FFFFFF,#F8CAC6
+AUT_david_affengruber,David AFFENGRUBER,AUT,Austria,DF,2,4,0,0,0,#ED2939,#FFFFFF,#F8CAC6
+AUT_dejan_ljubicic,Dejan LJUBICIC,AUT,Austria,MF,19,4,0,0,0,#ED2939,#FFFFFF,#F8CAC6
+AUT_florian_wiegele,Florian WIEGELE,AUT,Austria,GK,12,4,0,0,0,#ED2939,#FFFFFF,#F8CAC6
+AUT_michael_svoboda,Michael SVOBODA,AUT,Austria,DF,25,4,0,0,0,#ED2939,#FFFFFF,#F8CAC6
+AUT_patrick_pentz,Patrick PENTZ,AUT,Austria,GK,13,4,0,0,0,#ED2939,#FFFFFF,#F8CAC6
+BEL_koni_de_winter,Koni DE WINTER,BEL,Belgium,DF,16,4,0,0,0,#C8102E,#FDDA24,#F0C4C4
+BEL_mike_penders,Mike PENDERS,BEL,Belgium,GK,13,4,0,0,0,#C8102E,#FDDA24,#F0C4C4
+BEL_zeno_debast,Zeno DEBAST,BEL,Belgium,DF,2,4,0,0,0,#C8102E,#FDDA24,#F0C4C4
+BIH_martin_zlomislic,Martin ZLOMISLIC,BIH,Bosnia and Herzegovina,GK,22,4,0,0,0,#1D3C9A,#FECB00,#CACEDC
+BIH_mladen_jurkas,Mladen JURKAS,BIH,Bosnia and Herzegovina,GK,12,4,0,0,0,#1D3C9A,#FECB00,#CACEDC
+BIH_nihad_mujakic,Nihad MUJAKIC,BIH,Bosnia and Herzegovina,DF,2,4,0,0,0,#1D3C9A,#FECB00,#CACEDC
+BRA_bremer,BREMER,BRA,Brazil,DF,14,4,0,0,0,#FFDF00,#009C3B,#FCF2BA
+BRA_ederson,EDERSON,BRA,Brazil,GK,23,4,0,0,0,#FFDF00,#009C3B,#FCF2BA
+BRA_leo_pereira,LEO PEREIRA,BRA,Brazil,DF,15,4,0,0,0,#FFDF00,#009C3B,#FCF2BA
+BRA_weverton,WEVERTON,BRA,Brazil,GK,12,4,0,0,0,#FFDF00,#009C3B,#FCF2BA
+CAN_alfie_jones,Alﬁe JONES,CAN,Canada,DF,3,4,0,0,0,#D80621,#FFFFFF,#F3C2C1
+CAN_dayne_st_clair,Dayne ST. CLAIR,CAN,Canada,GK,1,4,0,0,0,#D80621,#FFFFFF,#F3C2C1
+CAN_joel_waterman,Joel WATERMAN,CAN,Canada,DF,5,4,0,0,0,#D80621,#FFFFFF,#F3C2C1
+CAN_owen_goodman,Owen GOODMAN,CAN,Canada,GK,18,4,0,0,0,#D80621,#FFFFFF,#F3C2C1
+CIV_alban_lafont,Alban LAFONT,CIV,Côte d'Ivoire,GK,23,4,0,0,0,#FF8200,#009E60,#FCDDBA
+CIV_evan_ndicka,Evan NDICKA,CIV,Côte d'Ivoire,DF,21,4,0,0,0,#FF8200,#009E60,#FCDDBA
+CIV_mohamed_kone,Mohamed KONE,CIV,Côte d'Ivoire,GK,16,4,0,0,0,#FF8200,#009E60,#FCDDBA
+CIV_parfait_guiagon,Parfait GUIAGON,CIV,Côte d'Ivoire,MF,25,4,0,0,0,#FF8200,#009E60,#FCDDBA
+COD_aaron_tshibola,Aaron TSHIBOLA,COD,Congo DR,MF,15,4,0,0,0,#007FFF,#CE1021,#C4DDF2
+COD_dylan_batubinsika,Dylan BATUBINSIKA,COD,Congo DR,DF,5,4,0,0,0,#007FFF,#CE1021,#C4DDF2
+COD_gael_kakuta,Gael KAKUTA,COD,Congo DR,FW,11,4,0,0,0,#007FFF,#CE1021,#C4DDF2
+COD_matthieu_epolo,Matthieu EPOLO,COD,Congo DR,GK,21,4,0,0,0,#007FFF,#CE1021,#C4DDF2
+COD_timothy_fayulu,Timothy FAYULU,COD,Congo DR,GK,16,4,0,0,0,#007FFF,#CE1021,#C4DDF2
+COL_alvaro_montero,Alvaro MONTERO,COL,Colombia,GK,24,4,0,0,0,#FCD116,#003893,#FBEFBE
+COL_david_ospina,David OSPINA,COL,Colombia,GK,1,4,0,0,0,#FCD116,#003893,#FBEFBE
+COL_jorge_carrascal,Jorge CARRASCAL,COL,Colombia,MF,8,4,0,0,0,#FCD116,#003893,#FBEFBE
+COL_juan_portilla,Juan PORTILLA,COL,Colombia,MF,15,4,0,0,0,#FCD116,#003893,#FBEFBE
+COL_willer_ditta,Willer DITTA,COL,Colombia,DF,18,4,0,0,0,#FCD116,#003893,#FBEFBE
+CPV_cj_dos_santos,CJ DOS SANTOS,CPV,Cabo Verde,GK,23,4,0,0,0,#003893,#CF2027,#C4CDDA
+CPV_kelvin_pires,KELVIN PIRES,CPV,Cabo Verde,DF,25,4,0,0,0,#003893,#CF2027,#C4CDDA
+CPV_logan_costa,LOGAN COSTA,CPV,Cabo Verde,DF,5,4,0,0,0,#003893,#CF2027,#C4CDDA
+CPV_marcio_rosa,MARCIO ROSA,CPV,Cabo Verde,GK,12,4,0,0,0,#003893,#CF2027,#C4CDDA
+CPV_stopira,STOPIRA,CPV,Cabo Verde,DF,2,4,0,0,0,#003893,#CF2027,#C4CDDA
+CRO_dominik_kotarski,Dominik KOTARSKI,CRO,Croatia,GK,23,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CRO_duje_caleta_car,Duje CALETA-CAR,CRO,Croatia,DF,5,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CRO_ivor_pandur,Ivor PANDUR,CRO,Croatia,GK,12,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CRO_kristijan_jakic,Kristijan JAKIC,CRO,Croatia,DF,18,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CRO_martin_erlic,Martin ERLIC,CRO,Croatia,DF,25,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CRO_nikola_moro,Nikola MORO,CRO,Croatia,MF,7,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CRO_toni_fruk,Toni FRUK,CRO,Croatia,MF,19,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+CUW_arjany_martha,Arjany MARTHA,CUW,Curaçao,MF,15,4,0,0,0,#002B7F,#F9E814,#C4CAD6
+CUW_kevin_felida,Kevin FELIDA,CUW,Curaçao,MF,22,4,0,0,0,#002B7F,#F9E814,#C4CAD6
+CUW_trevor_doornbusch,Trevor DOORNBUSCH,CUW,Curaçao,GK,26,4,0,0,0,#002B7F,#F9E814,#C4CAD6
+CUW_tyrick_bodak,Tyrick BODAK,CUW,Curaçao,GK,25,4,0,0,0,#002B7F,#F9E814,#C4CAD6
+CZE_david_jurasek,David JURASEK,CZE,Czechia,DF,14,4,0,0,0,#D7141A,#11457E,#F3C5BF
+CZE_hugo_sochurek,Hugo SOCHUREK,CZE,Czechia,MF,25,4,0,0,0,#D7141A,#11457E,#F3C5BF
+CZE_jan_kuchta,Jan KUCHTA,CZE,Czechia,FW,11,4,0,0,0,#D7141A,#11457E,#F3C5BF
+CZE_jindrich_stanek,Jindrich STANEK,CZE,Czechia,GK,16,4,0,0,0,#D7141A,#11457E,#F3C5BF
+CZE_lukas_hornicek,Lukas HORNICEK,CZE,Czechia,GK,23,4,0,0,0,#D7141A,#11457E,#F3C5BF
+ECU_anthony_valencia,Anthony VALENCIA,ECU,Ecuador,MF,8,4,0,0,0,#FFD100,#0072CE,#FCEFBA
+ECU_denil_castillo,Denil CASTILLO,ECU,Ecuador,MF,18,4,0,0,0,#FFD100,#0072CE,#FCEFBA
+ECU_gonzalo_valle,Gonzalo VALLE,ECU,Ecuador,GK,22,4,0,0,0,#FFD100,#0072CE,#FCEFBA
+ECU_jeremy_arevalo,Jeremy AREVALO,ECU,Ecuador,FW,24,4,0,0,0,#FFD100,#0072CE,#FCEFBA
+ECU_moises_ramirez,Moises RAMIREZ,ECU,Ecuador,GK,12,4,0,0,0,#FFD100,#0072CE,#FCEFBA
+EGY_mahdy_soliman,MAHDY SOLIMAN,EGY,Egypt,GK,16,4,0,0,0,#CE1126,#1A1A1A,#F1C4C2
+EGY_mohamed_alaa,MOHAMED ALAA,EGY,Egypt,GK,26,4,0,0,0,#CE1126,#1A1A1A,#F1C4C2
+EGY_mohamed_elshenawy,MOHAMED ELSHENAWY,EGY,Egypt,GK,1,4,0,0,0,#CE1126,#1A1A1A,#F1C4C2
+EGY_nabil_donga,NABIL DONGA,EGY,Egypt,MF,18,4,0,0,0,#CE1126,#1A1A1A,#F1C4C2
+EGY_tarek_alaa,TAREK ALAA,EGY,Egypt,DF,24,4,0,0,0,#CE1126,#1A1A1A,#F1C4C2
+ENG_james_trafford,James TRAFFORD,ENG,England,GK,23,4,0,0,0,#FFFFFF,#1D2C5E,#CACACE
+ENG_kobbie_mainoo,Kobbie MAINOO,ENG,England,MF,16,4,0,0,0,#FFFFFF,#1D2C5E,#CACACE
+ESP_alex_grimaldo,Alex GRIMALDO,ESP,Spain,DF,3,4,0,0,0,#C60B1E,#FFC400,#EFC3C0
+ESP_david_raya,David RAYA,ESP,Spain,GK,1,4,0,0,0,#C60B1E,#FFC400,#EFC3C0
+ESP_joan_garcia,Joan GARCIA,ESP,Spain,GK,13,4,0,0,0,#C60B1E,#FFC400,#EFC3C0
+ESP_victor_munoz,Victor MUNOZ,ESP,Spain,FW,25,4,0,0,0,#C60B1E,#FFC400,#EFC3C0
+FRA_brice_samba,Brice SAMBA,FRA,France,GK,1,4,0,0,0,#1E2A4A,#E1000F,#CACACA
+FRA_lucas_hernandez,Lucas HERNANDEZ,FRA,France,DF,21,4,0,0,0,#1E2A4A,#E1000F,#CACACA
+FRA_ngolo_kante,Ngolo KANTE,FRA,France,MF,13,4,0,0,0,#1E2A4A,#E1000F,#CACACA
+FRA_robin_risser,Robin RISSER,FRA,France,GK,23,4,0,0,0,#1E2A4A,#E1000F,#CACACA
+GER_alexander_nuebel,Alexander NUEBEL,GER,Germany,GK,21,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+GER_assan_ouedraogo,Assan OUEDRAOGO,GER,Germany,MF,25,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+GER_oliver_baumann,Oliver BAUMANN,GER,Germany,GK,12,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+GHA_abdul_mumin,Abdul MUMIN,GHA,Ghana,DF,6,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_augustine_boakye,Augustine BOAKYE,GHA,Ghana,MF,20,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_avazbek_ulmasaliyev,Avazbek ULMASALIYEV,GHA,Ghana,DF,25,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_azizbek_amonov,Azizbek AMONOV,GHA,Ghana,FW,20,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_botirali_ergashev,Botirali ERGASHEV,GHA,Ghana,GK,16,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_christopher_bonsu_baah,Christopher BONSU BAAH,GHA,Ghana,FW,13,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_dostonbek_khamdamov,Dostonbek KHAMDAMOV,GHA,Ghana,MF,17,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_farrukh_sayfiev,Farrukh SAYFIEV,GHA,Ghana,DF,4,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_jakhongir_urozov,Jakhongir UROZOV,GHA,Ghana,DF,26,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_jamshid_iskanderov,Jamshid ISKANDEROV,GHA,Ghana,MF,8,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_joseph_anang,Joseph ANANG,GHA,Ghana,GK,12,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_oston_urunov,Oston URUNOV,GHA,Ghana,MF,11,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_umar_eshmurodov,Umar ESHMURODOV,GHA,Ghana,DF,15,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+GHA_utkir_yusupov,Utkir YUSUPOV,GHA,Ghana,GK,1,4,0,0,0,#FFFFFF,#FCD116,#FBEFBE
+HAI_alexandre_pierre,Alexandre PIERRE,HAI,Haiti,GK,12,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_carl_sainte,Carl SAINTE,HAI,Haiti,MF,6,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_garven_metusala,Garven METUSALA,HAI,Haiti,DF,14,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_josue_duverger,Josue DUVERGER,HAI,Haiti,GK,23,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_keeto_thermoncy,Keeto THERMONCY,HAI,Haiti,DF,3,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_markhus_lacroix,Markhus LACROIX,HAI,Haiti,DF,13,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_wilguens_paugain,Wilguens PAUGAIN,HAI,Haiti,DF,24,4,0,0,0,#00209F,#D21034,#C4C8DD
+HAI_woodensky_pierre,Woodensky PIERRE,HAI,Haiti,MF,26,4,0,0,0,#00209F,#D21034,#C4C8DD
+IRN_amirmohammad_razaghinia,Amirmohammad RAZAGHINIA,IRN,IR Iran,MF,26,4,0,0,0,#FFFFFF,#DA0000,#F4C1BA
+IRN_danial_iri,Danial IRI,IRN,IR Iran,DF,25,4,0,0,0,#FFFFFF,#DA0000,#F4C1BA
+IRN_dennis_dargahi,Dennis DARGAHI,IRN,IR Iran,FW,24,4,0,0,0,#FFFFFF,#DA0000,#F4C1BA
+IRN_hossein_hosseini,Hossein HOSSEINI,IRN,IR Iran,GK,22,4,0,0,0,#FFFFFF,#DA0000,#F4C1BA
+IRN_payam_niazmand,Payam NIAZMAND,IRN,IR Iran,GK,12,4,0,0,0,#FFFFFF,#DA0000,#F4C1BA
+IRN_roozbeh_cheshmi,Roozbeh CHESHMI,IRN,IR Iran,MF,15,4,0,0,0,#FFFFFF,#DA0000,#F4C1BA
+IRQ_fahad_talib,FAHAD TALIB,IRQ,Iraq,GK,1,4,0,0,0,#007A3D,#FFFFFF,#C4DCC7
+JOR_abdallah_alfakhori,ABDALLAH ALFAKHORI,JOR,Jordan,GK,22,4,0,0,0,#CE1126,#FFFFFF,#F1C4C2
+JOR_anas_badawi,ANAS BADAWI,JOR,Jordan,DF,26,4,0,0,0,#CE1126,#FFFFFF,#F1C4C2
+JOR_ibrahim_sadeh,IBRAHIM SADEH,JOR,Jordan,MF,15,4,0,0,0,#CE1126,#FFFFFF,#F1C4C2
+JOR_mohammad_abughoush,MOHAMMAD ABUGHOUSH,JOR,Jordan,MF,18,4,0,0,0,#CE1126,#FFFFFF,#F1C4C2
+JOR_nour_baniateyah,NOUR BANIATEYAH,JOR,Jordan,GK,12,4,0,0,0,#CE1126,#FFFFFF,#F1C4C2
+JOR_rajaei_ayed,RAJAEI AYED,JOR,Jordan,MF,14,4,0,0,0,#CE1126,#FFFFFF,#F1C4C2
+JPN_keisuke_osako,Keisuke OSAKO,JPN,Japan,GK,12,4,0,0,0,#0A3A8C,#FFFFFF,#C6CDD8
+JPN_tomoki_hayakawa,Tomoki HAYAKAWA,JPN,Japan,GK,23,4,0,0,0,#0A3A8C,#FFFFFF,#C6CDD8
+KOR_bae_junho,BAE Junho,KOR,Korea Republic,MF,17,4,0,0,0,#C60C30,#0047A0,#EFC3C4
+KOR_cho_wije,CHO Wije,KOR,Korea Republic,DF,14,4,0,0,0,#C60C30,#0047A0,#EFC3C4
+KOR_jo_hyeonwoo,JO Hyeonwoo,KOR,Korea Republic,GK,21,4,0,0,0,#C60C30,#0047A0,#EFC3C4
+KOR_kim_taehyeon,KIM Taehyeon,KOR,Korea Republic,DF,5,4,0,0,0,#C60C30,#0047A0,#EFC3C4
+KOR_lee_donggyeong,LEE Donggyeong,KOR,Korea Republic,MF,26,4,0,0,0,#C60C30,#0047A0,#EFC3C4
+KOR_song_bumkeun,SONG Bumkeun,KOR,Korea Republic,GK,12,4,0,0,0,#C60C30,#0047A0,#EFC3C4
+KSA_ahmed_alkassar,AHMED ALKASSAR,KSA,Saudi Arabia,GK,22,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_aiman_yahya,AIMAN YAHYA,KSA,Saudi Arabia,FW,8,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_ali_majrashi,ALI MAJRASHI,KSA,Saudi Arabia,DF,2,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_hassan_kadish,HASSAN KADISH,KSA,Saudi Arabia,DF,14,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_jehad_thikri,JEHAD THIKRI,KSA,Saudi Arabia,DF,25,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_nawaf_alaqidi,NAWAF ALAQIDI,KSA,Saudi Arabia,GK,1,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_saleh_alshehri,SALEH ALSHEHRI,KSA,Saudi Arabia,FW,11,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+KSA_ziyad_aljohani,ZIYAD ALJOHANI,KSA,Saudi Arabia,MF,16,4,0,0,0,#006C35,#FFFFFF,#C4D8C5
+MAR_ahmed_reda_tagnaouti,Ahmed Reda TAGNAOUTI,MAR,Morocco,GK,22,4,0,0,0,#C1272D,#006233,#EEC9C4
+MAR_munir_el_kajoui,Munir EL KAJOUI,MAR,Morocco,GK,12,4,0,0,0,#C1272D,#006233,#EEC9C4
+MAR_youssef_belammari,Youssef BELAMMARI,MAR,Morocco,DF,19,4,0,0,0,#C1272D,#006233,#EEC9C4
+MEX_carlos_acevedo,Carlos ACEVEDO,MEX,Mexico,GK,12,4,0,0,0,#006847,#CE1126,#C4D8C9
+NED_lutsharel_geertruida,Lutsharel GEERTRUIDA,NED,Netherlands,DF,2,4,0,0,0,#F36C21,#1E2A4A,#F9D8C1
+NED_mark_flekken,Mark FLEKKEN,NED,Netherlands,GK,23,4,0,0,0,#F36C21,#1E2A4A,#F9D8C1
+NED_mats_wieffer,Mats WIEFFER,NED,Netherlands,DF,12,4,0,0,0,#F36C21,#1E2A4A,#F9D8C1
+NED_robin_roefs,Robin ROEFS,NED,Netherlands,GK,13,4,0,0,0,#F36C21,#1E2A4A,#F9D8C1
+NOR_sander_tangvik,Sander TANGVIK,NOR,Norway,GK,12,4,0,0,0,#BA0C2F,#00205B,#EDC3C4
+NZL_alex_paulsen,Alex PAULSEN,NZL,New Zealand,GK,12,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_alex_rufer,Alex RUFER,NZL,New Zealand,MF,14,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_ben_waine,Ben WAINE,NZL,New Zealand,FW,18,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_kosta_barbarouses,Kosta BARBAROUSES,NZL,New Zealand,FW,17,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_lachlan_bayliss,Lachlan BAYLISS,NZL,New Zealand,MF,25,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_logan_rogerson,Logan ROGERSON,NZL,New Zealand,FW,7,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_michael_woud,Michael WOUD,NZL,New Zealand,GK,22,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_nando_pijnaker,Nando PIJNAKER,NZL,New Zealand,DF,15,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+NZL_tommy_smith,Tommy SMITH,NZL,New Zealand,DF,26,4,0,0,0,#FFFFFF,#1A1A1A,#CAC6BF
+PAN_adalberto_carrasquilla,Adalberto CARRASQUILLA,PAN,Panama,MF,8,4,0,0,0,#DA121A,#072357,#F4C5BF
+PAN_cesar_samudio,Cesar SAMUDIO,PAN,Panama,GK,12,4,0,0,0,#DA121A,#072357,#F4C5BF
+PAN_cesar_yanis,Cesar YANIS,PAN,Panama,MF,21,4,0,0,0,#DA121A,#072357,#F4C5BF
+PAN_edgardo_farina,Edgardo FARINA,PAN,Panama,DF,5,4,0,0,0,#DA121A,#072357,#F4C5BF
+PAN_luis_mejia,Luis MEJIA,PAN,Panama,GK,1,4,0,0,0,#DA121A,#072357,#F4C5BF
+PAN_roderick_miller,Roderick MILLER,PAN,Panama,DF,25,4,0,0,0,#DA121A,#072357,#F4C5BF
+PAR_gaston_olveira,Gaston OLVEIRA,PAR,Paraguay,GK,22,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+PAR_gatito_fernandez,Gatito FERNANDEZ,PAR,Paraguay,GK,1,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+POR_goncalo_guedes,GONCALO GUEDES,POR,Portugal,FW,19,4,0,0,0,#A6192E,#006600,#E8C6C4
+POR_goncalo_inacio,GONCALO INACIO,POR,Portugal,DF,14,4,0,0,0,#A6192E,#006600,#E8C6C4
+POR_jose_sa,JOSE SA,POR,Portugal,GK,12,4,0,0,0,#A6192E,#006600,#E8C6C4
+POR_rui_silva,RUI SILVA,POR,Portugal,GK,22,4,0,0,0,#A6192E,#006600,#E8C6C4
+QAT_meshaal_barsham,MESHAAL BARSHAM,QAT,Qatar,GK,22,4,0,0,0,#8A1538,#FFFFFF,#E2C5C6
+QAT_mohammed_muntari,MOHAMMED MUNTARI,QAT,Qatar,FW,9,4,0,0,0,#8A1538,#FFFFFF,#E2C5C6
+QAT_salah_zakaria,SALAH ZAKARIA,QAT,Qatar,GK,21,4,0,0,0,#8A1538,#FFFFFF,#E2C5C6
+QAT_tahsin_mohammed,TAHSIN MOHAMMED,QAT,Qatar,FW,24,4,0,0,0,#8A1538,#FFFFFF,#E2C5C6
+RSA_bradley_cross,Bradley CROSS,RSA,South Africa,DF,26,4,0,0,0,#FFB81C,#007749,#FCE9C0
+RSA_khulumani_ndamane,Khulumani NDAMANE,RSA,South Africa,DF,3,4,0,0,0,#FFB81C,#007749,#FCE9C0
+RSA_olwethu_makhanya,Olwethu MAKHANYA,RSA,South Africa,DF,24,4,0,0,0,#FFB81C,#007749,#FCE9C0
+RSA_ricardo_goss,Ricardo GOSS,RSA,South Africa,GK,22,4,0,0,0,#FFB81C,#007749,#FCE9C0
+RSA_samukele_kabini,Samukele KABINI,RSA,South Africa,DF,18,4,0,0,0,#FFB81C,#007749,#FCE9C0
+RSA_sipho_chaine,Sipho CHAINE,RSA,South Africa,GK,16,4,0,0,0,#FFB81C,#007749,#FCE9C0
+RSA_thabang_matuludi,Thabang MATULUDI,RSA,South Africa,DF,2,4,0,0,0,#FFB81C,#007749,#FCE9C0
+SCO_craig_gordon,Craig GORDON,SCO,Scotland,GK,21,4,0,0,0,#0B2A5B,#FFFFFF,#C6CACE
+SCO_dominic_hyam,Dominic HYAM,SCO,Scotland,DF,16,4,0,0,0,#0B2A5B,#FFFFFF,#C6CACE
+SCO_george_hirst,George HIRST,SCO,Scotland,FW,18,4,0,0,0,#0B2A5B,#FFFFFF,#C6CACE
+SCO_john_souttar,John SOUTTAR,SCO,Scotland,DF,15,4,0,0,0,#0B2A5B,#FFFFFF,#C6CACE
+SCO_liam_kelly,Liam KELLY,SCO,Scotland,GK,12,4,0,0,0,#0B2A5B,#FFFFFF,#C6CACE
+SCO_tyler_fletcher,Tyler FLETCHER,SCO,Scotland,MF,8,4,0,0,0,#0B2A5B,#FFFFFF,#C6CACE
+SEN_antoine_mendy,Antoine MENDY,SEN,Senegal,DF,24,4,0,0,0,#FFFFFF,#00853F,#C4DEC8
+SEN_cherif_ndiaye,Cherif NDIAYE,SEN,Senegal,FW,12,4,0,0,0,#FFFFFF,#00853F,#C4DEC8
+SEN_mamadou_sarr,Mamadou SARR,SEN,Senegal,DF,2,4,0,0,0,#FFFFFF,#00853F,#C4DEC8
+SEN_yehvann_diouf,Yehvann DIOUF,SEN,Senegal,GK,1,4,0,0,0,#FFFFFF,#00853F,#C4DEC8
+SUI_aurele_amenda,Aurele AMENDA,SUI,Switzerland,DF,24,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+SUI_marvin_keller,Marvin KELLER,SUI,Switzerland,GK,21,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+SUI_yvon_mvogo,Yvon MVOGO,SUI,Switzerland,GK,12,4,0,0,0,#D52B1E,#FFFFFF,#F3CAC0
+SWE_eric_smith,Eric SMITH,SWE,Sweden,DF,20,4,0,0,0,#FECC00,#006AA7,#FCEEBA
+SWE_herman_johansson,Herman JOHANSSON,SWE,Sweden,DF,6,4,0,0,0,#FECC00,#006AA7,#FCEEBA
+SWE_hjalmar_ekdal,Hjalmar EKDAL,SWE,Sweden,DF,14,4,0,0,0,#FECC00,#006AA7,#FCEEBA
+SWE_viktor_johansson,Viktor JOHANSSON,SWE,Sweden,GK,12,4,0,0,0,#FECC00,#006AA7,#FCEEBA
+TUN_adam_arous,Adam AROUS,TUN,Tunisia,DF,5,4,0,0,0,#E70013,#FFFFFF,#F7C1BE
+TUN_khalil_ayari,Khalil AYARI,TUN,Tunisia,MF,14,4,0,0,0,#E70013,#FFFFFF,#F7C1BE
+TUN_moutaz_neffati,Moutaz NEFFATI,TUN,Tunisia,DF,23,4,0,0,0,#E70013,#FFFFFF,#F7C1BE
+TUN_raed_chikhaoui,Raed CHIKHAOUI,TUN,Tunisia,DF,24,4,0,0,0,#E70013,#FFFFFF,#F7C1BE
+TUN_rayan_elloumi,Rayan ELLOUMI,TUN,Tunisia,FW,18,4,0,0,0,#E70013,#FFFFFF,#F7C1BE
+TUN_sabri_ben_hessen,Sabri BEN HESSEN,TUN,Tunisia,GK,22,4,0,0,0,#E70013,#FFFFFF,#F7C1BE
+TUR_altay_bayindir,Altay BAYINDIR,TUR,Türkiye,GK,12,4,0,0,0,#E30A17,#FFFFFF,#F6C3BF
+TUR_mert_gunok,Mert GUNOK,TUR,Türkiye,GK,1,4,0,0,0,#E30A17,#FFFFFF,#F6C3BF
+TUR_samet_akaydin,Samet AKAYDIN,TUR,Türkiye,DF,25,4,0,0,0,#E30A17,#FFFFFF,#F6C3BF
+URU_emiliano_martinez,Emiliano MARTINEZ,URU,Uruguay,MF,15,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_facundo_pellistri,Facundo PELLISTRI,URU,Uruguay,FW,11,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_giorgian_de_arrascaeta,Giorgian DE ARRASCAETA,URU,Uruguay,MF,10,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_joaquin_piquerez,Joaquin PIQUEREZ,URU,Uruguay,MF,22,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_jose_maria_gimenez,Jose Maria GIMENEZ,URU,Uruguay,DF,2,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_rodrigo_zalazar,Rodrigo ZALAZAR,URU,Uruguay,MF,26,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_ronald_araujo,Ronald ARAUJO,URU,Uruguay,DF,4,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_santiago_bueno,Santiago BUENO,URU,Uruguay,DF,24,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+URU_santiago_mele,Santiago MELE,URU,Uruguay,GK,12,4,0,0,0,#5CBFEB,#1A1A1A,#D8EBED
+USA_chris_brady,Chris BRADY,USA,USA,GK,25,4,0,0,0,#FFFFFF,#0A3161,#C6CBCF
+USA_cristian_roldan,Cristian ROLDAN,USA,USA,MF,15,4,0,0,0,#FFFFFF,#0A3161,#C6CBCF
+UZB_avazbek_ulmasaliyev,Avazbek ULMASALIYEV,UZB,Uzbekistan,DF,25,4,0,0,0,#0099B5,#FFFFFF,#C4E2E1
+UZB_botirali_ergashev,Botirali ERGASHEV,UZB,Uzbekistan,GK,16,4,0,0,0,#0099B5,#FFFFFF,#C4E2E1
+UZB_ruslanbek_jiyanov,Ruslanbek JIYANOV,UZB,Uzbekistan,MF,10,4,0,0,0,#0099B5,#FFFFFF,#C4E2E1
+UZB_sherzod_esanov,Sherzod ESANOV,UZB,Uzbekistan,MF,23,4,0,0,0,#0099B5,#FFFFFF,#C4E2E1
+UZB_umar_eshmurodov,Umar ESHMURODOV,UZB,Uzbekistan,DF,15,4,0,0,0,#0099B5,#FFFFFF,#C4E2E1

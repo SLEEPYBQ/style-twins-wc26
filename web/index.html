@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Style Twins · World Cup 2026</title>
+  <meta name="description" content="Same playbook, different fate: an interactive look at how all 48 teams played the 2026 World Cup, and why teams with the same style got different results.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <defs>
+      <clipPath id="ball-clip"><circle r="47"/></clipPath>
+      <clipPath id="flag-clip"><circle r="7"/></clipPath>
+      <symbol id="ball" viewBox="-50 -50 100 100">
+        <circle r="47" fill="#ffffff"/>
+        <g clip-path="url(#ball-clip)">
+          <path fill="#1d2433" d="M0.0,-15.0 L14.3,-4.6 L8.8,12.1 L-8.8,12.1 L-14.3,-4.6Z M0.0,-31.0 L-14.3,-41.4 L-8.8,-58.1 L8.8,-58.1 L14.3,-41.4Z M29.5,-9.6 L34.9,-26.4 L52.6,-26.4 L58.0,-9.6 L43.7,0.8Z M18.2,25.1 L35.9,25.1 L41.3,41.9 L27.0,52.2 L12.8,41.9Z M-18.2,25.1 L-12.8,41.9 L-27.0,52.2 L-41.3,41.9 L-35.9,25.1Z M-29.5,-9.6 L-43.7,0.8 L-58.0,-9.6 L-52.6,-26.4 L-34.9,-26.4Z"/>
+          <path fill="none" stroke="#1d2433" stroke-width="3.2" stroke-linecap="round" d="M0,-15 L0,-31 M14.3,-4.6 L29.5,-9.6 M8.8,12.1 L18.2,25.1 M-8.8,12.1 L-18.2,25.1 M-14.3,-4.6 L-29.5,-9.6 M14.3,-41.4 L34.9,-26.4 M43.7,0.8 L35.9,25.1 M12.8,41.9 L-12.8,41.9 M-35.9,25.1 L-43.7,0.8 M-34.9,-26.4 L-14.3,-41.4"/>
+        </g>
+        <circle r="46" fill="none" stroke="#1d2433" stroke-width="4.5"/>
+      </symbol>
+    </defs>
+  </svg>
+  <header class="topbar">
+    <a class="brand" href="#/story" aria-label="Style Twins home">
+      <span class="brand-ball" aria-hidden="true"><i></i><i></i></span>
+      <span>Style Twins</span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#/story" data-tab="story">Story</a>
+      <a href="#/styles" data-tab="styles">Style map</a>
+      <a href="#/twins" data-tab="twins">Twins</a>
+      <a href="#/matches" data-tab="matches">Matches</a>
+      <a href="#/method" data-tab="method">How it works</a>
+    </nav>
+    <div class="jump" id="team-jump"></div>
+  </header>
+
+  <main id="view" tabindex="-1"></main>
+
+  <footer class="foot">
+    <p>Data: <a href="https://github.com/Alamyy/Worldcup26" target="_blank" rel="noopener">Worldcup26</a> (CC BY 4.0), derived from FIFA Training Centre post-match reports. Not affiliated with FIFA.
+      Player avatars are cartoon interpretations drawn from reference photos: freely licensed Wikimedia Commons photos where they exist, otherwise public press photos used only as a drawing reference (sources on each player card). Non-commercial course project.</p>
+    <p>Group 6 · Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang</p>
+  </footer>
+
+  <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <div id="vp-sentinel" aria-hidden="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="data/core.js"></script>
+  <script src="data/avatars.js" onerror="window.WC_AVATARS = window.WC_AVATARS || {}"></script>
+  <script src="data/avatar_credits.js" onerror="window.WC_AVATAR_CREDITS = window.WC_AVATAR_CREDITS || {}"></script>
+  <script src="js/util.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/view-story.js"></script>
+  <script src="js/view-styles.js"></script>
+  <script src="js/view-team.js"></script>
+  <script src="js/view-twins.js"></script>
+  <script src="js/view-matches.js"></script>
+  <script src="js/view-match.js"></script>
+  <script src="js/view-method.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
