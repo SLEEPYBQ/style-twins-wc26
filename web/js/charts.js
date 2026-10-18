@@ -160,42 +160,99 @@
     }
   };
 
-  /** Phase-of-play butterfly: home share to the left, away share to the right. */
-  C.butterfly = (el, phasesA, phasesB, kits, names) => {
-    const groups = [
-      ["In possession", ["Build Up Unopposed", "Build Up Opposed", "Progression", "Final Third", "Long Ball", "Attacking Transition", "Counter Attack", "Set Piece"]],
-      ["Out of possession", ["High Press", "Mid Press", "Low Press", "High Block", "Mid Block", "Low Block", "Counter-press", "Recovery", "Defensive Transition"]],
-    ];
-    const W = el.clientWidth || 300, mid = W / 2, labelW = 112, rowH = 19;
-    const nRows = groups.reduce((s, g) => s + g[1].length, 0);
-    const H = nRows * rowH + groups.length * 26 + 24;
-    const svg = d3.select(el).append("svg").attr("width", W).attr("height", H);
-    const maxV = d3.max([...Object.values(phasesA), ...Object.values(phasesB)]);
-    const half = (W - labelW) / 2;
-    const x = d3.scaleLinear().domain([0, maxV]).range([0, half - 26]);
-    svg.append("text").attr("x", 0).attr("y", 12).attr("class", "axis-cap").text(names[0]);
-    svg.append("text").attr("x", W).attr("y", 12).attr("text-anchor", "end").attr("class", "axis-cap").text(names[1]);
-    let y = 24;
-    for (const [gname, phases] of groups) {
-      svg.append("text").attr("x", mid).attr("y", y + 12).attr("text-anchor", "middle").attr("font-size", 11).attr("font-weight", 800)
-        .attr("fill", MUTED).text(gname);
-      y += 20;
-      for (const p of phases) {
+  /** Phase-of-play comparison in the layout of FIFA's post-match reports: phase names down the middle,
+   *  home share growing left, away share growing right, the biggest contrasts in each group emphasised. */
+  const PHASE_HELP = {
+    "Build Up Unopposed": "Building from the back with no pressure on the ball.",
+    "Build Up Opposed": "Building from the back while the opponent presses.",
+    "Progression": "Moving the ball through midfield towards the final third.",
+    "Final Third": "Keeping the ball in the attacking third.",
+    "Long Ball": "Going long, skipping midfield.",
+    "Attacking Transition": "Attacking straight after winning the ball.",
+    "Counter Attack": "Fast breaks into space behind the opponent.",
+    "Set Piece": "Corners, free kicks and throw-ins.",
+    "High Press": "Pressing the ball high up the pitch.",
+    "Mid Press": "Pressing around the halfway line.",
+    "Low Press": "Pressing near their own box.",
+    "High Block": "Holding a compact shape high up, without chasing the ball.",
+    "Mid Block": "Holding a compact shape around halfway.",
+    "Low Block": "Sitting deep in front of their own box.",
+    "Counter-press": "Pressing straight after losing the ball.",
+    "Recovery": "Running back into shape.",
+    "Defensive Transition": "The moments just after losing the ball.",
+  };
+  const PHASE_GROUPS = [
+    ["In possession", ["Build Up Unopposed", "Build Up Opposed", "Progression", "Final Third", "Long Ball", "Attacking Transition", "Counter Attack", "Set Piece"]],
+    ["Out of possession", ["High Press", "Mid Press", "Low Press", "High Block", "Mid Block", "Low Block", "Counter-press", "Recovery", "Defensive Transition"]],
+  ];
+  const phaseLabel = (p) => { const t = p.replace("Build Up", "Build-up").toLowerCase(); return t[0].toUpperCase() + t.slice(1); };
+  C.phaseLabel = phaseLabel;
+
+  /** The two phases (one per group) where the teams differ most, for a one-line summary. */
+  C.phaseContrasts = (phasesA, phasesB) => PHASE_GROUPS.map(([g, ps]) => {
+    const p = ps.slice().sort((x, y) => Math.abs((phasesB[y] ?? 0) - (phasesA[y] ?? 0)) - Math.abs((phasesB[x] ?? 0) - (phasesA[x] ?? 0)))[0];
+    return { group: g, phase: p, a: phasesA[p] ?? 0, b: phasesB[p] ?? 0 };
+  });
+
+  C.butterfly = (el, phasesA, phasesB, kits, names, { animate = false } = {}) => {
+    const W = (el.clientWidth || 340) - 8, mid = W / 2;
+    const anim = animate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let rowNo = 0;
+    const fs = W < 360 ? 10.5 : 11.5;
+    const labelW = Math.min(W * 0.42, fs * 13), rowH = fs * 1.9, barH = fs * 1.25, valW = fs * 3;
+    const nRows = PHASE_GROUPS.reduce((t, g) => t + g[1].length, 0);
+    const H = nRows * rowH + PHASE_GROUPS.length * (fs * 3) + fs * 2.6;
+    const svg = d3.select(el).append("svg").attr("width", W).attr("height", H).style("display", "block");
+    const half = (W - labelW) / 2 - 4;
+    // one scale per group so out-of-possession shares are as readable as in-possession ones
+    const kitStroke = (k) => (App.isLight(k) ? AXIS : null);
+    // team headers, each in its own colour
+    for (const [side, anchor, x0] of [[0, "start", 0], [1, "end", W]]) {
+      const g = svg.append("g").attr("transform", `translate(${x0},${fs * 0.9})`);
+      g.append("rect").attr("x", side ? -10 : 0).attr("y", -5).attr("width", 10).attr("height", 10).attr("rx", 3).attr("fill", kits[side]).attr("stroke", kitStroke(kits[side]));
+      g.append("text").attr("x", side ? -15 : 15).attr("dominant-baseline", "central").attr("text-anchor", anchor)
+        .attr("font-size", fs * 1.1).attr("font-weight", 800).attr("fill", INK).text(names[side]);
+    }
+    let y = fs * 2.6;
+    for (const [gname, phases] of PHASE_GROUPS) {
+      const maxV = d3.max(phases, (p) => Math.max(phasesA[p] ?? 0, phasesB[p] ?? 0)) || 1;
+      const x = d3.scaleLinear().domain([0, maxV]).range([0, half - valW]);
+      const diffs = phases.map((p) => Math.abs((phasesA[p] ?? 0) - (phasesB[p] ?? 0)));
+      const cut = diffs.slice().sort((p, q) => q - p)[1];
+      svg.append("text").attr("x", mid).attr("y", y + fs * 1.3).attr("text-anchor", "middle").attr("font-size", fs * 1.05).attr("font-weight", 800)
+        .attr("fill", INK).text(gname);
+      y += fs * 2.4;
+      phases.forEach((p, i) => {
         const a = phasesA[p] ?? 0, b = phasesB[p] ?? 0;
-        const left = mid - labelW / 2, right = mid + labelW / 2;
-        svg.append("path").attr("d", hbar(left, left - x(a), y + 3, rowH - 7, 3)).attr("fill", kits[0])
-          .attr("stroke", App.isLight(kits[0]) ? AXIS : null);
-        svg.append("path").attr("d", hbar(right, right + x(b), y + 3, rowH - 7, 3)).attr("fill", kits[1])
-          .attr("stroke", App.isLight(kits[1]) ? AXIS : null);
-        svg.append("text").attr("x", mid).attr("y", y + rowH / 2).attr("text-anchor", "middle").attr("dominant-baseline", "central")
-          .attr("font-size", 11.5).attr("font-weight", 600).attr("fill", INK).text(p.replace("Build Up", "Build-up"));
-        svg.append("text").attr("x", left - x(a) - 4).attr("y", y + rowH / 2).attr("text-anchor", "end").attr("dominant-baseline", "central")
-          .attr("font-size", 11).attr("font-weight", 700).attr("fill", "#4a5263").text(`${a}%`);
-        svg.append("text").attr("x", right + x(b) + 4).attr("y", y + rowH / 2).attr("dominant-baseline", "central")
-          .attr("font-size", 11).attr("font-weight", 700).attr("fill", "#4a5263").text(`${b}%`);
+        const hot = diffs[i] >= cut && diffs[i] >= 5;
+        const left = mid - labelW / 2 - 4, right = mid + labelW / 2 + 4, yb = y + (rowH - barH) / 2;
+        const row = svg.append("g").attr("class", "phase-row").style("cursor", "default");
+        row.append("rect").attr("x", mid - labelW / 2).attr("y", y + 1.5).attr("width", labelW).attr("height", rowH - 3).attr("rx", (rowH - 3) / 2)
+          .attr("fill", hot ? "#f3e7cf" : "#f3f0e8");
+        const barA = row.append("path").attr("fill", kits[0]).attr("stroke", kitStroke(kits[0])).attr("opacity", hot ? 1 : 0.78);
+        const barB = row.append("path").attr("fill", kits[1]).attr("stroke", kitStroke(kits[1])).attr("opacity", hot ? 1 : 0.78);
+        const grow = (t) => { barA.attr("d", hbar(left, left - x(a) * t, yb, barH, barH / 2)); barB.attr("d", hbar(right, right + x(b) * t, yb, barH, barH / 2)); };
+        row.append("text").attr("x", mid).attr("y", y + rowH / 2).attr("text-anchor", "middle").attr("dominant-baseline", "central")
+          .attr("font-size", fs).attr("font-weight", hot ? 800 : 600).attr("fill", hot ? INK : "#4a5263").text(phaseLabel(p));
+        const valA = row.append("text").attr("x", left - x(a) - 5).attr("y", y + rowH / 2).attr("text-anchor", "end").attr("dominant-baseline", "central")
+          .attr("class", "tnum").attr("font-size", fs).attr("font-weight", 700).attr("fill", hot ? INK : "#5b6170").text(`${a}%`);
+        const valB = row.append("text").attr("x", right + x(b) + 5).attr("y", y + rowH / 2).attr("dominant-baseline", "central")
+          .attr("class", "tnum").attr("font-size", fs).attr("font-weight", 700).attr("fill", hot ? INK : "#5b6170").text(`${b}%`);
+        row.append("rect").attr("x", 0).attr("y", y).attr("width", W).attr("height", rowH).attr("fill", "transparent")
+          .on("mousemove", (evt) => App.tip.show(`<div class="tt-title">${phaseLabel(p)}</div><div class="tt-dim">${PHASE_HELP[p] || ""}</div>` +
+            App.ttRows([[names[0], `${a}%`], [names[1], `${b}%`]]), evt))
+          .on("mouseleave", App.tip.hide);
+        if (anim) { // bars grow out of the label, row by row
+          const delay = 60 + rowNo * 28;
+          grow(0); valA.attr("opacity", 0); valB.attr("opacity", 0);
+          row.transition().delay(delay).duration(620).ease(d3.easeCubicOut).tween("grow", () => grow);
+          valA.transition().delay(delay + 380).duration(260).attr("opacity", 1);
+          valB.transition().delay(delay + 380).duration(260).attr("opacity", 1);
+        } else grow(1);
+        rowNo++;
         y += rowH;
-      }
-      y += 6;
+      });
+      y += fs * 0.6;
     }
   };
 })();

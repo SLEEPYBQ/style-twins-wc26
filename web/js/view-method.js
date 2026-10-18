@@ -41,6 +41,8 @@
         <p>The data has no tracking coordinates, so the replay is a <b>schematic reconstruction</b>: players stand on lines by listed position (GK/DF/MF/FW),
           and the left-to-right order within a line comes from who passes to whom (spectral ordering of the passing network). Substitutes take the place of the player they replaced, red cards remove a player.
           Shots, cards, goals and substitutions happen at their recorded minute; shot locations are not in the data, so shot paths are illustrative. Passing links are full-match totals.</p>
+        <p><b>Line breaks</b> follow FIFA's definition: a pass or carry that goes past one of the opponent's lines. FIFA counts them separately for opponents defending in four, three or two lines;
+          we fold these into three lines an enthusiast can picture (their forwards, their midfield, their back line). The report gives attempts per line and completions only in total.</p>
         <p class="note">Shot minutes are recorded as elapsed minutes and shown as the next minute (a shot at 105:xx is "106'"), matching the official goal times. First-half stoppage time shares the axis with the early second half.</p>
 
         <h2>5 · The statistics behind the story</h2>

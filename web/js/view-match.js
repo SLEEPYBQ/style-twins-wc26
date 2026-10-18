@@ -63,7 +63,8 @@
 
         <div class="card pitch-card" id="pitch-card">
           <div class="pitch-tools">
-            <div class="seg" id="mode"><button data-v="replay" class="on">Replay</button><button data-v="web">Passing web</button></div>
+            <div class="seg" id="mode"><button data-v="replay" class="on">Replay</button><button data-v="web">Passing web</button>${H.lb && A.lb ? `<button data-v="lb">Line breaks</button>` : ""}</div>
+            <div class="seg" id="lbteam" hidden><button data-v="0" class="on">${App.esc(H.name)}</button><button data-v="1">${App.esc(A.name)}</button></div>
             <div class="seg" id="webteam" hidden><button data-v="both" class="on">Both</button><button data-v="0">${H.team_id}</button><button data-v="1">${A.team_id}</button></div>
             <label class="note" id="webmin-wrap" hidden>Min. passes <input type="range" class="slider" id="webmin" min="1" max="30" value="6" style="--fill:17%"> <b id="webmin-v">6</b></label>
             <span class="spacer"></span>
@@ -88,7 +89,7 @@
           <div class="panel-body">
             <div class="pane" data-pane="events"><div class="sub" id="feed-sub"></div><div class="feed" id="feed"></div></div>
             <div class="pane" data-pane="numbers" hidden><div class="sub">Full-match numbers.</div><div id="dual"></div></div>
-            <div class="pane" data-pane="phases" hidden><div class="sub">Share of time in each phase of play.</div><div id="phases"></div></div>
+            <div class="pane" data-pane="phases" hidden><div class="sub" id="phases-sub"></div><div id="phases"></div><div class="note" style="margin-top:6px">Share of match time in each phase, as in FIFA's post-match report. Phases overlap, so they do not add up to 100%.</div></div>
             <div class="pane" data-pane="why" hidden><div class="sub">Goal difference split into style, opponent and execution (<a href="#/method">method</a>).</div><div id="recipe-m"></div><div id="recipe-note" class="note" style="margin-top:8px"></div></div>
           </div>
         </aside>
@@ -106,11 +107,12 @@
     const svg = d3.select("#pitch");
     drawPitch(svg);
     const webLayer = svg.append("g").attr("class", "web");
+    const lbLayer = svg.append("g").attr("class", "lb");
     const tokenLayer = svg.append("g").attr("class", "tokens");
     const fxLayer = svg.append("g").attr("class", "fx");
 
     // ------------------------------------------------------------------ state
-    const st = { t: 0, playing: false, speed: SPEEDS["1×"], mode: "replay", webTeam: "both", webMin: 6, selected: null };
+    const st = { t: 0, playing: false, speed: SPEEDS["1×"], mode: "replay", webTeam: "both", webMin: 6, lbTeam: 0, selected: null };
     // the player in focus (side + index); filters the feed and dims everyone else's events on the timeline
     const focusOf = () => (st.selected ? { side: Number(st.selected.split(":")[0]), pid: st.selected.split(":").slice(1).join(":") } : null);
     const isFocusEvent = (e) => {
@@ -148,6 +150,10 @@
     }
 
     function tokenData() {
+      if (st.mode === "lb") { // only the passing side, everyone who played; the lines they passed are drawn by drawLines
+        const s = st.lbTeam, pos = layout(s, players[s]);
+        return players[s].map((p, i) => ({ key: `${s}:${p.pid}`, side: s, i, p, xy: pos[p.pid] }));
+      }
       if (st.mode === "web") {
         const teams = st.webTeam === "both" ? [0, 1] : [Number(st.webTeam)];
         return teams.flatMap((s) => {
@@ -168,10 +174,13 @@
       return v;
     });
     const maxInv = d3.max(involvement.flat()) || 1;
+    const lbAtt = (d) => d.p.stats?.lb_att ?? 0;
+    const maxLb = d3.max(players.flat(), (p) => p.stats?.lb_att ?? 0) || 1;
 
     function drawTokens(animate = true) {
       const data = tokenData();
-      const R = (d) => (st.mode === "web" ? 13 + 15 * Math.sqrt(involvement[d.side][d.i] / maxInv) : 25);
+      const R = (d) => (st.mode === "web" ? 13 + 15 * Math.sqrt(involvement[d.side][d.i] / maxInv)
+        : st.mode === "lb" ? 13 + 15 * Math.sqrt(lbAtt(d) / maxLb) : 25);
       const dur = animate ? 650 : 0;
       const sel = tokenLayer.selectAll("g.token").data(data, (d) => d.key);
       sel.exit().transition().duration(dur).attr("opacity", 0).attr("transform", (d) => `translate(${d.xy ? d.xy[0] : 0},${d.xy ? d.xy[1] : 0}) scale(0.3)`).remove();
@@ -196,6 +205,10 @@
           g.append("circle").attr("cx", 17).attr("cy", 17).attr("r", 11).attr("fill", kit).attr("stroke", "#fff").attr("stroke-width", 2);
           g.append("text").attr("class", "num").attr("x", 17).attr("y", 17).attr("fill", App.textOn(kit)).style("font-size", "13px").text(d.p.num);
         }
+        // line-break count, shown only in the line-break view
+        const chip = g.append("g").attr("class", "lbchip").attr("transform", "translate(21,-21)").attr("display", "none");
+        chip.append("circle").attr("r", 15).attr("fill", "#fff").attr("stroke", INK).attr("stroke-width", 2);
+        chip.append("text").attr("text-anchor", "middle").attr("dominant-baseline", "central").attr("font-size", 16).attr("font-weight", 800).attr("fill", INK);
         // name plate: shirt number + short name
         const lab = g.append("g").attr("class", "lab").attr("transform", `translate(0,${33 + labelSize * 0.75})`);
         const txt = lab.append("text").attr("class", "lab-t").attr("text-anchor", "middle").attr("dominant-baseline", "central").style("font-size", `${labelSize}px`);
@@ -208,7 +221,10 @@
       const merged = enter.merge(sel);
       merged.transition().duration(dur).attr("opacity", 1).attr("transform", (d) => `translate(${d.xy[0]},${d.xy[1]}) scale(${R(d) / 25})`);
       merged.select(".halo").attr("opacity", (d) => (d.key === st.selected ? 1 : 0));
-      merged.select(".lab").attr("display", (d) => (compact || (st.mode === "web" && R(d) < 19) ? "none" : null));
+      merged.select(".lab").attr("display", (d) => (compact || (st.mode !== "replay" && R(d) < 19) ? "none" : null));
+      merged.select(".lbchip").attr("display", (d) => (st.mode === "lb" && lbAtt(d) > 0 ? null : "none"))
+        .attr("transform", (d) => `scale(${25 / R(d)}) translate(21,-21)`)
+        .select("text").text((d) => lbAtt(d));
       positions = Object.fromEntries(data.map((d) => [d.key, d.xy]));
     }
     let positions = {};
@@ -260,11 +276,89 @@
       }
     }
 
+    // The opponent's three defending lines, how often the passing side tried to play past each, and how.
+    function drawLines(animate = false) {
+      lbLayer.interrupt().selectAll("*").interrupt().remove();
+      if (st.mode !== "lb") return;
+      const anim = animate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const T0 = 120; // let the tokens start moving first
+      const s = st.lbTeam, o = 1 - s, T = m.teams[s], O = m.teams[o], lb = T.lb;
+      const dir = s === 0 ? 1 : -1;                         // home attacks to the right
+      const X = (role) => PX + (o === 1 ? 1 - DEPTH[role] : DEPTH[role]) * PL;
+      const fs = labelSize;
+      const lines = [["fwd", "FW", "their forwards"], ["mid", "MF", "their midfield"], ["back", "DF", "their back line"]];
+      const maxN = d3.max(lines, (l) => lb.lines[l[0]]) || 1;
+      const halfMid = PX + PL / 2, farEnd = s === 0 ? PX + PL : PX;
+      // shade the half the passes went into
+      const shade = lbLayer.append("rect").attr("x", Math.min(halfMid, farEnd)).attr("y", PY).attr("width", PL / 2).attr("height", PW).attr("fill", "rgba(29,36,51,0.16)");
+      if (anim) shade.attr("opacity", 0).transition().duration(400).attr("opacity", 1);
+      lines.forEach(([k, role, label], li) => {
+        const x = X(role), n = lb.lines[k], g = lbLayer.append("g");
+        const band = g.append("rect").attr("x", x - 22).attr("y", PY).attr("width", 44).attr("height", PW).attr("fill", "#fff").attr("opacity", 0.06 + 0.3 * (n / maxN));
+        const dash = g.append("line").attr("x1", x).attr("x2", x).attr("y1", PY + 6).attr("y2", PY + PW - 6)
+          .attr("stroke", "#fff").attr("stroke-width", 3.5).attr("stroke-dasharray", "14 10").attr("stroke-linecap", "round");
+        const b = g.append("g").attr("transform", `translate(${x},${CY})`);
+        const bw = Math.max(104, fs * 7.4), bh = fs * 4.6;
+        b.append("rect").attr("x", -bw / 2).attr("y", -bh / 2).attr("width", bw).attr("height", bh).attr("rx", 16).attr("fill", "#fff")
+          .attr("stroke", marks[s]).attr("stroke-width", 4);
+        const num = b.append("text").attr("text-anchor", "middle").attr("y", -fs * 0.35).attr("font-size", fs * 2.2).attr("font-weight", 800).attr("fill", INK).text(n);
+        b.append("text").attr("text-anchor", "middle").attr("y", fs * 1.45).attr("font-size", fs * 0.95).attr("font-weight", 700).attr("fill", "#5b6170").text(label);
+        g.on("mousemove", (evt) => App.tip.show(`<div class="tt-title">${App.esc(T.name)} past ${label}</div>` +
+          `<div class="tt-dim">Passes and carries ${App.esc(T.name)} tried to play beyond ${App.esc(O.name)}'s ${label.replace("their ", "")}.</div>`, evt))
+          .on("mouseleave", App.tip.hide);
+        if (anim) { // the line rolls out from the centre, then its badge pops and counts up
+          const d0 = T0 + li * 150;
+          band.attr("y", CY).attr("height", 0).transition().delay(d0).duration(520).ease(d3.easeCubicOut).attr("y", PY).attr("height", PW);
+          dash.attr("y1", CY).attr("y2", CY).transition().delay(d0).duration(520).ease(d3.easeCubicOut).attr("y1", PY + 6).attr("y2", PY + PW - 6);
+          b.attr("opacity", 0).attr("transform", `translate(${x},${CY}) scale(0.5)`)
+            .transition().delay(d0 + 260).duration(460).ease(d3.easeBackOut.overshoot(1.6))
+            .attr("opacity", 1).attr("transform", `translate(${x},${CY}) scale(1)`);
+          num.text(0).transition().delay(d0 + 300).duration(700).ease(d3.easeCubicOut)
+            .tween("count", () => { const i = d3.interpolateRound(0, n); return (t) => num.text(i(t)); });
+        }
+      });
+      // direction of play
+      const ay = PY + PW - fs * 4.6, ax0 = halfMid + dir * 40, ax1 = farEnd - dir * 40;
+      const shaft = lbLayer.append("line").attr("x1", ax0).attr("x2", ax1 - dir * 18).attr("y1", ay).attr("y2", ay).attr("stroke", "rgba(255,255,255,0.8)").attr("stroke-width", 4).attr("stroke-linecap", "round");
+      const head = lbLayer.append("path").attr("d", `M${ax1},${ay} l${-dir * 22},-12 v24 Z`).attr("fill", "rgba(255,255,255,0.8)");
+      if (anim) {
+        shaft.attr("x2", ax0).transition().delay(T0 + 200).duration(700).ease(d3.easeCubicInOut).attr("x2", ax1 - dir * 18);
+        head.attr("opacity", 0).transition().delay(T0 + 820).duration(200).attr("opacity", 1);
+      }
+      lbLayer.append("text").attr("x", (ax0 + ax1) / 2).attr("y", ay - fs * 0.7).attr("text-anchor", "middle").attr("font-size", fs).attr("font-weight", 700)
+        .attr("fill", "#fff").text(`${T.name} attacking`);
+      // two white cards in the attacked half: what happened (top) and how it compares (bottom)
+      const pct = lb.att ? Math.round((100 * lb.cmp) / lb.att) : 0;
+      const cx0 = Math.min(halfMid, farEnd) + 24, cw = PL / 2 - 48;
+      const card = (y, rows, delay) => {
+        const g = lbLayer.append("g");
+        if (anim) g.attr("opacity", 0).attr("transform", `translate(0,${y < CY ? -14 : 14})`)
+          .transition().delay(delay).duration(420).ease(d3.easeCubicOut).attr("opacity", 1).attr("transform", "translate(0,0)");
+        const h = rows.reduce((t, r) => t + r.size * 1.35, 0) + fs * 1.1;
+        g.append("rect").attr("x", cx0).attr("y", y).attr("width", cw).attr("height", h).attr("rx", 14).attr("fill", "rgba(255,255,255,0.95)");
+        let yy = y + fs * 0.55;
+        for (const r of rows) {
+          yy += r.size * 1.1;
+          const t = g.append("text").attr("x", cx0 + cw / 2).attr("y", yy).attr("text-anchor", "middle").attr("font-size", r.size)
+            .attr("font-weight", r.bold ? 800 : 600).attr("fill", r.bold ? INK : "#5b6170").text(r.text);
+          const w = t.node().getComputedTextLength();
+          if (w > cw - 44) t.attr("font-size", (r.size * (cw - 44)) / w); // shrink to fit on small pitches
+          yy += r.size * 0.25;
+        }
+      };
+      card(PY + 16, [{ text: `${lb.att} tried, ${lb.cmp} got through (${pct}%)`, size: fs * 1.45, bold: true },
+        { text: `Through the lines ${lb.dir.through} · around them ${lb.dir.around} · over the top ${lb.dir.over}`, size: fs * 0.95 }], T0 + 80);
+      card(PY + PW - fs * 3.1, [{ text: `Past the back line more often than ${lb.back_pct}% of team-matches at this World Cup`, size: fs * 0.95 }], T0 + 650);
+    }
+
     function playerTip(d) {
       const p = d.p, s = p.stats || {};
       const mins = (p.off ?? p.sent_off ?? m.duration) - (p.on ?? 0);
       return `<div class="tt-title">${App.esc(p.name)} #${p.num}</div><div class="tt-dim">${m.teams[d.side].name} · ${p.role} · ${p.starter ? "starter" : `on ${p.on}'`}${p.off ? `, off ${p.off}'` : ""}${p.sent_off ? `, sent off ${p.sent_off}'` : ""}</div>` +
-        App.ttRows([["Minutes (approx.)", Math.max(0, mins)], ["Passes (completed)", `${s.passes ?? "–"} (${s.passes_cmp ?? "–"})`], ["Passes in this web", involvement[d.side][d.i]]]);
+        App.ttRows(st.mode === "lb"
+          ? [["Line breaks tried", s.lb_att ?? "–"], ["Completed", s.line_breaks ?? "–"],
+             ...(s.lb_dir ? [["Through / around / over", s.lb_dir.join(" / ")]] : [])]
+          : [["Minutes (approx.)", Math.max(0, mins)], ["Passes (completed)", `${s.passes ?? "–"} (${s.passes_cmp ?? "–"})`], ["Passes in this web", involvement[d.side][d.i]]]);
     }
 
     function showPlayer(side, i) {
@@ -671,9 +765,11 @@
       d3.selectAll("#mode button").classed("on", function () { return this.dataset.v === v; });
       document.getElementById("webteam").hidden = v !== "web";
       document.getElementById("webmin-wrap").hidden = v !== "web";
-      if (v === "web") pause();
+      document.getElementById("lbteam").hidden = v !== "lb";
+      if (v !== "replay") pause();
       lineupSig = "";
       drawWeb();
+      drawLines(true);
       drawTokens(true);
       if (v === "replay") setT(st.t, { silent: true });
     }
@@ -682,6 +778,11 @@
       st.webTeam = this.dataset.v;
       d3.selectAll("#webteam button").classed("on", (d, i, n) => n[i] === this);
       drawWeb(); drawTokens(true);
+    });
+    d3.selectAll("#lbteam button").on("click", function () {
+      st.lbTeam = Number(this.dataset.v);
+      d3.selectAll("#lbteam button").classed("on", (d, i, n) => n[i] === this);
+      drawLines(true); drawTokens(true);
     });
     d3.select("#webmin").on("input", function () { st.webMin = +this.value; this.style.setProperty("--fill", `${((this.value - 1) / 29) * 100}%`); d3.select("#webmin-v").text(this.value); drawWeb(); });
     d3.selectAll("#speed button").on("click", function () {
@@ -707,12 +808,16 @@
     ], marks);
 
     let pane = "events";
-    const drawLower = () => {
+    const drawLower = (animate = false) => {
       if (!document.getElementById("panel")) return;
       if (pane === "phases") {
         const ph = document.getElementById("phases");
         ph.innerHTML = "";
-        App.charts.butterfly(ph, H.phases, A.phases, marks, [H.team_id, A.team_id]);
+        App.charts.butterfly(ph, H.phases, A.phases, marks, [H.name, A.name], { animate });
+        const [cIn, cOut] = App.charts.phaseContrasts(H.phases, A.phases);
+        document.getElementById("phases-sub").innerHTML =
+          `Biggest gaps: with the ball, <b>${App.charts.phaseLabel(cIn.phase).toLowerCase()}</b> (${App.esc(H.name)} ${cIn.a}%, ${App.esc(A.name)} ${cIn.b}%); ` +
+          `without it, <b>${App.charts.phaseLabel(cOut.phase).toLowerCase()}</b> (${cOut.a}% v ${cOut.b}%).`;
       }
       if (pane === "why") {
         const rc = document.getElementById("recipe-m");
@@ -724,7 +829,7 @@
       pane = this.dataset.v;
       d3.selectAll("#panel-tabs button").classed("on", (d, i, n) => n[i] === this).attr("aria-selected", (d, i, n) => n[i] === this);
       d3.selectAll("#panel .pane").attr("hidden", function () { return this.dataset.pane === pane ? null : true; });
-      drawLower();
+      drawLower(true);
     });
     document.getElementById("recipe-note").innerHTML =
       `<span style="display:inline-flex;gap:12px"><span class="k"><svg width="10" height="10"><rect width="10" height="10" rx="3" fill="${marks[0]}"/></svg> ${App.esc(H.name)}</span>` +
@@ -787,7 +892,7 @@
         stage.style.gridTemplateColumns = `${Math.round(leftW)}px minmax(${PANEL_MIN}px, 1fr)`;
       }
     }
-    App.onViewport(() => { fitStage(); drawTimeline(); drawLower(); refreshTokens(); });
+    App.onViewport(() => { fitStage(); drawTimeline(); drawLower(); refreshTokens(); drawLines(); });
 
     // ------------------------------------------------------------------ go
     fitStage();

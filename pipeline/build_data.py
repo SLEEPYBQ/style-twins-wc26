@@ -206,6 +206,20 @@ apps = load("match_appearances.csv")
 events = load("player_events.csv")
 attempts = load("attempts_at_goal.csv")
 pin = load("player_in_possession_distributions.csv").set_index("appearance_id")
+plb = load("player_line_breaks.csv").set_index("appearance_id")
+# Line breaks by the opponent line they went past. FIFA splits them by the opponent's shape (4, 3 or 2 units);
+# we fold the shapes into three lines an enthusiast can picture: their forwards, their midfield, their back line.
+LB_LINES = {
+    "fwd": ["four_units_attacking_line", "three_units_attacking_line"],
+    "mid": ["four_units_attacking_midfield_line", "four_units_midfield_line", "three_units_midfield_line", "two_units_midfield_line"],
+    "back": ["four_units_defensive_line", "three_units_defensive_line", "two_units_defensive_line"],
+}
+LB_DIRS = {"through": "direction_through", "around": "direction_around", "over": "direction_over"}
+_lb_cols = sorted({c for cs in LB_LINES.values() for c in cs} | set(LB_DIRS.values()) | {"line_breaks_attempted", "line_breaks_completed"})
+for _c in _lb_cols:
+    plb[_c] = pd.to_numeric(plb[_c], errors="coerce").fillna(0)
+LB_TEAM = plb.groupby("match_team_id")[_lb_cols].sum()
+LB_TEAM["back"] = LB_TEAM[LB_LINES["back"]].sum(1)
 phys = load("player_physical_data.csv").set_index("appearance_id")
 oop = load("player_out_of_possession.csv").set_index("appearance_id")
 
@@ -310,6 +324,10 @@ def build_team_side(match_id, mtid, team_id, side):
             "top_speed": num(phys.at[a, "top_speed_kmh"]) if a in phys.index else None,
             "regains": num(oop.at[a, "possession_regains"], 0) if a in oop.index else None,
         }
+        if a in plb.index:
+            r = plb.loc[a]
+            st["lb_att"] = int(r.line_breaks_attempted)
+            st["lb_dir"] = [int(r[c]) for c in LB_DIRS.values()]
         players.append({
             "pid": p.player_id, "name": p.player_name, "short": short_name(p.player_name),
             "num": int(p.shirt_number), "role": p.position, "starter": bool(p.is_starter),
@@ -335,6 +353,21 @@ def build_team_side(match_id, mtid, team_id, side):
                      "opp_usual_conceded": round(tm.opp_usual_conceded, 2), "opp_usual_created": round(tm.opp_usual_created, 2),
                      "exp_xg": round(tm.exp_xg, 2), "exp_xga": round(tm.exp_xga, 2)},
         "players": players, "edges": edge_list, "_idx": idx,
+        "lb": line_break_summary(mtid),
+    }
+
+
+def line_break_summary(mtid):
+    if mtid not in LB_TEAM.index:
+        return None
+    r = LB_TEAM.loc[mtid]
+    back_all = LB_TEAM["back"]
+    return {
+        "att": int(r.line_breaks_attempted), "cmp": int(r.line_breaks_completed),
+        "lines": {k: int(r[cs].sum()) for k, cs in LB_LINES.items()},
+        "dir": {k: int(r[c]) for k, c in LB_DIRS.items()},
+        # share of all 208 team-matches with fewer attempts past the back line
+        "back_pct": round(float((back_all < r["back"]).mean() * 100)),
     }
 
 
