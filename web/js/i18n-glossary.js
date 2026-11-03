@@ -5,7 +5,7 @@
  * match complete labels, never replace these words inside arbitrary sentences.
  */
 (function () {
-  const languages = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko"];
+  const languages = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko", "zh-Hans", "zh-Hant"];
   // English, Spanish, French, Portuguese, German, Italian, Arabic, Japanese, Korean.
   const rows = [
     // The first two fragments form one heading across a <br>; keep their grammar paired.
@@ -183,9 +183,186 @@
     rows.push([`PLAYER LENS / ${role}`, ...playerLens.map((label) => `${label} / ${role}`)]);
   }
 
+  // Chinese editorial overrides are separate so the existing eight dictionaries
+  // remain unchanged. Each pair is Simplified Chinese, then Traditional Chinese.
+  const chinese = {
+    "Why do similar teams": ["为什么打法相似的球队", "為什麼打法相似的球隊"],
+    "get different results?": ["会有不同的结果？", "會有不同的結果？"],
+    "Why do similar teams get different results?": ["为什么打法相似的球队会有不同的结果？", "為什麼打法相似的球隊會有不同的結果？"],
+    "Look closer.": ["深入观察。", "深入觀察。"],
+    "Then challenge the comparison.": ["再检验这个比较是否稳健。", "再檢驗這個比較是否穩健。"],
+    "Who connects the team?": ["谁在串联球队？", "誰在串聯球隊？"],
+    "How fragile is “similar”?": ["“相似”的判断有多稳健？", "「相似」的判斷有多穩健？"],
+    "Start with a team you know. Find its closest styles, compare the chances and scorelines, then inspect the matches behind the difference.": ["从你熟悉的球队开始，寻找打法相近的球队，比较机会与比分，再深入查看产生这些差异的具体比赛。", "從你熟悉的球隊開始，尋找打法相近的球隊，比較機會與比分，再深入查看產生這些差異的具體比賽。"],
+    "The analysis desk": ["分析工作台", "分析工作臺"],
+    "Questions to explore": ["值得探究的问题", "值得探究的問題"],
+    "Choose a starting point": ["选择一个切入点", "選擇一個切入點"],
+    "Similar styles still spread out": ["打法相近，表现依然各有不同", "打法相近，表現依然各有不同"],
+    "A scoreline is the beginning of the question.": ["比分，是深入分析的起点。", "比分，是深入分析的起點。"],
+    "Find a meaningful comparison": ["找到值得比较的球队", "找到值得比較的球隊"],
+    "Separate chances from scores": ["区分机会与比分", "區分機會與比分"],
+    "Follow the match evidence": ["追溯具体比赛中的证据", "追溯具體比賽中的證據"],
+    "Language": ["语言", "語言"],
+    "Match intelligence": ["比赛分析", "比賽分析"],
+    "Min. passes": ["最低传球次数", "最低傳球次數"],
+    "Recorded network passes": ["网络中记录的传球次数", "網絡中記錄的傳球次數"],
+    "Who keeps the ball moving?": ["谁在推动球队的传球运转？", "誰在推動球隊的傳球運轉？"],
+    "Track the connections. Inspect how a team breaks the lines.": ["追踪传球联系，观察球队如何突破对手防线。", "追蹤傳球聯繫，觀察球隊如何突破對手防線。"],
+    "Follow the connections. Inspect how a team breaks through.": ["追踪传球联系，观察球队如何突破对手防线。", "追蹤傳球聯繫，觀察球隊如何突破對手防線。"],
+    "Brush a passage of play. Follow the accumulation of recorded attempts, then inspect the players, deliveries and outcomes behind that interval.": ["框选一段比赛时间，查看射门记录如何累积，再分析该时段的射门球员、射门形成方式和结果。", "框選一段比賽時間，查看射門記錄如何累積，再分析該時段的射門球員、射門形成方式和結果。"],
+    "Champions": ["冠军", "冠軍"],
+    "/ {0} full match": ["/ 全场 {0}", "/ 全場 {0}"],
+    "v {0}": ["对阵 {0}", "對陣 {0}"],
+    "v {0} · R16 · M{1}": ["对阵 {0} · 十六强赛 · M{1}", "對陣 {0} · 十六強賽 · M{1}"],
+    "{0} M{1} vs {2}, partner rank {3}": ["{0} M{1} 对阵 {2}，比较球队相似性排名：{3}", "{0} M{1} 對陣 {2}，比較球隊相似性排名：{3}"],
+    "{0}–{1} v {2}": ["{0}–{1} 对阵 {2}", "{0}–{1} 對陣 {2}"],
+    "a.e.t.": ["加时赛后", "加時賽後"],
+    "{0} matches": ["{0} 场比赛", "{0} 場比賽"],
+    "{0} match": ["{0} 场比赛", "{0} 場比賽"],
+    "{0} teams": ["{0} 支球队", "{0} 支球隊"],
+    "{0} team": ["{0} 支球队", "{0} 支球隊"],
+    "{0} passes": ["{0} 次传球", "{0} 次傳球"],
+    "{0} pass": ["{0} 次传球", "{0} 次傳球"],
+    "{0} attempts": ["{0} 次尝试", "{0} 次嘗試"],
+    "{0} attempt": ["{0} 次尝试", "{0} 次嘗試"],
+    "{0} selected metrics": ["已选 {0} 项指标", "已選 {0} 項指標"],
+    "Match {0}": ["比赛 {0}", "比賽 {0}"],
+    "Group {0}": ["{0} 组", "{0} 組"],
+    "Full-match pass counts": ["全场传球次数", "全場傳球次數"],
+    "style dimensions": ["风格维度", "風格維度"],
+    "Teams": ["球队", "球隊"],
+    "Choose the dimensions that define similar football.": ["选择用哪些指标来判断球队打法是否相似。", "選擇用哪些指標來判斷球隊打法是否相似。"],
+    "Compare shot volume, chance quality and conversion.": ["比较射门数量、机会质量，以及机会转化为进球的情况。", "比較射門數量、機會質量，以及機會轉化為進球的情況。"],
+    "Check opponents, individual games and passing patterns.": ["查看对手、具体比赛和传球模式。", "查看對手、具體比賽和傳球模式。"],
+    "{0} v {1}": ["{0} 对阵 {1}", "{0} 對陣 {1}"],
+    "{0} → {1}: {2} passes": ["{0} → {1}：{2} 次传球", "{0} → {1}：{2} 次傳球"],
+    "{0} → {1}: {2} passes (below threshold)": ["{0} → {1}：{2} 次传球（低于显示阈值）", "{0} → {1}：{2} 次傳球（低於顯示門檻）"],
+    "Passing network": ["传球网络", "傳球網絡"],
+    "Pass network": ["传球网络", "傳球網絡"],
+    "Pass matrix": ["传球矩阵", "傳球矩陣"],
+    "Expected goals": ["预期进球", "預期進球"],
+    "Line breaks": ["破线", "破線"],
+    "Through": ["穿透", "穿透"],
+    "Around": ["绕过", "繞過"],
+    "Over": ["越过", "越過"],
+    "Forward line": ["前锋线", "前鋒線"],
+    "Midfield line": ["中场线", "中場線"],
+    "Defensive line": ["后卫线", "後衛線"],
+    "Forward unit": ["前锋线", "前鋒線"],
+    "Midfield unit": ["中场线", "中場線"],
+    "Defensive unit": ["后卫线", "後衛線"],
+    "Goalkeeper": ["门将", "守門員"],
+    "Defender": ["后卫", "後衛"],
+    "Midfielder": ["中场球员", "中場球員"],
+    "Forward": ["前锋", "前鋒"],
+    "Goalkeepers": ["门将", "守門員"],
+    "Defenders": ["后卫", "後衛"],
+    "Midfielders": ["中场球员", "中場球員"],
+    "Forwards": ["前锋", "前鋒"],
+    "Possession": ["控球率", "控球率"],
+    "High press": ["高位压迫", "高位壓迫"],
+    "Deep block": ["低位防守", "低位防守"],
+    "Counter-press": ["丢失球权后反抢", "失去球權後反搶"],
+    "Direct play": ["直接进攻", "直接進攻"],
+    "Patient build-up": ["耐心组织进攻", "耐心組織進攻"],
+    "Transition attacks": ["转换进攻", "轉換進攻"],
+    "Final-third camp": ["进攻三区持球", "進攻三區持球"],
+    "Wing crosses": ["边路传中", "邊路傳中"],
+    "Press intensity": ["压迫强度", "壓迫強度"],
+    "Ball share": ["控球率", "控球率"],
+    "Match Lab": ["比赛分析室", "比賽分析室"],
+    "Match pulse": ["比赛脉络", "比賽脈絡"],
+    "Robustness lab": ["稳健性检验", "穩健性檢驗"],
+    "Style map": ["风格地图", "風格地圖"],
+    "Compare teams": ["球队比较", "球隊比較"],
+    "Start here": ["从这里开始", "從這裡開始"],
+    "How it works": ["方法与说明", "方法與說明"],
+    "Matches": ["比赛", "比賽"],
+    "Match": ["比赛", "比賽"],
+    "Goal difference": ["净胜球", "淨勝球"],
+    "xG difference": ["xG 差值", "xG 差值"],
+    "xG per shot": ["每次射门 xG", "每次射門 xG"],
+    "Shot volume": ["射门数量", "射門數量"],
+    "Attempts": ["尝试", "嘗試"],
+    "Shots": ["射门", "射門"],
+    "On target": ["射正", "射正"],
+    "Saved": ["被门将扑出", "被守門員撲出"],
+    "Blocked": ["被封堵", "被封堵"],
+    "Off target": ["射偏", "射偏"],
+    "Incoming": ["接到的传球", "接到的傳球"],
+    "Outgoing": ["送出的传球", "送出的傳球"],
+    "Directed links": ["有向传球连接", "有向傳球連結"],
+    "Directed connections": ["有向传球连接", "有向傳球連結"],
+    "Group": ["小组", "小組"],
+    "Group stage": ["小组赛", "分組賽"],
+    "Knockout stage": ["淘汰赛", "淘汰賽"],
+    "Final": ["决赛", "決賽"],
+    "Round of 16": ["十六强赛", "十六強賽"],
+    "Round of 32": ["三十二强赛", "三十二強賽"],
+    "Quarter-final": ["四分之一决赛", "八強賽"],
+    "Semi-final": ["半决赛", "四強賽"],
+    "Bronze final": ["季军赛", "季軍賽"],
+    "Win": ["胜", "勝"],
+    "Draw": ["平", "和"],
+    "Loss": ["负", "負"],
+    "Goal": ["进球", "進球"],
+    "Goals": ["进球", "進球"],
+    "Own goal": ["乌龙球", "烏龍球"],
+    "Penalty": ["点球", "十二碼"],
+    "Penalty shoot-out": ["点球大战", "十二碼大戰"],
+    "Red card": ["红牌", "紅牌"],
+    "Yellow card": ["黄牌", "黃牌"],
+    "Substitution": ["换人", "換人"],
+    "First half": ["上半场", "上半場"],
+    "Second half": ["下半场", "下半場"],
+    "Extra time": ["加时赛", "加時賽"],
+    "Stoppage time": ["伤停补时", "傷停補時"],
+    "Kick-off": ["开球", "開球"],
+    "Full time": ["全场结束", "全場結束"],
+    "Play": ["播放", "播放"],
+    "Pause": ["暂停", "暫停"],
+    "England": ["英格兰", "英格蘭"],
+    "Scotland": ["苏格兰", "蘇格蘭"],
+    "Player involvement": ["球员传球参与度", "球員傳球參與度"],
+    "Completion rate": ["成功率", "成功率"],
+    "Per match": ["场均", "場均"],
+    "Style distance": ["风格距离", "風格距離"],
+    "Similarity percentile": ["相似性百分位", "相似性百分位"],
+    "Baseline": ["基准", "基準"],
+    "Indicator omission": ["逐项移除指标", "逐項移除指標"],
+    "Match omission": ["逐场移除比赛", "逐場移除比賽"],
+    "Search": ["搜索", "搜尋"],
+    "Search options": ["搜索选项", "搜尋選項"],
+    "No match": ["无匹配结果", "沒有符合的結果"],
+    "Reset": ["重置", "重設"],
+    "Evidence": ["证据", "證據"],
+    "Sources": ["来源", "來源"],
+    "Schematic": ["示意", "示意"],
+    "Recorded attempts": ["已记录的射门尝试", "已記錄的射門嘗試"],
+    "Delivery": ["射门形成方式", "射門形成方式"],
+    "Body part": ["触球部位", "觸球部位"],
+    "Outcome": ["结果", "結果"],
+    "Header": ["头球", "頭球"],
+    "Left Foot": ["左脚", "左腳"],
+    "Right Foot": ["右脚", "右腳"],
+    "Head": ["头部", "頭部"],
+    "Cross": ["传中", "傳中"],
+    "Corner": ["角球", "角球"],
+    "Freekick": ["任意球", "罰球"],
+    "Loose Ball": ["无主球", "無主球"],
+    "Ball Progression": ["带球推进", "帶球推進"],
+    "Pass": ["传球", "傳球"],
+    "Not recorded": ["未记录", "未記錄"],
+    "PLAYER LENS / MF": ["球员观察 / MF", "球員觀察 / MF"],
+    "PLAYER LENS / DF": ["球员观察 / DF", "球員觀察 / DF"],
+    "PLAYER LENS / FW": ["球员观察 / FW", "球員觀察 / FW"],
+    "PLAYER LENS / GK": ["球员观察 / GK", "球員觀察 / GK"],
+  };
+
   const glossary = Object.fromEntries(languages.map((language) => [language, {}]));
   for (const row of rows) {
     const source = row[0];
+    if (!chinese[source]) throw new Error(`Missing Chinese glossary entry: ${source}`);
     const variants = new Set([
       source,
       source.toLowerCase(),
@@ -194,10 +371,33 @@
       source.replace(/\b[a-z]/g, (letter) => letter.toUpperCase()),
     ]);
     languages.forEach((language, index) => {
-      for (const variant of variants) glossary[language][variant] = row[index + 1];
+      const translation = index < 8 ? row[index + 1] : chinese[source][index - 8];
+      for (const variant of variants) glossary[language][variant] = translation;
       glossary[language]["Style Twins"] = "Style Twins";
       glossary[language]["xG"] = "xG";
     });
   }
+  // This count concerns progression beyond a defensive unit, not shots at goal.
+  const breakAttempts = {
+    es: "Intentos de ruptura de líneas", fr: "Tentatives de franchissement de lignes",
+    pt: "Tentativas de quebra de linhas", de: "Versuche, Linien zu überspielen",
+    it: "Tentativi di superamento delle linee", ar: "محاولات اختراق الخطوط",
+    ja: "ライン突破の試み", ko: "라인 돌파 시도",
+    "zh-Hans": "破线尝试", "zh-Hant": "破線嘗試"
+  };
+  for (const [language, label] of Object.entries(breakAttempts)) {
+    for (const key of ["Line-break attempts", "line-break attempts", "LINE-BREAK ATTEMPTS", "Line-Break Attempts"]) glossary[language][key] = label;
+  }
+  // Compact chart labels have their own translations; they are not English IDs.
+  const compactLocales = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko", "zh-Hans", "zh-Hant"];
+  const compactLabels = [
+    ["1H", "1.ª parte", "1re MT", "1º tempo", "1. HZ", "1º tempo", "الشوط 1", "前半", "전반", "上半场", "上半場"],
+    ["2H", "2.ª parte", "2e MT", "2º tempo", "2. HZ", "2º tempo", "الشوط 2", "後半", "후반", "下半场", "下半場"],
+    ["ET1", "Prór. 1", "Prol. 1", "Prorr. 1", "Verl. 1", "Suppl. 1", "الإضافي 1", "延長前半", "연장 전반", "加时上", "加時上"],
+    ["ET2", "Prór. 2", "Prol. 2", "Prorr. 2", "Verl. 2", "Suppl. 2", "الإضافي 2", "延長後半", "연장 후반", "加时下", "加時下"],
+    ["Transition atta…", "Transiciones", "Transitions", "Transições", "Umschaltangriffe", "Transizioni", "التحولات", "攻撃転換", "공격 전환", "转换进攻", "轉換進攻"]
+  ];
+  for (const row of compactLabels) compactLocales.forEach((language, index) => { glossary[language][row[0]] = row[index + 1]; });
+  for (const language of compactLocales) glossary[language]["− Transition atta…"] = "− " + glossary[language]["Transition atta…"];
   window.STYLE_TWINS_GLOSSARY = glossary;
 })();

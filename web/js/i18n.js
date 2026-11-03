@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
   const App = global.App || (global.App = {});
-  const locales = Object.freeze(["en", "es", "fr", "pt", "de", "it", "ar", "ja", "ko"]);
+  const locales = Object.freeze(["en", "zh-Hans", "zh-Hant", "es", "fr", "pt", "de", "it", "ar", "ja", "ko"]);
   const storageKey = "style-twins-language";
   const doc = typeof document === "undefined" ? null : document;
   const missing = new Set();

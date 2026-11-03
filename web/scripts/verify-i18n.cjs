@@ -5,7 +5,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
-const languages = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko"];
+const languages = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko", "zh-Hans", "zh-Hant"];
+const chineseLocales = ["zh-Hans", "zh-Hant"];
 const read = (file) => {
   const location = path.join(root, file);
   assert.ok(fs.existsSync(location), `Required localization file is missing: ${file}`);
@@ -61,7 +62,7 @@ function createHarness({ stored = null, withDOM = false, storageBlocked = false 
 
 function checkDictionary(dictionaries, label) {
   assert.ok(dictionaries && typeof dictionaries === "object", `${label}: locale dictionaries exist`);
-  assert.deepEqual(Object.keys(dictionaries).sort(), [...languages].sort(), `${label}: exactly the eight supported translations`);
+  assert.deepEqual(Object.keys(dictionaries).sort(), [...languages].sort(), `${label}: exactly the ${languages.length} supported translations`);
   const reference = Object.keys(dictionaries[languages[0]]).sort();
   assert.ok(reference.length > 0, `${label}: keys are not empty`);
   for (const locale of languages) {
@@ -102,17 +103,21 @@ assert.deepEqual(placeholderBag("{0} then {1} and {0}"), placeholderBag("{1} / {
 assert.notDeepEqual(placeholderBag("{0} then {1} and {0}"), placeholderBag("{0} and {1}"));
 assert.notDeepEqual(placeholderBag("{0} and {1}"), placeholderBag("{0} and {2}"));
 
-assert.deepEqual(plain(engine.locales), ["en", ...languages]);
+assert.equal(engine.locales[0], "en", "English remains the first/default locale");
+assert.deepEqual(plain(engine.locales).sort(), ["en", ...languages].sort());
 assert.equal(engine.locale, "en", "New visitors start in English, ignoring zh-CN navigator language");
 assert.equal(engine.t("  Pass network\n"), "  Pass network\n", "English output is the literal source");
-assert.equal(engine.setLocale("zh"), false, "Unsupported Chinese locale rejected");
+assert.equal(engine.setLocale("xx"), false, "Unsupported locale rejected");
 assert.equal(engine.locale, "en");
 assert.equal(engine.setLocale("es"), true);
 assert.equal(engine.setLocale("invalid"), false);
 assert.equal(engine.locale, "es", "Invalid change retains the valid current language");
 assert.equal(main.writes.at(-1)[1], "es", "Invalid language is not persisted");
-assert.equal(createHarness({ stored: "zh-CN" }).engine.locale, "en", "Invalid saved language falls back to English");
+assert.equal(createHarness({ stored: "unsupported" }).engine.locale, "en", "Invalid saved language falls back to English");
 assert.equal(createHarness({ stored: "de" }).engine.locale, "de", "Explicit saved preference is honored");
+for (const locale of chineseLocales) {
+  assert.equal(createHarness({ stored: locale }).engine.locale, locale, `${locale}: explicit Chinese preference survives a new session`);
+}
 const blocked = createHarness({ storageBlocked: true }).engine;
 assert.equal(blocked.locale, "en");
 assert.equal(blocked.setLocale("ja"), true, "Storage failure does not break switching");
@@ -151,6 +156,35 @@ assert.equal(engine.t(probe), `${engine.t("Croatia")}: +0.50; ${engine.t("Englan
 assert.equal(engine.t(`  ${probe}\n`), `  ${engine.t(probe)}\n`, "Outer whitespace is preserved");
 if (previous === undefined) delete window.STYLE_TWINS_MESSAGES.es[probeKey];
 else window.STYLE_TWINS_MESSAGES.es[probeKey] = previous;
+
+// Both Chinese scripts need real football translations, not English fallback,
+// while signed values, percentages and canonical identifiers remain untouched.
+const chineseLabels = {};
+for (const locale of chineseLocales) {
+  engine.setLocale(locale);
+  assert.equal(main.writes.at(-1)[1], locale, `${locale}: language preference persisted`);
+  chineseLabels[locale] = {};
+  for (const label of ["Pass network", "Expected goals"]) {
+    const translated = engine.t(label);
+    assert.notEqual(translated, label, `${locale}/${label}: must not fall back to English`);
+    assert.match(translated, /\p{Script=Han}/u, `${locale}/${label}: must contain Chinese text`);
+    assert.match(translated, /球/u, `${locale}/${label}: football term retains its meaning`);
+    chineseLabels[locale][label] = translated;
+  }
+  assert.equal(engine.t("Spain"), "西班牙", `${locale}: localized Spain label resolves for team search`);
+  assert.equal(engine.t("ESP"), "ESP", `${locale}: country display names do not change team IDs`);
+  const source = "Chinese numeric probe Spain −1.28 62.5% +0.50";
+  const key = engine.template(source).key;
+  const messages = window.STYLE_TWINS_MESSAGES[locale];
+  const oldValue = messages[key];
+  const prefix = locale === "zh-Hans" ? "占比" : "佔比";
+  messages[key] = `${prefix} {2}；{0}：{1}；差值 {3}`;
+  assert.equal(engine.t(source), `${prefix} 62.5%；西班牙：−1.28；差值 +0.50`, `${locale}: reordered placeholders preserve exact numeric strings`);
+  if (oldValue === undefined) delete messages[key]; else messages[key] = oldValue;
+}
+for (const label of ["Pass network", "Expected goals"]) {
+  assert.notEqual(chineseLabels["zh-Hans"][label], chineseLabels["zh-Hant"][label], `${label}: Simplified and Traditional script variants are distinct`);
+}
 
 const unknown = "A deliberately unknown analysis label zzqv";
 assert.equal(engine.t(unknown), unknown, "Unknown text falls back to its English source");
@@ -197,6 +231,16 @@ assert.equal(dom.events.at(-1).detail.locale, "ar");
 dom.engine.setLocale("fr");
 assert.equal(dom.html.dir, "ltr");
 assert.equal(dom.textNode.nodeValue, dom.engine.t("Pass network"), "Translation uses original source when switching languages");
+for (const locale of chineseLocales) {
+  dom.engine.setLocale(locale);
+  assert.equal(dom.html.lang, locale);
+  assert.equal(dom.html.dir, "ltr", `${locale}: Chinese interface keeps left-to-right layout`);
+  assert.equal(dom.textNode.nodeValue, dom.engine.t("Pass network"), `${locale}: DOM uses the correct catalog`);
+  assert.match(dom.textNode.nodeValue, /\p{Script=Han}/u);
+  assert.equal(dom.writes.at(-1)[1], locale, `${locale}: DOM language switch persists preference`);
+  dom.engine.setLocale("en");
+  assert.equal(dom.textNode.nodeValue, "Pass network", `${locale}: returning to English restores original text exactly`);
+}
 dom.engine.setLocale("en");
 assert.equal(dom.textNode.nodeValue, "Pass network", "Returning to English restores the exact original text");
 const markup = '<img src="x" onerror="alert(1)">literal';
@@ -209,4 +253,4 @@ dom.engine.setLocale("en");
 assert.equal(dom.textNode.nodeValue, "Untrusted translation probe");
 
 console.log("Localization checks passed");
-console.log(JSON.stringify({ defaultLocale: "en", translatedLocales: languages.length, catalogKeysPerLocale: catalogKeys, glossaryKeysPerLocale: glossaryKeys, canonicalTeamCount: window.WC.teams.length, canonicalMatch: canonical.match.id, reversibleDOM: true, literalMarkup: true }, null, 2));
+console.log(JSON.stringify({ defaultLocale: "en", translatedLocales: languages.length, chineseLocales, catalogKeysPerLocale: catalogKeys, glossaryKeysPerLocale: glossaryKeys, canonicalTeamCount: window.WC.teams.length, canonicalMatch: canonical.match.id, reversibleDOM: true, literalMarkup: true }, null, 2));
