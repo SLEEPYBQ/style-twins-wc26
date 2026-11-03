@@ -7,7 +7,11 @@
 
   const jump = App.ui.select("team-jump", {
     options: App.ui.teamOptions(), placeholder: "Jump to a team", searchable: true, ariaLabel: "Jump to a team",
-    onChange: (v) => { App.go(`#/team/${v}`); jump.set(""); },
+    onChange: (v) => {
+      const params = Object.fromEntries(new URLSearchParams(location.hash.split("?")[1] || ""));
+      App.go(`#/team/${v}${App.analysis.query(App.analysis.readDials(params), { return: location.hash })}`);
+      jump.set("");
+    },
   });
 
   function parse() {
@@ -35,13 +39,14 @@
     const fn = App.views[r.name] || App.views.story;
     document.querySelectorAll(".tabs a").forEach((a) => {
       const tab = a.dataset.tab;
-      a.classList.toggle("on", tab === r.name || (tab === "matches" && r.name === "match") || (tab === "styles" && r.name === "team"));
+      a.classList.toggle("on", tab === r.name || (tab === "matches" && ["match", "duel"].includes(r.name)) || (tab === "styles" && r.name === "team") || (tab === "twins" && r.name === "robustness"));
     });
     view.innerHTML = "";
     view.classList.toggle("wide", r.name === "match");
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     try {
       instance = fn(view, r.params, ...r.args) || null;
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     } catch (err) {
       console.error(err);
       instance = null;

@@ -4,11 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Style Twins · World Cup 2026</title>
-  <meta name="description" content="Same playbook, different fate: an interactive look at how all 48 teams played the 2026 World Cup, and why teams with the same style got different results.">
+  <meta name="description" content="Investigate similar playing styles, different chances and the match evidence behind the 2026 World Cup. A visual analysis workspace for football fans.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/review.css">
+  <link rel="stylesheet" href="css/story-review.css">
+  <link rel="stylesheet" href="css/duel.css">
+  <link rel="stylesheet" href="css/robustness.css">
+  <link rel="stylesheet" href="css/lab.css">
+  <link rel="stylesheet" href="css/lab-pulse.css">
+  <link rel="stylesheet" href="css/i18n.css">
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false">
@@ -31,13 +38,29 @@
       <span>Style Twins</span>
     </a>
     <nav class="tabs" aria-label="Sections">
-      <a href="#/story" data-tab="story">Story</a>
+      <a href="#/story" data-tab="story">Start here</a>
       <a href="#/styles" data-tab="styles">Style map</a>
-      <a href="#/twins" data-tab="twins">Twins</a>
+      <a href="#/twins" data-tab="twins">Compare teams</a>
       <a href="#/matches" data-tab="matches">Matches</a>
+      <a href="#/lab/2026-M022-ENG-CRO" data-tab="lab">Match Lab</a>
       <a href="#/method" data-tab="method">How it works</a>
     </nav>
     <div class="jump" id="team-jump"></div>
+    <div class="language-control">
+      <label class="sr-only" for="language-select">Language</label>
+      <svg class="language-globe" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18M5 6.5h14M5 17.5h14"/></svg>
+      <select id="language-select" name="language" translate="no" data-i18n-skip>
+        <option value="en" lang="en" selected>English</option>
+        <option value="es" lang="es">Español</option>
+        <option value="fr" lang="fr">Français</option>
+        <option value="pt" lang="pt">Português</option>
+        <option value="de" lang="de">Deutsch</option>
+        <option value="it" lang="it">Italiano</option>
+        <option value="ar" lang="ar" dir="rtl">العربية</option>
+        <option value="ja" lang="ja">日本語</option>
+        <option value="ko" lang="ko">한국어</option>
+      </select>
+    </div>
   </header>
 
   <main id="view" tabindex="-1"></main>
@@ -45,23 +68,34 @@
   <footer class="foot">
     <p>Data: <a href="https://github.com/Alamyy/Worldcup26" target="_blank" rel="noopener">Worldcup26</a> (CC BY 4.0), derived from FIFA Training Centre post-match reports. Not affiliated with FIFA.
       Player avatars are cartoon interpretations drawn from reference photos: freely licensed Wikimedia Commons photos where they exist, otherwise public press photos used only as a drawing reference (sources on each player card). Non-commercial course project.</p>
-    <p>Group 6 · Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang</p>
+    <p translate="no">Group 6 · Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang</p>
   </footer>
 
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
   <div id="vp-sentinel" aria-hidden="true"></div>
 
-  <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+  <script src="js/d3.min.js"></script>
   <script src="data/core.js"></script>
+  <script src="data/sources.js"></script>
   <script src="data/avatars.js" onerror="window.WC_AVATARS = window.WC_AVATARS || {}"></script>
   <script src="data/avatar_credits.js" onerror="window.WC_AVATAR_CREDITS = window.WC_AVATAR_CREDITS || {}"></script>
   <script src="js/util.js"></script>
+  <script src="js/i18n-catalogs.js"></script>
+  <script src="js/i18n-glossary.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/robustness.js"></script>
+  <script src="js/match-pulse-data.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/view-story.js"></script>
   <script src="js/view-styles.js"></script>
   <script src="js/view-team.js"></script>
-  <script src="js/view-twins.js"></script>
+  <script src="js/view-investigate.js"></script>
+  <script src="js/view-duel.js"></script>
+  <script src="js/view-robustness.js"></script>
+  <script src="js/lab-pulse.js"></script>
+  <script src="js/view-lab.js"></script>
   <script src="js/view-matches.js"></script>
   <script src="js/view-match.js"></script>
   <script src="js/view-method.js"></script>

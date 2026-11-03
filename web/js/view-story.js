@@ -1,293 +1,283 @@
-/* Story: the guided path through the findings. Every number on this page is computed from the data. */
+/* A guided entry into the same comparisons available throughout the explorer. */
 (function () {
   const App = window.App;
-  const INK = "#1d2433", MUTED = "#858a96", GRID = "#efe9dc", AXIS = "#cfc7b5", POS = "#0a9396", NEG = "#e8743b";
+  const INK = "#1d2433", TEAL = "#087f82", ORANGE = "#bd6234";
 
   App.views.story = function (root) {
-    const S = App.data.story;
-    const sh = S.shares;
-    const pct = (v) => `${Math.round(v * 100)}%`;
-    const conv = sh.c_finish + sh.c_keep, exec = sh.c_create + sh.c_prevent, ctx = sh.c_style + sh.c_opp;
-    const order = App.data.archetypes.slice().sort((a, b) => archGD(b) - archGD(a));
-    function archGD(a) { return d3.mean(a.members, (t) => App.team[t].gd_per_match); }
-    const best = order[0], worst = order[order.length - 1];
-    const spread = d3.max(App.data.archetypes, (a) => d3.max(a.members, (t) => App.team[t].gd_per_match) - d3.min(a.members, (t) => App.team[t].gd_per_match));
+    const analysis = App.analysis;
+    const profiles = Object.fromEntries(App.teams.map((team) =>
+      [team.id, analysis.summary(analysis.rows(team.id))]
+    ));
+    const twins = analysis.twinTable(analysis.space(App.dials));
+    const comparisonLink = (a, b) => `#/twins/${a}/${b}${analysis.query(App.dials)}`;
+    const pairPercentile = (a, b) => Math.round(twins.near[a].find((row) => row.id === b).sim * 100);
+    const ned = profiles.NED, cro = profiles.CRO;
+    const outcomes = [
+      { label: "Expected goal difference", key: "xgd" },
+      { label: "Actual goal difference", key: "gd" },
+    ];
+    const barScale = Math.max(...outcomes.flatMap(({ key }) => [Math.abs(ned[key]), Math.abs(cro[key])]));
+    const heroRows = outcomes.map(({ label, key }) => `
+      <div class="review-hero-metric">
+        <span>${label} <small>per match</small></span>
+        ${[["NED", ned, "home"], ["CRO", cro, "away"]].map(([id, data, color]) => `
+          <div class="review-hero-bar">
+            <span>${id}</span>
+            <div class="review-bar-track"><i class="${color}" style="left:${data[key] < 0 ? 50 - Math.abs(data[key]) / barScale * 50 : 50}%;width:${Math.abs(data[key]) / barScale * 50}%"></i></div>
+            <b>${App.signed(data[key], 2)}</b>
+          </div>`).join("")}
+      </div>`).join("");
 
     root.innerHTML = `
-      <section class="hero">
-        <div>
-          <div class="kicker">FIFA World Cup 2026 · 48 teams · 104 matches</div>
-          <h1>Same playbook,<br><em>different fate.</em></h1>
-          <p class="lede">Teams that play almost the same football still walk away with very different results. We sort every team by <b>how</b> it plays,
-            then split each result into style, opponents, the team's own play, and what happened in the two penalty boxes.</p>
-          <div class="stat-row">
-            <div class="stat"><b>5</b><span>playstyles in the tournament</span></div>
-            <div class="stat"><b>${pct(sh.c_style)}</b><span>of results explained by style</span></div>
-            <div class="stat"><b>${pct(conv)}</b><span>by finishing and goalkeeping</span></div>
+      <div class="review-home">
+        <section class="review-hero">
+          <div class="review-hero-copy">
+            <div class="review-eyebrow">World Cup 2026 · For fans who study the match</div>
+            <h1>Why do similar teams<br>get different results?</h1>
+            <p>Start with a team you know. Find its closest styles, compare the chances and scorelines, then inspect the matches behind the difference.</p>
+            <div class="review-actions">
+              <a class="btn" href="${comparisonLink("NED", "CRO")}">Investigate Netherlands & Croatia <span aria-hidden="true">↗</span></a>
+              <div class="review-hero-tool-links"><a class="review-text-link" href="#/lab/2026-M022-ENG-CRO?team=ENG&pane=network">Open Match Lab ↗</a><a class="review-text-link review-hero-audit-link" href="#/robustness/NED/CRO">Audit the resemblance →</a></div>
+            </div>
+            <div class="review-coverage"><span><b>48</b> teams</span><span><b>104</b> matches</span><span><b>10</b> style dimensions</span></div>
           </div>
-        </div>
-        <img src="img/gen/hero.webp" alt="Two identical cartoon footballers back to back: one celebrating, one dejected">
-      </section>
-
-      <nav class="chapter-nav" aria-label="Chapters">
-        ${["Five ways to play", "Style vs. the score", "Skill or luck?", "Same style, different fate", "Who beats whom?", "Watch it happen"]
-          .map((t, i) => `<button type="button" data-ch="${i + 1}"><span>${i + 1}</span>${t}</button>`).join("")}
-      </nav>
-
-      <section class="chapter" id="ch-1">
-        <header class="ch-head"><span class="ch-n">1</span><div><h2>Five ways to play</h2>
-          <p>Ten style dials from FIFA's phase-of-play data, averaged per team and clustered with k-means, give five clear playstyles. The bars show each style's average setting: teal above the tournament average, orange below.</p></div></header>
-        <div class="arch-row" id="arch-row"></div>
-        <div class="ch-cta"><a class="btn" href="#/styles">Open the style map →</a><span class="note">See where every team sits, switch dials off, and trace each team's matches.</span></div>
-      </section>
-
-      <section class="chapter" id="ch-2">
-        <header class="ch-head"><span class="ch-n">2</span><div><h2>Style sets the stage, not the score</h2>
-          <p><b>${best.name} averaged ${App.signed(archGD(best), 2)} goals per match and ${worst.name} ${App.signed(archGD(worst), 2)}</b>, so style matters.
-            But inside every playstyle, results spread by up to ${spread.toFixed(1)} goals per match. Across all 208 team-matches, style explains only ${pct(sh.c_style)} of the goal difference.</p></div></header>
-        <div class="grid-2">
-          <div class="card"><h3>Goal difference per match, by playstyle</h3><div class="sub">Each flag is a team; the black tick is the playstyle average. Click a flag for the team page.</div><div id="strip"></div></div>
-          <div class="card"><h3>Where results come from</h3><div class="sub">Share of the variation in goal difference across all 208 team-matches, from our six-part split of every result.</div><div id="shares"></div>
-            <p class="callout" style="margin-top:12px">What happens in the two boxes (finishing and goalkeeping) explains <b>${pct(conv)}</b>; making and denying chances <b>${pct(exec)}</b>; style and opponents together <b>${pct(ctx)}</b>.</p></div>
-        </div>
-      </section>
-
-      <section class="chapter" id="ch-3">
-        <header class="ch-head"><span class="ch-n">3</span><div><h2>Skill or luck? Ask the knockouts</h2>
-          <p>If a strength is real, it should survive into the next round. For the 32 teams that reached the knockouts we compare their group-stage average with their knockout average.
-            <b>Making and denying chances carried over (r = ${S.carry.exec.r.toFixed(2)}); finishing and goalkeeping did not (r = ${S.carry.luck.r.toFixed(2)}).</b></p></div></header>
-        <div class="grid-2">
-          <div class="card"><h3>Execution carries over</h3><div class="sub">Chance creation + prevention beyond expectation, goals per match. 90% bootstrap interval for r: ${S.carry.exec.ci90[0].toFixed(2)} to ${S.carry.exec.ci90[1].toFixed(2)}.</div><div id="carry-exec"></div></div>
-          <div class="card"><h3>Conversion resets</h3><div class="sub">Finishing + goalkeeping beyond expectation, goals per match. 90% bootstrap interval for r: ${S.carry.luck.ci90[0].toFixed(2)} to ${S.carry.luck.ci90[1].toFixed(2)}.</div><div id="carry-luck"></div></div>
-        </div>
-        <p class="note" style="margin-top:10px">Only 32 teams and 1–5 knockout matches each, so read this as strong evidence rather than proof. It fits what analysts see in club football: chance quality is sticky, conversion swings.</p>
-      </section>
-
-      <section class="chapter" id="ch-4">
-        <header class="ch-head"><span class="ch-n">4</span><div><h2>Same style, different fate</h2>
-          <p>Pairs of teams that play more alike than nine in ten team pairs, both with at least four matches. For each pair we split the gap in goal difference into style, opponents, execution and conversion, and name the biggest reason.</p></div></header>
-        <div class="pair-grid" id="story-pairs"></div>
-        <div class="ch-cta"><a class="btn" href="#/twins">All twin pairs →</a><span class="note">Pick any two teams and see the full breakdown.</span></div>
-      </section>
-
-      <section class="chapter" id="ch-5">
-        <header class="ch-head"><span class="ch-n">5</span><div><h2>Who beats whom?</h2>
-          <p id="matchup-lede"></p></div></header>
-        <div class="card">
-          <div class="row" style="justify-content:space-between">
-            <div class="seg" id="mu-metric"><button data-v="xgd" class="on">Chances (xG difference)</button><button data-v="gd">Scoreboard (goal difference)</button></div>
-            <span class="note">Rows play against columns. Average per match; n = matches.</span>
+          <div class="review-hero-evidence">
+            <div class="review-evidence-top"><span>Start with an observation</span><span class="review-live-dot">Tournament data</span></div>
+            <div class="review-hero-teams">
+              <div>${App.flag("NED", 40)}<b>Netherlands</b><span>${ned.n} matches</span></div>
+              <span class="review-vs">vs</span>
+              <div>${App.flag("CRO", 40)}<b>Croatia</b><span>${cro.n} matches</span></div>
+            </div>
+            <div class="review-similarity">Closer in style than <b>${pairPercentile("NED", "CRO")}%</b> of team pairings</div>
+            ${heroRows}
+            <p class="review-hero-foot">Both reached the round of 32. Their goal difference still differs by <b>${(ned.gd - cro.gd).toFixed(2)} per match</b>. Which matches account for that gap?</p>
           </div>
-          <div id="matrix" style="overflow-x:auto;margin-top:12px"></div>
-        </div>
-      </section>
+        </section>
 
-      <section class="chapter" id="ch-6">
-        <header class="ch-head"><span class="ch-n">6</span><div><h2>Watch it happen</h2>
-          <p>Every one of the 104 matches can be replayed from the event data: line-ups, substitutions, cards, every shot, the passing network and the six-part result split.</p></div></header>
-        <div class="grid-3" id="replay-cards"></div>
-      </section>`;
+        <nav class="review-journey" aria-label="Your analysis journey">
+          <a href="#/styles"><span class="review-step">01</span><div><b>Find a meaningful comparison</b><span>Choose the dimensions that define similar football.</span></div><span aria-hidden="true">↗</span></a>
+          <a href="${comparisonLink("NED", "CRO")}"><span class="review-step">02</span><div><b>Separate chances from scores</b><span>Compare shot volume, chance quality and conversion.</span></div><span aria-hidden="true">↗</span></a>
+          <a href="#/matches"><span class="review-step">03</span><div><b>Follow the match evidence</b><span>Check opponents, individual games and passing patterns.</span></div><span aria-hidden="true">↗</span></a>
+        </nav>
 
-    root.querySelectorAll(".chapter-nav button").forEach((b) => b.addEventListener("click", () => {
-      document.getElementById(`ch-${b.dataset.ch}`).scrollIntoView({ behavior: "smooth", block: "start" });
-    }));
+        <section class="review-tools" aria-labelledby="review-tools-title">
+          <div class="review-tools-heading"><div><div class="review-eyebrow">The analysis desk</div><h2 id="review-tools-title">Look closer.<br>Then challenge the comparison.</h2></div><p>Trace the connections in a match. Test whether a familiar style survives a different choice of evidence.</p></div>
+          <div class="review-tool-grid">
+            <article class="review-tool review-tool-lab">
+              <div class="review-tool-top"><span>01 / Match lab</span><span class="review-tool-badge">104 matches to inspect</span></div>
+              <h3>Who connects the team?</h3><p>Follow directed passing links, reveal individual contributions, and inspect how a team attempts to break the lines.</p>
+              <div id="review-lab-preview" class="review-tool-graphic" aria-live="polite"><p class="review-preview-loading">Loading England’s passing connections…</p></div>
+              <div class="review-tool-actions"><a class="review-tool-primary" href="#/lab/2026-M022-ENG-CRO?team=ENG&pane=network">Open the match lab <span aria-hidden="true">↗</span></a><a href="#/lab/2026-M022-ENG-CRO?team=ENG&pane=breaks">Line breaks →</a><a href="#/lab/2026-M022-ENG-CRO?team=ENG&pane=pulse">Match pulse →</a></div>
+            </article>
+            <article class="review-tool review-tool-audit">
+              <div class="review-tool-top"><span>02 / Robustness lab</span><span class="review-tool-badge">Test the evidence</span></div>
+              <h3>How fragile is “similar”?</h3><p>Omit one indicator or one match at a time. Watch a neighbour’s rank move, and see which observations matter most.</p>
+              <div id="review-audit-preview" class="review-tool-graphic"></div>
+              <div class="review-tool-actions"><a class="review-tool-primary" href="#/robustness/NED/CRO">Challenge Netherlands & Croatia <span aria-hidden="true">↗</span></a><a href="#/method">Read the method →</a></div>
+            </article>
+          </div>
+          <div class="review-tools-foot"><span>Connected evidence. Your selections carry into the next view.</span><a href="#/method">How these tools use the data ↗</a></div>
+        </section>
 
-    // ------------------------------------------------------------------ chapter 1: archetype cards
-    d3.select("#arch-row").selectAll(".arch-card").data(App.data.archetypes).join("a")
-      .attr("class", "arch-card").attr("href", (a) => `#/styles?arch=${a.id}`)
-      .html((a) => `
-        <div class="art" style="background:${d3.color(a.color).copy({ opacity: 0.12 })}"><img src="${App.archArt(a.id)}" alt="" onerror="this.style.visibility='hidden'"></div>
-        <h4><svg width="16" height="16" viewBox="-8 -8 16 16" aria-hidden="true"><path d="${App.symbol(a.id, 90)}" fill="${a.color}"/></svg>${a.name}</h4>
-        <div class="tag">${a.tagline}</div>
-        <div class="fp"></div>
-        <div class="members">${a.members.map((t) => `<span title="${App.esc(App.team[t].name)}">${App.flag(t, 18)}</span>`).join("")}</div>`)
-      .each(function (a) { App.charts.miniFingerprint(this.querySelector(".fp"), App.dials.map((d) => a.centroid[d]), App.dials, { width: 200, height: 40 }); });
+        <section class="review-section">
+          <div class="review-section-head"><div><div class="review-eyebrow">Questions to explore</div><h2>Choose a starting point</h2></div><a class="review-text-link" href="#/twins">Explore every pair →</a></div>
+          <div class="review-case-grid" id="review-cases"></div>
+        </section>
 
-    // ------------------------------------------------------------------ chapter 2: strip plot + variance shares
-    function drawStrip() {
-      const el = document.getElementById("strip"); el.innerHTML = "";
-      const W = el.clientWidth || 520, rowH = 54, labelW = Math.min(150, W * 0.3), H = order.length * rowH + 34;
-      const vals = App.teams.map((t) => t.gd_per_match);
-      const x = d3.scaleLinear().domain([Math.floor(d3.min(vals)), Math.ceil(d3.max(vals))]).range([labelW + 12, W - 14]);
-      const svg = d3.select(el).append("svg").attr("width", W).attr("height", H);
-      svg.append("g").selectAll("line").data(x.ticks(6)).join("line").attr("x1", (d) => x(d)).attr("x2", (d) => x(d)).attr("y1", 6).attr("y2", H - 24)
-        .attr("stroke", (d) => (d === 0 ? AXIS : GRID)).attr("stroke-width", (d) => (d === 0 ? 1.5 : 1));
-      svg.append("g").selectAll("text").data(x.ticks(6)).join("text").attr("class", "axis-cap tnum").attr("x", (d) => x(d)).attr("y", H - 8)
-        .attr("text-anchor", "middle").text((d) => (d === 0 ? "0" : App.signed(d, 0)));
-      order.forEach((a, i) => {
-        const cy = 10 + i * rowH + rowH / 2;
-        const g = svg.append("g");
-        g.append("path").attr("d", App.symbol(a.id, 70)).attr("transform", `translate(8,${cy})`).attr("fill", a.color);
-        g.append("text").attr("x", 20).attr("y", cy).attr("dominant-baseline", "central").attr("font-size", 12.5).attr("font-weight", 700).attr("fill", INK)
-          .text(a.name.replace("The ", ""));
-        // beeswarm-ish: spread flags vertically when they collide
-        const nodes = a.members.map((id) => ({ id, x: x(App.team[id].gd_per_match), y: cy, tx: x(App.team[id].gd_per_match) }));
-        const sim = d3.forceSimulation(nodes).force("x", d3.forceX((d) => d.tx).strength(1)).force("y", d3.forceY(cy).strength(0.08))
-          .force("c", d3.forceCollide(9.5)).stop();
-        for (let k = 0; k < 120; k++) sim.tick();
-        nodes.forEach((n) => { n.y = Math.max(cy - rowH / 2 + 10, Math.min(cy + rowH / 2 - 10, n.y)); });
-        const mean = archGD(a);
-        g.append("line").attr("x1", x(mean)).attr("x2", x(mean)).attr("y1", cy - rowH / 2 + 4).attr("y2", cy + rowH / 2 - 4).attr("stroke", INK).attr("stroke-width", 2.5).attr("stroke-linecap", "round");
-        const f = g.selectAll("g.f").data(nodes).join("g").attr("class", "f").attr("transform", (n) => `translate(${n.x},${n.y})`).style("cursor", "pointer")
-          .on("mousemove", (evt, n) => { const t = App.team[n.id]; App.tip.show(`<div class="tt-title">${App.esc(t.name)}</div>${App.ttRows([["Goal diff / match", App.signed(t.gd_per_match, 2)], ["Reached", t.stage]])}`, evt); })
-          .on("mouseleave", App.tip.hide).on("click", (evt, n) => App.go(`#/team/${n.id}`));
-        f.append("circle").attr("r", 8.5).attr("fill", "#fff").attr("stroke", a.color).attr("stroke-width", 2);
-        f.append("image").attr("href", (n) => App.flagUrl(n.id)).attr("x", -7).attr("y", -7).attr("width", 14).attr("height", 14)
-          .attr("clip-path", "url(#flag-clip)");
+        <section class="review-section">
+          <div class="review-section-head"><div><div class="review-eyebrow">Tournament overview</div><h2>Similar styles still spread out</h2></div><a class="review-text-link" href="#/styles">Open the interactive map →</a></div>
+          <div class="review-overview-grid">
+            <div class="card review-style-summary">
+              <p>Five groups summarize the tournament's style profiles. Teams within a group can have very different opportunities and scorelines.</p>
+              <div class="review-archetype-list">${App.data.archetypes.map((arch) => `
+                <a href="#/styles?arch=${arch.id}"><i style="background:${arch.color}"></i><span><b>${arch.name.replace("The ", "")}</b><small>${arch.members.length} teams</small></span><span aria-hidden="true">→</span></a>`).join("")}</div>
+              <p class="note">Groups use all ten dimensions and remain fixed when you explore alternative feature selections.</p>
+            </div>
+            <div class="card review-outcome-card">
+              <div class="review-chart-heading"><h3>Team performance within each style</h3><div class="seg" id="review-outcome-control" aria-label="Outcome measure"><button type="button" data-metric="xgd" class="on" aria-pressed="true">xG difference</button><button type="button" data-metric="gd" aria-pressed="false">Goal difference</button></div></div>
+              <p class="sub">Each dot is one team's per-match average. The vertical tick is the average of teams in that group. Select a dot to inspect the team.</p>
+              <div id="review-outcomes"></div>
+              <div class="review-chart-key"><span><i style="background:${TEAL}"></i>Above zero</span><span><i style="background:${ORANGE}"></i>Below zero</span><span>All tournament matches</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="review-section">
+          <div class="review-section-head"><div><div class="review-eyebrow">Opponent context</div><h2>What happened when styles met?</h2></div></div>
+          <div class="card review-matrix-card">
+            <div class="review-chart-heading"><p>Choose a cell to inspect every match behind its average.</p><div class="seg" id="review-matrix-control" aria-label="Matchup measure"><button type="button" data-metric="xgd" class="on" aria-pressed="true">xG difference</button><button type="button" data-metric="gd" aria-pressed="false">Goal difference</button></div></div>
+            <div id="review-matrix" class="review-matrix-scroll"></div>
+            <div class="review-matrix-legend"><span class="review-color-scale"></span><span>Orange favours the column · Teal favours the row · Values per match</span></div>
+            <p class="note">Each team's style group comes from its tournament average. Different teams, opponents and sample sizes contribute to each cell. These are observed matchups within this tournament.</p>
+          </div>
+        </section>
+
+        <section class="review-closing">
+          <div><div class="review-eyebrow">From a pattern to a match</div><h2>A scoreline is the beginning of the question.</h2><p>Explore the underlying chances, then use the event timeline and full-match passing network to build a more specific interpretation.</p></div>
+          <div class="review-actions"><a class="btn" href="#/matches">Browse all matches →</a><a class="review-text-link" href="#/method">Understand the measures</a></div>
+        </section>
+      </div>`;
+
+    const cases = [
+      { a: "NED", b: "CRO", question: "Does the average hide one decisive match?", note: "Both teams played four games and exited in the same round. Check how much each match contributes.", metric: "Goal difference gap", value: profiles.NED.gd - profiles.CRO.gd },
+      { a: "MEX", b: "SWE", question: "Where do their chances start to differ?", note: "Compare opportunities created and allowed, then inspect the opponents in each team's schedule.", metric: "xG difference gap", value: profiles.MEX.xgd - profiles.SWE.xgd },
+      { a: "ENG", b: "NOR", question: "Does the comparison hold across stages?", note: "Switch between group and knockout matches to see how the selected evidence changes.", metric: "Goal difference gap", value: profiles.ENG.gd - profiles.NOR.gd },
+    ];
+    root.querySelector("#review-cases").innerHTML = cases.map((c, i) => `
+      <a class="review-case" href="${comparisonLink(c.a, c.b)}">
+        <div class="review-case-top"><span>CASE 0${i + 1}</span><span>Similarity percentile ${pairPercentile(c.a, c.b)}</span></div>
+        <div class="review-case-teams">${App.flag(c.a, 26)}<b>${App.esc(App.team[c.a].name)}</b><span> / </span>${App.flag(c.b, 26)}<b>${App.esc(App.team[c.b].name)}</b></div>
+        <h3>${c.question}</h3><p>${c.note}</p>
+        <div class="review-case-bottom"><span>${c.metric}<small>First team minus second · per match</small></span><b>${App.signed(c.value, 2)} <span aria-hidden="true">↗</span></b></div>
+      </a>`).join("");
+
+    // Preview actual directed pass counts; the circular layout implies no field coordinates.
+    App.loadMatch("2026-M022-ENG-CRO").then((match) => {
+      const target = root.querySelector("#review-lab-preview");
+      if (!target || !target.isConnected) return;
+      const team = match.teams.find((item) => item.team_id === "ENG");
+      const edges = team.edges.filter((edge) => edge[2] > 0);
+      const volume = d3.sum(edges, (edge) => edge[2]);
+      const strongest = edges.slice().sort((a, b) => b[2] - a[2]).slice(0, 10);
+      const involvement = team.players.map((_, index) => d3.sum(edges, (edge) => edge[0] === index || edge[1] === index ? edge[2] : 0));
+      const active = team.players.map((player, index) => ({ player, index })).filter(({ index }) => involvement[index] > 0);
+      const roleOrder = { GK: 0, DF: 1, MF: 2, FW: 3 };
+      active.sort((a, b) => (roleOrder[a.player.role] ?? 4) - (roleOrder[b.player.role] ?? 4) || a.player.num - b.player.num);
+      const positions = new Map(active.map((item, index) => {
+        const angle = -Math.PI / 2 + index / active.length * Math.PI * 2;
+        return [item.index, { x: 205 + 111 * Math.cos(angle), y: 154 + 111 * Math.sin(angle), angle }];
+      }));
+      target.innerHTML = `<div class="review-preview-caption"><b>${App.esc(team.name)} v Croatia</b><span>M22 · Full-match pass counts</span></div><div class="review-network-preview"></div><div class="review-preview-stats"><div><b>${volume}</b><span>recorded network passes</span></div><div><b>${team.lb.cmp}<small> / ${team.lb.att}</small></b><span>line breaks completed / attempted</span></div></div>`;
+      const svg = d3.select(target.querySelector(".review-network-preview")).append("svg").attr("viewBox", "0 0 410 310").attr("role", "img")
+        .attr("aria-label", `England against Croatia: ten strongest directed passing connections, from ${volume} recorded network passes. Schematic circular player layout.`);
+      svg.append("defs").append("marker").attr("id", "review-pass-arrow").attr("viewBox", "0 -3 6 6").attr("refX", 5).attr("refY", 0).attr("markerWidth", 4).attr("markerHeight", 4).attr("orient", "auto")
+        .append("path").attr("d", "M0,-3L6,0L0,3Z").attr("fill", "#7ce3e2");
+      svg.append("circle").attr("cx", 205).attr("cy", 154).attr("r", 111).attr("fill", "none").attr("stroke", "#d5f4ff15");
+      const edgeWidth = d3.scaleSqrt().domain([0, d3.max(strongest, (edge) => edge[2])]).range([0.6, 4]);
+      strongest.forEach((edge) => {
+        const from = positions.get(edge[0]), to = positions.get(edge[1]);
+        const dx = to.x - from.x, dy = to.y - from.y, length = Math.hypot(dx, dy);
+        svg.append("path").attr("d", `M${from.x + dx / length * 11},${from.y + dy / length * 11} Q205,154 ${to.x - dx / length * 14},${to.y - dy / length * 14}`)
+          .attr("fill", "none").attr("stroke", "#73d6df").attr("stroke-opacity", 0.65).attr("stroke-width", edgeWidth(edge[2])).attr("marker-end", "url(#review-pass-arrow)")
+          .append("title").text(`${team.players[edge[0]].short} → ${team.players[edge[1]].short}: ${edge[2]} passes`);
       });
-    }
-    function drawShares() {
-      const el = document.getElementById("shares"); el.innerHTML = "";
-      const items = [
-        { g: "Conversion", k: "c_finish", label: "Finishing" }, { g: "Conversion", k: "c_keep", label: "Goalkeeping" },
-        { g: "Execution", k: "c_prevent", label: "Chance prevention" }, { g: "Execution", k: "c_create", label: "Chance creation" },
-        { g: "Context", k: "c_style", label: "Style" }, { g: "Context", k: "c_opp", label: "Opponents" },
-      ];
-      const W = el.clientWidth || 480, labelW = 140, groupW = 96, rowH = 34, H = items.length * rowH + 8;
-      const x = d3.scaleLinear().domain([0, d3.max(items, (d) => sh[d.k])]).range([labelW, W - groupW - 40]);
-      const svg = d3.select(el).append("svg").attr("width", W).attr("height", H);
-      items.forEach((d, i) => {
-        const y = 4 + i * rowH;
-        svg.append("text").attr("x", labelW - 10).attr("y", y + rowH / 2).attr("text-anchor", "end").attr("dominant-baseline", "central")
-          .attr("font-size", 13).attr("font-weight", 650).attr("fill", INK).text(d.label);
-        svg.append("path").attr("d", App.charts.hbar(labelW, x(sh[d.k]), y + 8, rowH - 16)).attr("fill", d.g === "Context" ? MUTED : INK);
-        svg.append("text").attr("x", x(sh[d.k]) + 6).attr("y", y + rowH / 2).attr("dominant-baseline", "central").attr("font-size", 12.5)
-          .attr("font-weight", 800).attr("fill", INK).attr("class", "tnum").text(pct(sh[d.k]));
+      const radius = d3.scaleSqrt().domain([0, d3.max(involvement)]).range([4, 11]);
+      active.forEach(({ player, index }) => {
+        const position = positions.get(index), leader = involvement[index] === d3.max(involvement);
+        const node = svg.append("a").attr("href", `#/lab/${match.id}?team=ENG&pane=network&player=${index}`).attr("aria-label", `Inspect ${player.name}'s passing connections`);
+        node.append("circle").attr("cx", position.x).attr("cy", position.y).attr("r", radius(involvement[index])).attr("fill", leader ? "#ddf38b" : "#183743").attr("stroke", leader ? "#ddf38b" : "#83d7d9").attr("stroke-width", 1.4);
+        node.append("text").attr("x", position.x).attr("y", position.y + 3).attr("text-anchor", "middle").attr("font-size", 7).attr("font-weight", 750).attr("fill", leader ? "#122832" : "#e5fafa").text(player.num);
+        const labelX = position.x + Math.cos(position.angle) * 17, labelY = position.y + Math.sin(position.angle) * 17;
+        node.append("text").attr("x", labelX).attr("y", labelY + 3).attr("text-anchor", Math.cos(position.angle) < -.15 ? "end" : Math.cos(position.angle) > .15 ? "start" : "middle").attr("font-size", 8).attr("fill", "#ccdde6").text(player.short);
+        node.append("title").text(`${player.name}: ${involvement[index]} incoming + outgoing network passes. Select to inspect.`);
       });
-      [["Conversion", 0, 2, conv], ["Execution", 2, 4, exec], ["Context", 4, 6, ctx]].forEach(([g, a, b, v]) => {
-        const y1 = 4 + a * rowH + 6, y2 = 4 + b * rowH - 6, gx = W - groupW;
-        svg.append("path").attr("d", `M${gx},${y1} h6 V${y2} h-6`).attr("fill", "none").attr("stroke", AXIS).attr("stroke-width", 1.5);
-        svg.append("text").attr("x", gx + 14).attr("y", (y1 + y2) / 2 - 7).attr("font-size", 12).attr("font-weight", 700).attr("fill", "#4a5263").text(g);
-        svg.append("text").attr("x", gx + 14).attr("y", (y1 + y2) / 2 + 10).attr("font-size", 15).attr("font-weight", 800).attr("fill", INK).text(pct(v));
-      });
-    }
-
-    // ------------------------------------------------------------------ chapter 3: carry-over scatterplots
-    function drawCarry(id, key, r) {
-      const el = document.getElementById(id); el.innerHTML = "";
-      const W = el.clientWidth || 420, H = Math.min(360, W * 0.82), m = { t: 12, r: 14, b: 40, l: 46 };
-      const pts = S.carry.teams.map((t) => ({ id: t.id, x: t[`${key}_g`], y: t[`${key}_k`] }));
-      const all = S.carry.teams.flatMap((t) => [t.exec_g, t.exec_k, t.luck_g, t.luck_k]);
-      const lim = Math.ceil(d3.max(all, Math.abs) * 2) / 2;
-      const x = d3.scaleLinear().domain([-lim, lim]).range([m.l, W - m.r]);
-      const y = d3.scaleLinear().domain([-lim, lim]).range([H - m.b, m.t]);
-      const svg = d3.select(el).append("svg").attr("width", W).attr("height", H);
-      const ticks = x.ticks(5);
-      svg.append("g").selectAll("line").data(ticks).join("line").attr("x1", (d) => x(d)).attr("x2", (d) => x(d)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", (d) => (d === 0 ? AXIS : GRID));
-      svg.append("g").selectAll("line").data(ticks).join("line").attr("y1", (d) => y(d)).attr("y2", (d) => y(d)).attr("x1", m.l).attr("x2", W - m.r).attr("stroke", (d) => (d === 0 ? AXIS : GRID));
-      svg.append("g").selectAll("text").data(ticks).join("text").attr("class", "axis-cap tnum").attr("x", (d) => x(d)).attr("y", H - m.b + 14).attr("text-anchor", "middle").text((d) => (d ? App.signed(d, 1) : "0"));
-      svg.append("g").selectAll("text").data(ticks).join("text").attr("class", "axis-cap tnum").attr("x", m.l - 6).attr("y", (d) => y(d)).attr("text-anchor", "end").attr("dominant-baseline", "central").text((d) => (d ? App.signed(d, 1) : "0"));
-      svg.append("text").attr("class", "axis-label").attr("x", W - m.r).attr("y", H - 6).attr("text-anchor", "end").text("Group stage →");
-      svg.append("text").attr("class", "axis-label").attr("transform", `translate(12,${H - m.b}) rotate(-90)`).text("Knockouts →");
-      // least-squares line
-      const mx = d3.mean(pts, (p) => p.x), my = d3.mean(pts, (p) => p.y);
-      const b = d3.sum(pts, (p) => (p.x - mx) * (p.y - my)) / d3.sum(pts, (p) => (p.x - mx) ** 2);
-      const xa = -lim, xb = lim;
-      svg.append("line").attr("x1", x(xa)).attr("y1", y(my + b * (xa - mx))).attr("x2", x(xb)).attr("y2", y(my + b * (xb - mx)))
-        .attr("stroke", key === "exec" ? POS : NEG).attr("stroke-width", 2.5).attr("stroke-linecap", "round");
-      const f = svg.selectAll("g.f").data(pts).join("g").attr("class", "f").attr("transform", (p) => `translate(${x(p.x)},${y(p.y)})`).style("cursor", "pointer")
-        .on("mousemove", (evt, p) => App.tip.show(`<div class="tt-title">${App.esc(App.team[p.id].name)}</div>${App.ttRows([["Group stage", App.signed(p.x, 2)], ["Knockouts", App.signed(p.y, 2)]])}`, evt))
-        .on("mouseleave", App.tip.hide).on("click", (evt, p) => App.go(`#/team/${p.id}`));
-      f.append("circle").attr("r", 8.5).attr("fill", "#fff").attr("stroke", INK).attr("stroke-opacity", 0.25).attr("stroke-width", 1.5);
-      f.append("image").attr("href", (p) => App.flagUrl(p.id)).attr("x", -7).attr("y", -7).attr("width", 14).attr("height", 14).attr("clip-path", "url(#flag-clip)");
-      svg.append("text").attr("x", m.l + 10).attr("y", m.t + 16).attr("font-size", 22).attr("font-weight", 800).attr("font-family", "var(--display)").attr("fill", INK)
-        .text(`r = ${r.toFixed(2)}`);
-    }
-
-    // ------------------------------------------------------------------ chapter 4: featured twin stories
-    function storyPairs() {
-      const space = App.styleSpace(App.dials);
-      const twins = App.twinTable(space);
-      const pairs = [];
-      for (const t of App.teams) for (const n of twins.near[t.id]) {
-        if (t.id >= n.id || n.sim < 0.9 || t.n < 4 || App.team[n.id].n < 4) continue;
-        pairs.push({ a: t.id, b: n.id, sim: n.sim, e: App.explainGap(t.id, n.id) });
-      }
-      pairs.sort((p, q) => q.e.gap - p.e.gap);
-      // one example per story type, never reusing a team
-      const picks = [], used = new Set();
-      const free = (p) => !used.has(p.a) && !used.has(p.b);
-      const take = (p) => { picks.push(p); used.add(p.a); used.add(p.b); };
-      for (const type of ["exec", "luck", "opp", "style"]) {
-        const p = pairs.find((x) => x.e.type === type && free(x));
-        if (p && picks.length < 3) take(p);
-      }
-      for (const p of pairs) if (picks.length < 3 && free(p)) take(p);
-      return picks;
-    }
-    document.getElementById("story-pairs").innerHTML = storyPairs().map((p) => App.pairCard(p)).join("");
-
-    // ------------------------------------------------------------------ chapter 5: matchup matrix
-    const A = App.data.archetypes;
-    const mu = S.matchups;
-    const storm = A.find((a) => a.id === "stormers");
-    const stormRow = A.filter((a) => a.id !== "stormers").map((a) => ({ a, v: mu[`stormers|${a.id}`] })).filter((d) => d.v);
-    const beatAll = stormRow.every((d) => d.v.xgd > 0);
-    const gdLosses = stormRow.filter((d) => d.v.gd < 0);
-    document.getElementById("matchup-lede").innerHTML = `${beatAll ? `<b>${storm.name} out-chanced every other playstyle</b>, by up to ${App.signed(d3.max(stormRow, (d) => d.v.xgd), 2)} xG per match.` : ""}
-      ${gdLosses.length ? ` But on the scoreboard they came out behind against ${gdLosses.map((d) => d.a.name).join(" and ")}: a reminder from chapter 3 that conversion, not chance creation, is where results swing.` : ""}
-      Switch between chances and goals to compare.`;
-    let metric = "xgd";
-    function drawMatrix() {
-      const el = document.getElementById("matrix"); el.innerHTML = "";
-      const cell = Math.max(64, Math.min(104, ((el.clientWidth || 700) - 170) / 5)), labelW = 160, top = 54;
-      const W = labelW + cell * 5 + 4, H = top + cell * 5 + 4;
-      const svg = d3.select(el).append("svg").attr("width", W).attr("height", H);
-      const color = d3.scaleLinear().domain([-2, 0, 2]).range([NEG, "#f1ece2", POS]).clamp(true);
-      A.forEach((c, j) => {
-        const gx = labelW + j * cell + cell / 2;
-        svg.append("path").attr("d", App.symbol(c.id, 70)).attr("transform", `translate(${gx},${14})`).attr("fill", c.color);
-        svg.append("text").attr("x", gx).attr("y", 36).attr("text-anchor", "middle").attr("font-size", 11.5).attr("font-weight", 700).attr("fill", INK).text(c.name.replace("The ", ""));
-      });
-      A.forEach((r, i) => {
-        const gy = top + i * cell + cell / 2;
-        svg.append("path").attr("d", App.symbol(r.id, 70)).attr("transform", `translate(10,${gy})`).attr("fill", r.color);
-        svg.append("text").attr("x", 24).attr("y", gy).attr("dominant-baseline", "central").attr("font-size", 12.5).attr("font-weight", 700).attr("fill", INK).text(r.name.replace("The ", ""));
-        A.forEach((c, j) => {
-          const v = mu[`${r.id}|${c.id}`];
-          const g = svg.append("g").attr("transform", `translate(${labelW + j * cell},${top + i * cell})`);
-          const diag = r.id === c.id;
-          g.append("rect").attr("x", 2).attr("y", 2).attr("width", cell - 4).attr("height", cell - 4).attr("rx", 10)
-            .attr("fill", diag || !v ? "#f6f1e6" : color(v[metric]));
-          if (!diag && v) {
-            const dark = Math.abs(v[metric]) > 1.2;
-            g.append("text").attr("x", cell / 2).attr("y", cell / 2 - 5).attr("text-anchor", "middle").attr("font-size", 17).attr("font-weight", 800)
-              .attr("font-family", "var(--display)").attr("fill", dark ? "#fff" : INK).text(App.signed(v[metric], 2));
-            g.append("text").attr("x", cell / 2).attr("y", cell / 2 + 15).attr("text-anchor", "middle").attr("font-size", 11).attr("fill", dark ? "#fff" : MUTED).text(`n = ${v.n}`);
-            g.append("rect").attr("width", cell).attr("height", cell).attr("fill", "transparent")
-              .on("mousemove", (evt) => App.tip.show(`<div class="tt-title">${r.name} v ${c.name}</div>` +
-                App.ttRows([["xG difference / match", App.signed(v.xgd, 2)], ["Goal difference / match", App.signed(v.gd, 2)], ["Matches", v.n]]), evt))
-              .on("mouseleave", App.tip.hide);
-          } else if (diag) {
-            g.append("text").attr("x", cell / 2).attr("y", cell / 2).attr("text-anchor", "middle").attr("dominant-baseline", "central").attr("font-size", 11).attr("fill", MUTED)
-              .text(v ? `same style · n = ${v.n}` : "—");
-          }
-        });
-      });
-    }
-    d3.selectAll("#mu-metric button").on("click", function () {
-      metric = this.dataset.v;
-      d3.selectAll("#mu-metric button").classed("on", (d, i, n) => n[i] === this);
-      drawMatrix();
+      target.insertAdjacentHTML("beforeend", '<p class="review-preview-note">Ten strongest directed links · node size = pass involvement · positions schematic</p>');
+    }).catch(() => {
+      const target = root.querySelector("#review-lab-preview");
+      if (target) target.innerHTML = '<p class="review-preview-loading">Open the match lab to inspect the source passing records.</p>';
     });
 
-    // ------------------------------------------------------------------ chapter 6: replay entry points
-    const ms = App.data.matches;
-    const final = ms.find((m) => m.stage === "Final");
-    const upset = ms.map((m) => ({ m, u: Math.sign(m.xg[0] - m.xg[1]) !== Math.sign(m.score[0] - m.score[1]) && m.score[0] !== m.score[1] ? Math.abs(m.xg[0] - m.xg[1]) : 0 }))
-      .sort((a, b) => b.u - a.u)[0].m;
-    const goals = ms.slice().sort((a, b) => b.score[0] + b.score[1] - (a.score[0] + a.score[1]))[0];
-    const card = (m, label, note) => `<a class="card replay-card" href="#/match/${m.id}">
-      <div class="kicker">${label}</div>
-      <div class="rc-line">${App.flag(m.home, 30)}<b>${App.esc(App.team[m.home].name)}</b><span class="rc-score tnum">${m.score[0]}–${m.score[1]}</span><b>${App.esc(App.team[m.away].name)}</b>${App.flag(m.away, 30)}</div>
-      <div class="note">${note}</div><span class="btn small">Replay →</span></a>`;
-    document.getElementById("replay-cards").innerHTML =
-      card(final, "The final", `${final.date}, ${App.esc(final.venue)}${final.aet ? ", after extra time" : ""}.`) +
-      card(upset, "Biggest upset", `The winner had ${Math.min(...upset.xg).toFixed(2)} xG to the loser's ${Math.max(...upset.xg).toFixed(2)}.`) +
-      card(goals, "Most goals", `${goals.score[0] + goals.score[1]} goals, ${goals.stage === "Group" ? goals.group : goals.stage}.`);
+    drawAuditPreview();
+    function drawAuditPreview() {
+      const target = root.querySelector("#review-audit-preview");
+      const audit = App.robustness?.audit("NED", "CRO", App.dials, "all");
+      if (!audit?.valid) {
+        target.innerHTML = '<p class="review-preview-loading">Compare the full profile with each indicator and match removed in turn.</p>';
+        return;
+      }
+      const scenarios = audit.matches;
+      const worstRank = d3.max(scenarios, (row) => row.rankA), bestRank = d3.min(scenarios, (row) => row.rankA);
+      const withinFive = scenarios.filter((row) => row.rankA <= 5).length;
+      target.innerHTML = `<div class="review-preview-caption"><b>Croatia’s rank for the Netherlands</b><span>Leave one match out</span></div><div class="review-rank-preview"></div><div class="review-preview-stats"><div><b>${bestRank}<small>–</small>${worstRank}</b><span>neighbour rank across omissions</span></div><div><b>${withinFive}<small> / ${scenarios.length}</small></b><span>omissions keep Croatia in the top 5</span></div></div><p class="review-preview-note">All ten indicators · all tournament matches · lower rank means closer</p>`;
+      const svg = d3.select(target.querySelector(".review-rank-preview")).append("svg").attr("viewBox", "0 0 410 310").attr("role", "img").attr("aria-label", `Croatia's neighbour rank for the Netherlands ranges from ${bestRank} to ${worstRank} when one match is omitted.`);
+      const x = d3.scaleLinear().domain([1, Math.max(10, worstRank)]).range([135, 379]);
+      const y = d3.scalePoint().domain(scenarios.map((row) => row.id)).range([55, 264]);
+      svg.append("rect").attr("x", x(1)).attr("y", 37).attr("width", x(5) - x(1)).attr("height", 244).attr("rx", 4).attr("fill", "#ddf38b09");
+      [1, 5, 10].filter((rank) => rank <= Math.max(10, worstRank)).forEach((rank) => {
+        svg.append("line").attr("x1", x(rank)).attr("x2", x(rank)).attr("y1", 37).attr("y2", 282).attr("stroke", "#d5f4ff20").attr("stroke-dasharray", rank === 1 ? null : "3,5");
+        svg.append("text").attr("x", x(rank)).attr("y", 22).attr("text-anchor", "middle").attr("fill", "#c4d2db").attr("font-size", 10).text(`#${rank}`);
+      });
+      svg.append("text").attr("x", 0).attr("y", 22).attr("fill", "#8ba2af").attr("font-size", 9).text("OMITTED MATCH");
+      scenarios.forEach((scenario) => {
+        const row = analysis.records.find((item) => item.key === scenario.omittedKey);
+        const label = row ? `${row.team_id} v ${row.opp_id} · M${row.number}` : scenario.label;
+        const cy = y(scenario.id);
+        svg.append("text").attr("x", 0).attr("y", cy + 4).attr("fill", "#c7d7de").attr("font-size", 10).text(label);
+        svg.append("line").attr("x1", x(audit.base.rankA)).attr("x2", x(scenario.rankA)).attr("y1", cy).attr("y2", cy).attr("stroke", "#8ca5ae").attr("stroke-width", 2);
+        svg.append("circle").attr("cx", x(audit.base.rankA)).attr("cy", cy).attr("r", 3).attr("fill", "#526c7a");
+        svg.append("circle").attr("cx", x(scenario.rankA)).attr("cy", cy).attr("r", 5).attr("fill", scenario.rankA <= 5 ? "#ddf38b" : "#ffbc8c")
+          .append("title").text(`${label}: Croatia is neighbour #${scenario.rankA}. Baseline #${audit.base.rankA}.`);
+        svg.append("text").attr("x", x(scenario.rankA) + 9).attr("y", cy + 3).attr("fill", "#f2f7f8").attr("font-size", 9).text(scenario.rankA);
+      });
+      svg.append("text").attr("x", 135).attr("y", 303).attr("fill", "#8ba2af").attr("font-size", 9).text(`Baseline: neighbour #${audit.base.rankA} · one omission per row`);
+    }
 
-    const draw = () => { drawStrip(); drawShares(); drawCarry("carry-exec", "exec", S.carry.exec.r); drawCarry("carry-luck", "luck", S.carry.luck.r); drawMatrix(); };
-    draw();
-    App.onResize(document.getElementById("strip"), draw);
+    let outcomeMetric = "xgd", matchupMetric = "xgd";
+    function drawOutcomes() {
+      const target = root.querySelector("#review-outcomes");
+      target.innerHTML = "";
+      const width = Math.max(300, target.clientWidth);
+      const margin = { left: width < 460 ? 105 : 128, right: 20, top: 15, bottom: 30 };
+      const rowHeight = 56, height = rowHeight * App.data.archetypes.length + margin.top + margin.bottom;
+      const values = App.teams.map((team) => profiles[team.id][outcomeMetric]);
+      const x = d3.scaleLinear().domain([Math.floor(d3.min(values)), Math.ceil(d3.max(values))]).range([margin.left, width - margin.right]);
+      const svg = d3.select(target).append("svg").attr("viewBox", `0 0 ${width} ${height}`).attr("role", "img").attr("aria-label", `Team ${outcomeMetric === "xgd" ? "expected goal" : "goal"} difference per match by style group`);
+      svg.append("g").selectAll("line").data(x.ticks(5)).join("line")
+        .attr("x1", x).attr("x2", x).attr("y1", margin.top).attr("y2", height - margin.bottom)
+        .attr("stroke", (value) => value === 0 ? "#aaa999" : "#eeeadf");
+      svg.append("g").selectAll("text").data(x.ticks(5)).join("text")
+        .attr("x", x).attr("y", height - 8).attr("text-anchor", "middle").attr("fill", "#626873").attr("font-size", 11)
+        .text((value) => App.signed(value, 0));
+      App.data.archetypes.forEach((arch, index) => {
+        const cy = margin.top + rowHeight * (index + 0.5);
+        svg.append("text").attr("x", 0).attr("y", cy + 4).attr("fill", INK).attr("font-weight", 650).attr("font-size", width < 460 ? 10 : 12).text(arch.name.replace("The ", ""));
+        const points = arch.members.map((id) => ({ id, tx: x(profiles[id][outcomeMetric]), x: x(profiles[id][outcomeMetric]), y: cy }));
+        const simulation = d3.forceSimulation(points).force("x", d3.forceX((point) => point.tx).strength(1))
+          .force("y", d3.forceY(cy).strength(0.12)).force("collision", d3.forceCollide(7)).stop();
+        for (let step = 0; step < 90; step++) simulation.tick();
+        const mean = d3.mean(arch.members, (id) => profiles[id][outcomeMetric]);
+        svg.append("line").attr("x1", x(mean)).attr("x2", x(mean)).attr("y1", cy - 20).attr("y2", cy + 20).attr("stroke", INK).attr("stroke-width", 2);
+        const links = svg.append("g").selectAll("a").data(points).join("a")
+          .attr("href", (point) => `#/team/${point.id}`).attr("aria-label", (point) => `${App.team[point.id].name}, ${App.signed(profiles[point.id][outcomeMetric], 2)} per match`)
+          .on("mousemove", (event, point) => App.tip.show(`<div class="tt-title">${App.esc(App.team[point.id].name)}</div>${App.ttRows([["Per match", App.signed(profiles[point.id][outcomeMetric], 2)], ["Matches", profiles[point.id].n], ["Reached", App.team[point.id].stage]])}`, event))
+          .on("mouseleave", App.tip.hide);
+        links.append("circle").attr("cx", (point) => point.x).attr("cy", (point) => Math.max(cy - 21, Math.min(cy + 21, point.y)))
+          .attr("r", 5.5).attr("fill", (point) => profiles[point.id][outcomeMetric] >= 0 ? TEAL : ORANGE).attr("stroke", "#fff").attr("stroke-width", 1.5);
+        links.append("title").text((point) => `${App.team[point.id].name} · ${App.signed(profiles[point.id][outcomeMetric], 2)} · ${profiles[point.id].n} matches`);
+      });
+    }
+
+    function drawMatrix() {
+      const archetypes = App.data.archetypes;
+      const color = d3.scaleLinear().domain([-2, 0, 2]).range(["#eed9ca", "#f5f3ed", "#a5d8cf"]).clamp(true);
+      root.querySelector("#review-matrix").innerHTML = `
+        <table class="review-matchup-table"><caption>${matchupMetric === "xgd" ? "Expected goal" : "Goal"} difference for the row group against the column group</caption>
+          <thead><tr><th scope="col">Row plays column →</th>${archetypes.map((arch) => `<th scope="col">${arch.name.replace("The ", "")}</th>`).join("")}</tr></thead>
+          <tbody>${archetypes.map((row) => `<tr><th scope="row"><i style="background:${row.color}"></i>${row.name.replace("The ", "")}</th>
+            ${archetypes.map((column) => {
+              const result = App.data.story.matchups[`${row.id}|${column.id}`];
+              if (!result || !result.n) return "<td><span class='note'>No matches</span></td>";
+              const same = row.id === column.id;
+              const value = same ? "Within group" : App.signed(result[matchupMetric], 2);
+              const href = `#/matches?archA=${row.id}&archB=${column.id}&metric=${matchupMetric}&return=${encodeURIComponent("#/story")}`;
+              return `<td><a href="${href}" style="background:${same ? "#f3f0e7" : color(result[matchupMetric])}" aria-label="${row.name} against ${column.name}, ${result.n} match${result.n === 1 ? "" : "es"}, ${same ? "within the same group" : value + " per match"}. Inspect matches"><b>${value}</b><span>${result.n} match${result.n === 1 ? "" : "es"} <span aria-hidden="true">↗</span></span></a></td>`;
+            }).join("")}</tr>`).join("")}</tbody>
+        </table>`;
+    }
+
+    function bindMetricControls(selector, update) {
+      root.querySelectorAll(`${selector} button`).forEach((button) => button.addEventListener("click", () => {
+        root.querySelectorAll(`${selector} button`).forEach((other) => {
+          other.classList.toggle("on", other === button);
+          other.setAttribute("aria-pressed", String(other === button));
+        });
+        update(button.dataset.metric);
+      }));
+    }
+    bindMetricControls("#review-outcome-control", (metric) => { outcomeMetric = metric; drawOutcomes(); });
+    bindMetricControls("#review-matrix-control", (metric) => { matchupMetric = metric; drawMatrix(); });
+    drawOutcomes();
+    drawMatrix();
+    App.onResize(root.querySelector("#review-outcomes"), drawOutcomes);
   };
 })();

@@ -12,12 +12,12 @@
   App.tm = WC.teamMatches;
   App.match = Object.fromEntries(WC.matches.map((m) => [m.id, m]));
   App.components = [
-    { id: "c_style", label: "Style", help: "what this playbook usually yields", group: "style" },
-    { id: "c_opp", label: "Opponents", help: "easier (+) or tougher (−) opposition", group: "opp" },
+    { id: "c_style", label: "Style baseline", help: "fixed model estimate", group: "style" },
+    { id: "c_opp", label: "Opponent context", help: "opponents’ other matches", group: "opp" },
     { id: "c_create", label: "Chance creation", help: "xG created beyond expectation", group: "skill" },
     { id: "c_prevent", label: "Chance prevention", help: "xG allowed below expectation", group: "skill" },
-    { id: "c_finish", label: "Finishing", help: "goals scored minus xG", group: "skill" },
-    { id: "c_keep", label: "Goalkeeping", help: "xG faced minus goals conceded", group: "skill" },
+    { id: "c_finish", label: "Finishing vs xG", help: "goals scored minus xG", group: "skill" },
+    { id: "c_keep", label: "Conceding vs xG", help: "xGA minus goals conceded", group: "skill" },
   ];
   App.stageOrder = ["Final", "Bronze final", "Semi-final", "Quarter-final", "Round of 16", "Round of 32", "Group"];
 
@@ -72,18 +72,22 @@
     IRQ: "iq", JOR: "jo", JPN: "jp", KOR: "kr", KSA: "sa", MAR: "ma", MEX: "mx", NED: "nl", NOR: "no", NZL: "nz", PAN: "pa", PAR: "py",
     POR: "pt", QAT: "qa", RSA: "za", SCO: "gb-sct", SEN: "sn", SUI: "ch", SWE: "se", TUN: "tn", TUR: "tr", URU: "uy", USA: "us", UZB: "uz",
   };
-  App.flagUrl = (teamId) => `https://cdn.jsdelivr.net/npm/flag-icons@7.2.3/flags/1x1/${ISO[teamId]}.svg`;
+  App.flagUrl = (teamId) => `img/flags/${ISO[teamId]}.svg`;
   /** Round national flag; use it wherever the team name is written next to it. */
   App.flag = (teamId, size = 28) =>
     `<span class="flag" role="img" aria-label="${App.esc(App.team[teamId].name)} flag" style="width:${size}px;height:${size}px;background-image:url(${App.flagUrl(teamId)})"></span>`;
   App.teamLink = (teamId, size = 24) =>
     `<a class="team-link" href="#/team/${teamId}">${App.flag(teamId, size)}<span class="tname">${App.esc(App.team[teamId].name)}</span></a>`;
-  App.archPill = (archId) => {
+  App.archPill = (archId, dials) => {
     const a = App.arch[archId];
-    return `<a class="pill" href="#/styles?arch=${a.id}"><span class="sw" style="background:${a.color}"></span>${a.name}</a>`;
+    const query = dials ? App.analysis.query(dials, { arch: a.id }) : `?arch=${a.id}`;
+    return `<a class="pill" href="#/styles${query}"><span class="sw" style="background:${a.color}"></span>${a.name}</a>`;
   };
   App.resultChip = (r) => `<span class="result ${r}" title="${({ W: "Win", D: "Draw", L: "Loss" })[r]}">${r}</span>`;
-  App.avatarUrl = (pid) => (window.WC_AVATARS || {})[pid] || null;
+  App.avatarUrl = (pid) => {
+    const path = (window.WC_AVATARS || {})[pid];
+    return path || null;
+  };
   App.avatarHtml = (pid, kit, size = 44, num) => {
     const url = App.avatarUrl(pid);
     if (url) return `<img class="avatar" src="${url}" width="${size}" height="${size}" alt="" style="box-shadow:0 0 0 3px ${kit}">`;
@@ -96,6 +100,7 @@
     show(html, evt) {
       tip.innerHTML = html;
       tip.hidden = false;
+      if (App.i18n) App.i18n.translate(tip);
       App.tip.move(evt);
     },
     move(evt) {
@@ -117,7 +122,7 @@
     const idx = dialIds.map((d) => App.dials.indexOf(d));
     const ids = Object.keys(App.tm);
     const cols = idx.map((i) => ids.map((k) => App.tm[k].dials[i]));
-    const mu = cols.map((c) => d3.mean(c)), sd = cols.map((c) => d3.deviation(c) * Math.sqrt((c.length - 1) / c.length));
+    const mu = cols.map((c) => d3.mean(c)), sd = cols.map((c) => (d3.deviation(c) * Math.sqrt((c.length - 1) / c.length)) || 1);
     const z = {};
     ids.forEach((k, r) => { z[k] = idx.map((_, j) => (cols[j][r] - mu[j]) / sd[j]); });
     const team = {};

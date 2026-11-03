@@ -1,0 +1,114 @@
+/* Language controls, text expansion and RTL chrome. Charts keep their source
+   coordinate direction: changing the reading language must not reverse data. */
+.topbar { gap:16px; }
+.topbar > * { min-inline-size:0; }
+.topbar .brand { flex-shrink:0; }
+.topbar .tabs { min-inline-size:0; overscroll-behavior-inline:contain; scrollbar-width:thin; scrollbar-color:var(--axis) transparent; }
+.topbar .tabs a { flex:0 0 auto; line-height:1.4; }
+.topbar .jump { flex:0 1 190px; min-inline-size:120px; max-inline-size:210px; }
+.topbar .jump .sel { display:block; inline-size:100%; min-inline-size:0; }
+.topbar .jump .sel-btn { inline-size:100%; max-inline-size:100%; min-inline-size:0; }
+.topbar .jump .sel-val { display:block; min-inline-size:0; overflow:hidden; text-overflow:ellipsis; }
+.language-control { position:relative; flex:0 0 auto; inline-size:140px; }
+.language-control .language-globe { position:absolute; inset-inline-start:11px; top:50%; transform:translateY(-50%); inline-size:18px; block-size:18px; color:var(--ink-2); fill:none; stroke:currentColor; stroke-width:1.4; pointer-events:none; }
+#language-select { display:block; inline-size:100%; min-inline-size:0; min-block-size:40px; margin:0; padding-block:7px; padding-inline:36px 8px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); font:500 13px/1.4 var(--sans); cursor:pointer; }
+#language-select:hover { border-color:var(--axis); }
+#language-select:focus-visible { outline:3px solid var(--review-teal,#087f81); outline-offset:3px; }
+#language-select option { font-family:system-ui,"Segoe UI",sans-serif; }
+
+/* Each SVG uses coordinates computed in JavaScript, independent of language.
+   Directed matrices, timelines, progress bars and paired scores use the same
+   orientation as their corresponding figures and source records. */
+svg, canvas,
+.lab-matrix-scroll, .lab-matrix, .review-matrix-scroll,
+[data-rank-chart], [data-cumulative], [data-brush],
+.duel-measure, .dual-row, .review-numbers,
+.lab-scorecard, .sb-main, .sb-detail, .compare-head,
+.review-hero-teams, .pair-vs, .rc-line,
+.pulse-bar-track, .duel-track, .lab-unit-track, .lab-route-meter,
+input[type="range"] {
+  direction:ltr;
+  unicode-bidi:isolate;
+}
+.tnum, output, .lab-matrix td, .review-table td:not(:first-child),
+.lab-score > strong, .sb-score, .lab-rank-value, .lab-player-flow strong,
+.lab-pair-total strong, .lab-pair-directions b, .lab-partners b,
+.lab-unit-row > b, .lab-route-title > strong, .lab-completion-ring strong,
+.lab-break-total, .pulse-stat > strong, .pulse-event-row > b,
+.pulse-bar-label > b, .robust-percentile, .robust-neighbors strong,
+.robust-detail-score > b, .review-evidence-values b {
+  direction:ltr;
+  unicode-bidi:isolate;
+  font-variant-numeric:tabular-nums;
+}
+.lab-score-team > div > span, .sb-shots { direction:ltr; unicode-bidi:isolate; }
+
+/* Logical alignment mirrors the surrounding interface without rotating or
+   flipping football fields, arrows, chart scales or their numeric values. */
+html[dir="rtl"] .sel-btn { padding-inline:8px 12px; }
+html[dir="rtl"] .sel-ph { padding-left:0; padding-inline-start:4px; }
+html[dir="rtl"] .sel-pop { left:auto; right:auto; inset-inline-start:0; }
+html[dir="rtl"] .sel-pop.right { left:auto; right:auto; inset-inline-start:auto; inset-inline-end:0; }
+html[dir="rtl"] :is(.review-match-button,.arch-row-btn,.lab-page .lab-rank-row,.lab-page .lab-primary,.lab-page .lab-partners button span,.pulse-event-row,.review-table th,table.dials th,table.dials td) { text-align:start; }
+html[dir="rtl"] :is(.lab-page .lab-rank-value,.robust-neighbors strong) { text-align:end; }
+html[dir="rtl"] :is(.lab-match-meta,.lab-score-team,.sb-name,.sb-stage,.sb-scorers,.compare-head .side) { direction:rtl; }
+html[dir="rtl"] .lab-page .lab-kpis > div { border-right:0; border-inline-end:1px solid #2b4354; }
+html[dir="rtl"] .lab-page .lab-kpis > div:last-child { border-inline-end:0; }
+html[dir="rtl"] .lab-page .lab-rank-row > i { left:auto; inset-inline-start:0; }
+html[dir="rtl"] .lab-page .lab-pair-directions > span { gap:12px; }
+html[dir="rtl"] :is(.robust-pairline > .robust-percentile,.robust-chart-key span:last-child,.robust-feature-legend span:last-child,.pulse-window-caption,.pair-type .note) { margin-left:0; margin-inline-start:auto; }
+html[dir="rtl"] .robust-direction > span { margin-right:0; margin-inline-end:10px; }
+html[dir="rtl"] :is(.robust-tabs button span,.seg button .cnt) { margin-left:0; margin-inline-start:3px; }
+html[dir="rtl"] .legend-inline { margin-left:0; margin-inline-start:6px; }
+html[dir="rtl"] .robust-method-note { padding-left:0; padding-inline-start:12px; border-left:0; border-inline-start:2px solid #c7ad86; }
+html[dir="rtl"] .pulse-event-list { padding-right:0; padding-inline-end:5px; }
+html[dir="rtl"] .pulse-footnote ul { padding-left:0; padding-inline-start:20px; }
+
+/* Script-appropriate system fallbacks do not require another font download. */
+html[lang="ar"] { --display:Tahoma,"Segoe UI",Arial,sans-serif; --sans:Tahoma,"Segoe UI",Arial,sans-serif; }
+html[lang="ja"] { --display:system-ui,"Yu Gothic",Meiryo,sans-serif; --sans:system-ui,"Yu Gothic",Meiryo,sans-serif; }
+html[lang="ko"] { --display:system-ui,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; --sans:system-ui,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
+html:is([lang="ar"],[lang="ja"],[lang="ko"]) :is(h1,h2,h3,h4,.kicker,.lab-eyebrow,.pulse-eyebrow,.lab-coverage) { letter-spacing:normal; }
+html[lang="ar"] :is(h1,h2,h3,h4) { line-height:1.3; }
+html:not([lang="en"]) #view :is(h1,h2,h3,h4,p,.note,.sub,.lab-caption) { overflow-wrap:anywhere; }
+html:not([lang="en"]) :is(.lab-tabs,.lab-workbar,.lab-topline,.lab-direction-key,.lab-panel-head,.lab-next,.review-chart-heading,.robust-tabs,.duel-reading) { flex-wrap:wrap; }
+html:not([lang="en"]) .lab-page .lab-tabs { flex:1 1 auto; }
+html:not([lang="en"]) .lab-page .lab-tabs button { white-space:normal; text-align:start; }
+html:not([lang="en"]) .lab-page .lab-coverage { white-space:normal; }
+html:not([lang="en"]) :is(.review-controls > *,.duel-controls > *,.robust-controls > *,.lab-kpis > *) { min-inline-size:0; }
+
+@media (max-width:1500px) {
+  .topbar { flex-wrap:wrap; gap:8px 12px; }
+  .topbar .brand { order:0; }
+  .topbar .jump { order:1; margin-left:0; margin-inline-start:auto; }
+  .topbar .language-control { order:2; }
+  .topbar .tabs { order:3; flex:1 1 100%; max-inline-size:100%; }
+}
+/* Expanded navigation labels keep a full row even on wider displays; the
+   controls remain grouped together instead of squeezing a translated tab. */
+@media (min-width:1501px) {
+  html:not([lang="en"]) .topbar { flex-wrap:wrap; gap:8px 12px; }
+  html:not([lang="en"]) .topbar .brand { order:0; }
+  html:not([lang="en"]) .topbar .jump { order:1; margin-left:0; margin-inline-start:auto; }
+  html:not([lang="en"]) .topbar .language-control { order:2; }
+  html:not([lang="en"]) .topbar .tabs { order:3; flex:1 1 100%; max-inline-size:100%; }
+}
+@media (max-width:850px) {
+  html[dir="rtl"] .lab-page .lab-kpis > div:nth-child(2) { border-inline-end:0; }
+}
+@media (max-width:600px) {
+  .topbar { gap:8px; }
+  .topbar .brand { font-size:18px; }
+  .topbar .language-control { inline-size:126px; margin-inline-start:auto; }
+  #language-select { font-size:12px; min-block-size:40px; padding-inline-start:33px; }
+  .language-control .language-globe { inline-size:16px; block-size:16px; inset-inline-start:10px; }
+  .topbar .jump { order:3; flex:1 1 100%; inline-size:100%; max-inline-size:none; margin-inline-start:0; }
+  .topbar .tabs { order:4; }
+  .topbar .tabs a { padding-block:7px; padding-inline:10px; }
+  html:not([lang="en"]) .lab-page .lab-tabs { gap:6px 12px; }
+  html:not([lang="en"]) .lab-page .lab-tabs button { flex:1 1 80px; font-size:11px; }
+  html:not([lang="en"]) .lab-page .lab-match-meta { flex-wrap:wrap; }
+  html:not([lang="en"]) .lab-page .lab-match-meta > span { max-inline-size:100%; }
+  html:not([lang="en"]) .lab-page .lab-match-meta > a { white-space:normal; }
+  html[dir="rtl"] :is(.robust-pairline > .robust-percentile,.robust-feature-legend span:last-child,.pulse-window-caption) { margin-inline-start:0; }
+}

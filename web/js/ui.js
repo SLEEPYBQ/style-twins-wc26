@@ -36,7 +36,7 @@
     }
     function renderList() {
       const term = (q ? q.value : "").trim().toLowerCase();
-      shown = options.filter((o) => !term || o.label.toLowerCase().includes(term) || String(o.value).toLowerCase().includes(term));
+      shown = options.filter((o) => !term || o.label.toLowerCase().includes(term) || (App.i18n && App.i18n.t(o.label).toLowerCase().includes(term)) || String(o.value).toLowerCase().includes(term));
       let lastGroup = null;
       list.innerHTML = shown.length ? shown.map((o, i) => {
         const head = o.group && o.group !== lastGroup ? `<li class="sel-group" role="presentation">${App.esc(o.group)}</li>` : "";

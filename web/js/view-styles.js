@@ -2,6 +2,7 @@
  * State lives in the URL (?team=ESP, ?arch=stormers) so Back steps out of a selection. */
 (function () {
   const App = window.App;
+  const A = App.analysis;
   const INK = "#1d2433", GRID = "#efe9dc", MUTED = "#858a96";
   const DUR = 550;
 
@@ -12,8 +13,8 @@
     root.innerHTML = `
       <section class="section-head" style="margin-top:0">
         <div><div class="kicker">Style map</div><h2>Who plays like whom?</h2>
-          <p>Each marker is a team, placed by its average style over ten style dials. Close together means similar football; the shaded areas are the five playstyles found by clustering.
-            Click a team to see its matches and its nearest style twins. Click empty space, press Esc or use Back to return.</p></div>
+          <p>Choose the style metrics that matter to your question, then select a team and inspect its closest comparisons. The map projects those metrics into two dimensions. Neighbors use the full selected metric space.</p>
+          <p class="note">Team profiles average the full tournament. Cluster colors retain the original ten-metric grouping. Your metric selection travels with each comparison.</p></div>
       </section>
       <div class="map-wrap">
         <div class="card map-card">
@@ -51,18 +52,15 @@
       .on("click", (evt, d) => {
         const on = state.dials.includes(d);
         if (on && state.dials.length <= 2) return;
-        state.dials = on ? state.dials.filter((x) => x !== d) : App.dials.filter((x) => x === d || state.dials.includes(x));
-        relayout(true);
+        const dials = on ? state.dials.filter((x) => x !== d) : App.dials.filter((x) => x === d || state.dials.includes(x));
+        setSelection({ dials });
       })
       .on("mouseenter", (evt, d) => App.tip.show(`<div class="tt-title">${d}</div>${App.dialInfo[d].help}<div class="tt-dim" style="margin-top:4px">${App.dialInfo[d].label} · click to switch ${state.dials.includes(d) ? "off" : "on"}</div>`, evt))
       .on("mousemove", (evt) => App.tip.move(evt)).on("mouseleave", App.tip.hide);
     dialTools.append("button").attr("type", "button").attr("class", "chip").text("Reset dials")
-      .on("click", () => { state.dials = App.dials.slice(); relayout(true); });
+      .on("click", () => setSelection({ dials: App.dials.slice() }));
     d3.select("#toggle-matches").on("click", function () {
-      state.showMatches = !state.showMatches;
-      this.setAttribute("aria-pressed", state.showMatches);
-      this.classList.toggle("on", state.showMatches);
-      paint();
+      setSelection({ showMatches: !state.showMatches });
     });
     d3.select("#clear-sel").on("click", () => setSelection({ team: null, arch: null }));
     const onKey = (e) => { if (e.key === "Escape" && (state.team || state.arch)) setSelection({ team: null, arch: null }); };
@@ -70,12 +68,19 @@
     App._stop = () => document.removeEventListener("keydown", onKey);
 
     function readParams(p) {
+      state.dials = A.readDials(p);
       state.team = p.team && App.team[p.team] ? p.team : null;
       state.arch = !state.team && p.arch && App.arch[p.arch] ? p.arch : null;
+      state.showMatches = p.matches === "1";
     }
-    function setSelection({ team, arch }) {
-      const q = team ? `?team=${team}` : arch ? `?arch=${arch}` : "";
-      App.go(`#/styles${q}`);
+    function mapUrl(selection = state) {
+      return `#/styles${A.query(selection.dials, { team: selection.team, arch: selection.arch, matches: selection.showMatches ? "1" : null })}`;
+    }
+    function setSelection(patch) {
+      App.go(mapUrl({ ...state, ...patch }));
+    }
+    function detailUrl(route) {
+      return `${route}${A.query(state.dials, { return: mapUrl() })}`;
     }
 
     // ------------------------------------------------------------------ layout (only when dials or size change)
@@ -170,6 +175,7 @@
       d3.select("#clear-sel").attr("hidden", state.team || state.arch ? null : true)
         .text(state.team ? `✕ Clear ${App.team[state.team].name}` : state.arch ? `✕ Clear ${App.arch[state.arch].name.replace("The ", "")}` : "");
       d3.selectAll("#arch-tools .chip.arch").classed("on", (a) => a.id === state.arch).attr("aria-pressed", (a) => a.id === state.arch);
+      d3.select("#toggle-matches").classed("on", state.showMatches).attr("aria-pressed", state.showMatches);
       bg.style("cursor", state.team || state.arch ? "zoom-out" : "default");
 
       gHull.selectAll("path").transition().duration(dur)
@@ -185,7 +191,7 @@
         .attr("fill-opacity", (k) => (inFocus(App.tm[k].team_id) ? 0.4 : 0.1))
         .style("cursor", "pointer")
         .on("mousemove", (evt, k) => App.tip.show(tmTip(k), evt)).on("mouseleave", App.tip.hide)
-        .on("click", (evt, k) => App.go(`#/match/${App.tm[k].match_id}`));
+        .on("click", (evt, k) => App.go(detailUrl(`#/match/${App.tm[k].match_id}`)));
 
       gSel.selectAll("*").remove();
       gSelLabs.selectAll("*").remove();
@@ -241,7 +247,7 @@
       const rings = gSel.selectAll("g.m").data(pts).join("g").attr("class", "m")
         .attr("transform", (p) => `translate(${p.x},${p.y})`).style("cursor", "pointer")
         .on("mousemove", (evt, p) => App.tip.show(tmTip(p.k), evt)).on("mouseleave", App.tip.hide)
-        .on("click", (evt, p) => { evt.stopPropagation(); App.go(`#/match/${App.tm[p.k].match_id}`); });
+        .on("click", (evt, p) => { evt.stopPropagation(); App.go(detailUrl(`#/match/${App.tm[p.k].match_id}`)); });
       rings.append("circle").attr("r", 0).attr("fill", "#fff").attr("stroke", color).attr("stroke-width", 2.5)
         .transition().delay((p, i) => i * 60).duration(300).attr("r", 10);
       rings.append("text").attr("text-anchor", "middle").attr("dominant-baseline", "central").attr("font-size", 10).attr("font-weight", 800)
@@ -302,24 +308,24 @@
         side.html(`
           <div class="card">
             <button type="button" class="btn small ghost" id="back-all">← All teams</button>
-            <div class="team-head" style="margin-top:12px">${App.flag(t.id, 46)}<div><h3>${App.esc(t.name)}</h3>${App.archPill(t.archetype)}</div></div>
+            <div class="team-head" style="margin-top:12px">${App.flag(t.id, 46)}<div><h3>${App.esc(t.name)}</h3>${App.archPill(t.archetype, state.dials)}</div></div>
             <div class="row" style="margin-top:12px;gap:16px">
               <div class="fact"><b>${t.record.W}-${t.record.D}-${t.record.L}</b><span>W-D-L</span></div>
               <div class="fact"><b>${App.signed(t.gd_per_match, 2)}</b><span>Goal diff / match</span></div>
               <div class="fact"><b style="font-size:16px">${t.stage}</b><span>Reached</span></div>
             </div>
             <p class="note" style="margin-top:10px">Numbered rings are ${App.esc(t.name)}'s ${t.n} matches in order; the line traces how its style moved from game to game.</p>
-            <div class="row"><a class="btn small" href="#/team/${t.id}">Team page →</a><a class="btn small ghost" href="#/match/${App.tm[t.matches[t.matches.length - 1]].match_id}">Replay last match</a></div>
+            <div class="row"><a class="btn small" href="${detailUrl(`#/team/${t.id}`)}">Team page →</a><a class="btn small ghost" href="${detailUrl(`#/match/${App.tm[t.matches[t.matches.length - 1]].match_id}`)}">Inspect last match</a></div>
           </div>
           <div class="card">
             <h3>Closest style twins</h3>
-            <div class="sub">More alike than this share of all team pairs. Hover to find them on the map; click to compare results.</div>
+            <div class="sub">Similarity percentile among all 1,128 team pairs, using your ${state.dials.length} selected metrics. A higher percentile means a closer pairing.</div>
             <div class="twin-list">${near.map((n) => {
               const o = App.team[n.id];
               const gap = t.gd_per_match - o.gd_per_match;
-              return `<a class="twin-item" data-id="${o.id}" href="#/twins/${t.id}/${o.id}">${App.flag(o.id, 28)}
-                <div><b>${App.esc(o.name)}</b><div class="why">${Math.abs(gap) < 0.05 ? "Same results" : gap > 0 ? `${App.esc(t.name)} better by ${App.signed(gap, 2)}` : `${App.esc(o.name)} better by ${App.signed(-gap, 2)}`} GD/match</div></div>
-                <span class="sim">${Math.round(n.sim * 100)}%</span></a>`;
+              return `<a class="twin-item" data-id="${o.id}" href="${detailUrl(`#/twins/${t.id}/${o.id}`)}">${App.flag(o.id, 28)}
+                <div><b>${App.esc(o.name)}</b><div class="why">${Math.abs(gap) < 0.05 ? "Similar goal difference" : gap > 0 ? `${App.esc(t.name)} ahead by ${App.signed(gap, 2)}` : `${App.esc(o.name)} ahead by ${App.signed(-gap, 2)}`} GD/match</div></div>
+                <span class="sim">${Math.round(n.sim * 100)}<small> percentile</small></span></a>`;
             }).join("")}</div>
           </div>`);
       } else {
@@ -329,12 +335,12 @@
             <button type="button" class="btn small ghost" id="back-all">← All playstyles</button>
             <div class="row" style="margin-top:12px;flex-wrap:nowrap"><img src="${App.archArt(a.id)}" alt="" width="72" height="72" style="object-fit:contain"><div><h3>${a.name}</h3><div class="sub" style="margin:0">${a.tagline}</div></div></div>
             <div id="arch-fp" style="margin:10px 0"></div>
-            <div class="twin-list">${a.members.map((id) => `<a class="twin-item" data-id="${id}" href="#/styles?team=${id}">${App.flag(id, 26)}<div><b>${App.esc(App.team[id].name)}</b><div class="why">${App.team[id].stage}</div></div><span class="sim">${App.signed(App.team[id].gd_per_match, 2)}</span></a>`).join("")}</div>
+            <div class="twin-list">${a.members.map((id) => `<a class="twin-item" data-id="${id}" href="${mapUrl({ ...state, team: id, arch: null })}">${App.flag(id, 26)}<div><b>${App.esc(App.team[id].name)}</b><div class="why">${App.team[id].stage}</div></div><span class="sim">${App.signed(App.team[id].gd_per_match, 2)}</span></a>`).join("")}</div>
           </div>` : `
           <div class="card">
             <h3>How to read the map</h3>
             <div class="sub">Every team mixes possession, pressing, crossing and counter-attacking. We measure ten of these dials from FIFA's phase-of-play data and place each team by them.</div>
-            <div class="callout"><b>Try:</b> select Spain, then switch a few dials off. If a twin survives every combination, the resemblance is real, not an artefact of one metric.</div>
+            <div class="callout">Select Spain, then switch a few metrics off. Check whether its closest teams change. This shows how sensitive your comparison is to the chosen definition of style.</div>
           </div>
           <div class="card">
             <h3>Five playstyles</h3>
@@ -420,9 +426,11 @@
 
     return {
       update(p) {
+        const previousDials = state.dials.join("|");
         readParams(p);
         App.tip.hide();
-        paint(true);
+        if (previousDials !== state.dials.join("|")) relayout(true);
+        else paint(true);
       },
     };
   };

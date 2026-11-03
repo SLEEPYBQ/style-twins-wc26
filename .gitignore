@@ -15,3 +15,8 @@ pipeline/.bin/
 __pycache__/
 *.pyc
 .DS_Store
+node_modules/
+*.log
+.env
+.env.*
+!.env.example

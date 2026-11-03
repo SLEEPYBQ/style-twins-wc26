@@ -80,10 +80,10 @@
    * Result recipe: six signed components that add up to goal difference per match.
    * series: [{label, values: {c_style:..}, dots: [[...6 values], ...], color}] (1 or 2 series)
    */
-  C.recipe = (el, series, { width, title } = {}) => {
+  C.recipe = (el, series, { width, title, onMatch } = {}) => {
     const W = width || el.clientWidth || 520;
     const narrow = W < 460;
-    const labelW = narrow ? 118 : 168, valW = 54, rowH = series.length > 1 ? 50 : 42;
+    const labelW = narrow ? 128 : 168, valW = 54, rowH = series.length > 1 ? 50 : 42;
     const comps = App.components;
     const n = comps.length;
     const H = (n + 1) * rowH + 40;
@@ -105,23 +105,42 @@
       const y = i * rowH;
       const row = g.append("g").attr("transform", `translate(0,${y})`);
       if (c.id === "total") row.append("line").attr("x1", 0).attr("x2", W).attr("y1", 1).attr("y2", 1).attr("stroke", INK).attr("stroke-width", 1.2);
-      row.append("text").attr("class", c.id === "total" ? "rtotal" : "rlabel").attr("x", 0).attr("y", rowH / 2 - 5).text(c.label);
+      row.append("text").attr("class", c.id === "total" ? "rtotal" : "rlabel").attr("x", 0).attr("y", rowH / 2 - 5)
+        .style("font-size", narrow ? "11px" : "12.5px").text(c.label);
       row.append("text").attr("class", "rhelp").attr("x", 0).attr("y", rowH / 2 + 10).text(narrow ? "" : c.help);
       series.forEach((s, k) => {
         const v = c.id === "total" ? d3.sum(comps, (cc) => s.values[cc.id]) : s.values[c.id];
         const by = series.length > 1 ? rowH / 2 - barH - 1 + k * (barH + 2) : rowH / 2 - barH / 2;
         const fill = c.id === "total" ? (s.color || INK) : series.length > 1 ? s.color : v >= 0 ? POS : NEG;
         row.append("path").attr("d", hbar(x(0), x(v), by, barH)).attr("fill", fill);
-        const dots = (s.dots || []).map((d) => (c.id === "total" ? d3.sum(d) : d[i]));
-        if (series.length === 1 && dots.length > 1)
-          row.selectAll("circle.dot").data(dots).join("circle").attr("class", "dot")
-            .attr("cx", (d) => x(d)).attr("cy", by + barH / 2).attr("r", 3.6)
-            .attr("fill", "rgba(29,36,51,0.55)").attr("stroke", "#fff").attr("stroke-width", 1.5);
+        const dots = (s.dots || []).map((values, index) => ({ value: c.id === "total" ? d3.sum(values) : values[i], key: s.dotKeys?.[index] }));
+        if (series.length === 1 && dots.length > 1) {
+          const circles = row.selectAll("circle.dot").data(dots).join("circle").attr("class", "dot")
+            .attr("cx", (d) => x(d.value)).attr("cy", by + barH / 2).attr("r", onMatch ? 5 : 3.6)
+            .attr("fill", "rgba(29,36,51,0.55)").attr("stroke", "#fff").attr("stroke-width", 1.5)
+            .attr("tabindex", onMatch ? 0 : null).attr("role", onMatch ? "button" : null)
+            .style("cursor", onMatch ? "pointer" : "default")
+            .attr("aria-label", (d) => {
+              const match = App.tm[d.key];
+              return match ? `Match ${match.number} against ${App.team[match.opp_id].name}, ${c.label} ${App.signed(d.value, 2)}. Open evidence.` : `${c.label} ${App.signed(d.value, 2)}`;
+            })
+            .on("mousemove", (evt, d) => {
+              evt.stopPropagation();
+              const match = App.tm[d.key];
+              const description = match ? `M${match.number} · ${App.team[match.opp_id].name} · ${match.stage}` : "Individual match";
+              App.tip.show(`<div class="tt-title">${App.esc(description)}</div>${App.ttRows([[c.label, App.signed(d.value, 2)]])}${onMatch ? '<div class="tt-dim">Click to inspect match evidence</div>' : ""}`, evt);
+            })
+            .on("mouseleave", App.tip.hide);
+          if (onMatch) circles.on("click", (evt, d) => { evt.stopPropagation(); if (d.key) onMatch(d.key); })
+            .on("keydown", (evt, d) => {
+              if ((evt.key === "Enter" || evt.key === " ") && d.key) { evt.preventDefault(); onMatch(d.key); }
+            });
+        }
         row.append("text").attr("class", "rval").attr("x", W).attr("y", by + barH / 2).attr("dominant-baseline", "central")
           .attr("text-anchor", "end").text(App.signed(v, 2));
       });
-      row.append("rect").attr("width", W).attr("height", rowH).attr("fill", "transparent")
-        .on("mousemove", (evt) => {
+      row.append("rect").attr("width", W).attr("height", rowH).attr("fill", "transparent").lower();
+      row.on("mousemove", (evt) => {
           const lines = series.map((s) => {
             const v = c.id === "total" ? d3.sum(comps, (cc) => s.values[cc.id]) : s.values[c.id];
             return [s.label, App.signed(v, 2)];
@@ -136,13 +155,13 @@
   };
 
   C.componentHelp = {
-    c_style: "How many goals per match teams with this style usually win by: the average xG for and against of the 20 most similar team-matches (other teams), scaled by the model.",
-    c_opp: "How the opponent's usual numbers (xG they concede and create in their other matches) moved the expectation.",
-    c_create: "Actual xG created minus the xG that style + opponent predicted. Positive = made more chances than expected.",
-    c_prevent: "Expected xG against minus actual xG against. Positive = allowed fewer chances than expected.",
-    c_finish: "Goals scored minus xG. Positive = finished better than the chances suggest (skill or luck).",
-    c_keep: "xG faced minus goals conceded. Positive = the goalkeeper/last-ditch defending saved more than expected.",
-    total: "Goal difference per match. The six rows add up exactly to this number.",
+    c_style: "Style contribution under the supplied ten-metric model. Its reference uses xG for and against from the 20 closest displays by other teams. Changing selected style metrics leaves this stored model estimate fixed.",
+    c_opp: "The model contribution based on the opponent’s xG created and conceded in its other tournament matches. This is a retrospective context estimate.",
+    c_create: "Actual xG created minus the model estimate from style and opponent context. Positive values indicate more xG created than estimated.",
+    c_prevent: "Model-estimated xG against minus observed xG against. Positive values indicate less xG allowed than estimated.",
+    c_finish: "Goals scored minus xG. This observed conversion difference includes finishing, variation and limitations of the xG estimate.",
+    c_keep: "xG against minus goals conceded. Positive values mean fewer goals conceded than xGA. Opponent finishing, goalkeeping and variation can all contribute.",
+    total: "Observed goal difference per match. The stored six terms sum to this value within rounding precision.",
   };
 
   /** Head-to-head stat rows: two bars that share one track (left team vs right team). */

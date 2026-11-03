@@ -1,0 +1,81 @@
+.duel-topline { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px; }
+.duel-intro { display:grid; grid-template-columns:1.35fr 1fr; align-items:end; gap:40px; margin:28px 0; }
+.duel-intro h1 { font-size:clamp(34px,4.4vw,58px); line-height:1.06; letter-spacing:-1.6px; margin:0; }
+.duel-intro em { color:#087f8c; font-style:normal; }
+.duel-intro p { font-size:17px; line-height:1.65; color:#59616a; max-width:430px; }
+.duel-controls { display:grid; grid-template-columns:1fr 1fr 210px; gap:18px; margin-bottom:16px; }
+.duel-controls > div { min-width:0; }
+.duel-controls select { font:inherit; border:1px solid #d8d8cf; border-radius:12px; padding:12px; width:100%; background:white; }
+.duel-label { display:block; font-size:12px; font-weight:700; color:#6a7077; margin-bottom:8px; }
+.duel-controls .sel { display:block; width:100%; max-width:100%; min-width:0; }
+.duel-controls .sel-btn { width:100%; max-width:100%; min-width:0; }
+.duel-controls .sel-val { display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.duel-definition { margin-bottom:24px; }
+.duel-definition summary { font-weight:700; cursor:pointer; }
+.duel-dials { display:flex; flex-wrap:wrap; gap:9px; margin:16px 0; }
+.duel-dials label { display:flex; gap:6px; align-items:center; border:1px solid #e6e4d9; border-radius:8px; padding:9px 12px; font-size:13px; }
+.duel-match-heads { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin:20px 0; }
+.duel-match-head { border-top:4px solid var(--duel-color); }
+.duel-match-head h2 { display:flex; align-items:center; gap:13px; font-size:28px; margin-top:12px; }
+.duel-match-head p { color:#66707a; }
+.duel-score { display:flex; align-items:center; gap:20px; font-size:34px; font-weight:800; margin:18px 0; }
+.duel-score span { font-size:12px; font-weight:500; color:#66707a; }
+.duel-report { display:inline-block; margin:10px 0 0 14px; font-size:12px; color:#57706d; }
+.duel-reading { display:flex; align-items:center; gap:30px; background:#e7f1ec; border:1px solid #cfdfd6; padding:24px 28px; border-radius:16px; }
+.duel-reading > span { white-space:nowrap; font-size:12px; }
+.duel-reading b { color:#065d66; }
+.duel-reading > span b { display:block; font-size:32px; }
+.duel-reading p { margin:0; line-height:1.65; }
+.duel-section-heading { display:flex; gap:16px; align-items:flex-start; margin:36px 0 16px; }
+.duel-section-heading > span { color:#087f8c; font-size:12px; border:1px solid #bed5d1; padding:9px; border-radius:50%; }
+.duel-section-heading h2 { font-size:26px; margin:0 0 7px; }
+.duel-section-heading p { color:#6a7077; margin:0; font-size:14px; }
+.duel-legend { display:flex; gap:22px; flex-wrap:wrap; margin-bottom:20px; font-size:13px; }
+.duel-legend span { display:inline-flex; align-items:center; gap:8px; }
+.duel-legend i,.duel-dot { display:inline-block; width:9px; height:9px; flex:none; border-radius:50%; }
+.duel-metrics { display:grid; grid-template-columns:1fr 1fr; gap:26px 40px; }
+.duel-metric-title { font-weight:700; font-size:14px; margin-bottom:11px; }
+.duel-measure { display:flex; align-items:center; gap:9px; margin:7px 0; }
+.duel-measure b { width:48px; text-align:right; font-size:13px; font-variant-numeric:tabular-nums; }
+.duel-track { flex:1; height:9px; border-radius:5px; background:#f2f1eb; }
+.duel-track i { height:9px; display:block; border-radius:5px; }
+.duel-values { border-top:1px solid #e7e7df; padding-top:16px; margin-top:16px; }
+.duel-values summary { cursor:pointer; font-weight:700; font-size:13px; }
+.duel-values-scroll { overflow-x:auto; margin-top:14px; }
+.duel-values table { width:100%; border-collapse:collapse; font-size:12px; }
+.duel-values th,.duel-values td { padding:10px 8px; border-bottom:1px solid #eeede6; text-align:left; }
+.duel-values td { font-variant-numeric:tabular-nums; }
+.duel-opponent h3 { display:flex; align-items:center; gap:9px; margin-top:12px; }
+.duel-opponent dl { margin:22px 0; }
+.duel-opponent dl > div { display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid #eeede6; }
+.duel-opponent dt { color:#6a7077; font-size:13px; }
+.duel-opponent dd { margin:0; font-weight:700; font-variant-numeric:tabular-nums; }
+.duel-next { display:flex; align-items:center; gap:35px; margin-top:24px; }
+.duel-next p { color:#6a7077; line-height:1.7; font-size:14px; }
+.duel-next-actions { display:flex; flex-direction:column; gap:12px; flex:none; }
+.duel-neighbours { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.duel-neighbour { display:flex; align-items:center; gap:15px; text-decoration:none; transition:border-color .15s; }
+.duel-neighbour.selected { border-color:#087f8c; background:#eff7f3; }
+.duel-neighbour:hover { border-color:#087f8c; }
+.duel-neighbour p { font-size:12px; margin:7px 0; color:#68737a; }
+.duel-rank { color:#84908e; font-size:23px; font-weight:700; }
+.duel-match-context { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px; }
+.duel-replay-note { font-size:12px; line-height:1.6; color:#606e72; padding:12px 16px; background:#f0f3eb; border:1px solid #e1e6d9; border-radius:12px; margin-bottom:16px; }
+.duel-candidate { display:flex; align-items:center; gap:12px; border-bottom:1px solid #ece9df; padding:10px 0; }
+.duel-candidate .match-row { flex:1; border:0; min-width:0; }
+.duel-candidate > a:last-child { flex:none; font-size:12px; font-weight:700; color:#087f8c; }
+.duel-filter-context { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:16px 22px; margin-bottom:20px; background:#e7f1ec; border-radius:12px; }
+@media(max-width:850px) {
+  .duel-intro,.duel-controls { grid-template-columns:1fr; gap:18px; }
+  .duel-intro p { max-width:none; margin:0; }
+  .duel-next { flex-direction:column; align-items:stretch; gap:12px; }
+  .duel-neighbours { grid-template-columns:1fr; }
+}
+@media(max-width:560px) {
+  .duel-match-heads,.duel-metrics { grid-template-columns:1fr; }
+  .duel-topline { flex-direction:column; align-items:flex-start; }
+  .duel-reading { flex-direction:column; align-items:flex-start; gap:12px; }
+  .duel-section-heading h2 { font-size:22px; }
+  .duel-candidate { align-items:flex-start; }
+  .duel-candidate .match-row { flex-wrap:wrap; }
+}

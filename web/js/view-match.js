@@ -15,12 +15,21 @@
     const meta = App.match[id];
     if (!meta) { root.innerHTML = `<div class="card"><h3>Unknown match</h3><a href="#/matches">All matches</a></div>`; return; }
     root.innerHTML = `<div class="card"><p class="note">Loading match ${App.esc(id)}…</p></div>`;
-    App.loadMatch(id).then((m) => build(root, m)).catch((err) => {
+    let cancelled = false;
+    App._stop = () => { cancelled = true; };
+    App.loadMatch(id).then((m) => { if (!cancelled) build(root, m, params); }).catch((err) => {
+      if (cancelled) return;
       root.innerHTML = `<div class="card"><h3>Could not load this match</h3><p class="note">${App.esc(err.message)}</p></div>`;
     });
   };
 
-  function build(root, m) {
+  function build(root, m, params) {
+    const dials = App.analysis.readDials(params);
+    const back = /^#\/(twins|styles|story|matches|match|team|duel|lab|robustness)(\/|\?|$)/.test(params.return || "") ? params.return : `#/matches${App.analysis.query(dials)}`;
+    const initialMode = ["web", "lb"].includes(params.mode) ? params.mode : "replay";
+    const contextQuery = App.analysis.query(dials, { return: back, mode: initialMode });
+    const currentUrl = `#/match/${m.id}${contextQuery}`;
+    const report = window.WC_SOURCES?.[m.id];
     const H = m.teams[0], A = m.teams[1];
     const kits = App.matchKits(H.team_id, A.team_id);
     const trims = [H.trim, kits[1] === A.kit ? A.trim : A.kit];
@@ -32,19 +41,22 @@
 
     const stageLabel = m.stage === "Group" ? m.group : m.stage;
     const sbTeam = (T, side) => `
-      <a class="sb-team" href="#/team/${T.team_id}">
+      <a class="sb-team" href="#/team/${T.team_id}${App.analysis.query(dials, { return: currentUrl })}">
         ${App.flag(T.team_id, 54, kits[side])}
         <span class="sb-name">${App.esc(T.name)}</span>
       </a>`;
     const tile = (side) => `<span class="sb-tile${App.isLight(kits[side]) ? " light" : ""}" id="sb-s${side}" style="--k:${kits[side]};--t:${App.textOn(kits[side])}">0</span>`;
 
     root.innerHTML = `
+      <div class="duel-match-context"><a class="btn small ghost" href="${App.esc(back)}">← Back to analysis</a><span class="note">${dials.length} style metrics retained · <a href="#/styles${App.analysis.query(dials)}">Edit style definition</a>${report ? ` · <a href="${App.esc(report.url)}" target="_blank" rel="noopener">FIFA source report ↗</a>` : ""}</span></div>
+      <a class="review-lab-link" style="margin:0 0 18px" href="#/lab/${m.id}${App.analysis.query(dials, { return: currentUrl })}"><span><b>Open the Match Intelligence workspace</b><small>Directed passing network · line-breaking routes · linked event timeline</small></span><strong>Enter Match Lab ↗</strong></a>
+      <div class="duel-replay-note"><b>Reading this view</b> · Event times come from the match data. Player positions and shot paths are schematic. Passing links summarize the full match, including time beyond the playback cursor.</div>
       <div class="stage" id="stage">
         <section class="card score-bar" aria-label="Score">
           <div class="sb-top">
-            ${prev ? `<a class="sb-nav" href="#/match/${prev.id}" title="Previous: ${App.esc(App.matchTitle(prev))}" aria-label="Previous match"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 L4.5 7 L9 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : `<span class="sb-nav off"></span>`}
+            ${prev ? `<a class="sb-nav" href="#/match/${prev.id}${contextQuery}" title="Previous: ${App.esc(App.matchTitle(prev))}" aria-label="Previous match"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M9 2.5 L4.5 7 L9 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : `<span class="sb-nav off"></span>`}
             <span class="sb-stage">${App.esc(stageLabel)} · ${App.esc(m.date)} · Match ${m.number}</span>
-            ${next ? `<a class="sb-nav" href="#/match/${next.id}" title="Next: ${App.esc(App.matchTitle(next))}" aria-label="Next match"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M5 2.5 L9.5 7 L5 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : `<span class="sb-nav off"></span>`}
+            ${next ? `<a class="sb-nav" href="#/match/${next.id}${contextQuery}" title="Next: ${App.esc(App.matchTitle(next))}" aria-label="Next match"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M5 2.5 L9.5 7 L5 11.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>` : `<span class="sb-nav off"></span>`}
           </div>
           <div class="sb-main">
             ${sbTeam(H, 0)}
@@ -90,7 +102,7 @@
             <div class="pane" data-pane="events"><div class="sub" id="feed-sub"></div><div class="feed" id="feed"></div></div>
             <div class="pane" data-pane="numbers" hidden><div class="sub">Full-match numbers.</div><div id="dual"></div></div>
             <div class="pane" data-pane="phases" hidden><div class="sub" id="phases-sub"></div><div id="phases"></div><div class="note" style="margin-top:6px">Share of match time in each phase, as in FIFA's post-match report. Phases overlap, so they do not add up to 100%.</div></div>
-            <div class="pane" data-pane="why" hidden><div class="sub">Goal difference split into style, opponent and execution (<a href="#/method">method</a>).</div><div id="recipe-m"></div><div id="recipe-note" class="note" style="margin-top:8px"></div></div>
+            <div class="pane" data-pane="why" hidden><div class="sub">A fixed model allocation of goal difference using all ten style metrics. Residuals combine several influences (<a href="#/method">method</a>).</div><div id="recipe-m"></div><div id="recipe-note" class="note" style="margin-top:8px"></div></div>
           </div>
         </aside>
       </div>
@@ -99,7 +111,7 @@
 
       <div class="section card">
         <h3>Same style, other matches</h3>
-        <div class="sub">Team-matches by other teams whose ten style dials were closest to each side's display here, and how they turned out.</div>
+        <div class="sub">Nearest performances by other teams across your ${dials.length} selected style metrics. Both sides of this physical match are excluded. Compare keeps the current performance pinned.</div>
         <div class="grid-2" id="twin-matches"></div>
       </div>`;
 
@@ -840,15 +852,15 @@
     const badges = [];
     for (const [s, T] of [[0, H], [1, A]]) {
       const d = T.decomp;
-      if (d.c_keep > 0.8) badges.push({ img: "img/gen/keeper_save.webp", title: "Goalkeeper heroics", text: `${App.esc(T.name)} conceded ${d.c_keep.toFixed(2)} fewer goals than the chances they faced were worth (xG ${A === T ? H.stats.xg : A.stats.xg} faced).` });
-      if (d.c_finish > 1) badges.push({ img: "img/gen/goal_moment.webp", title: "Clinical finishing", text: `${App.esc(T.name)} scored ${d.c_finish.toFixed(2)} more than their xG of ${T.stats.xg}.` });
-      if (d.c_finish < -1) badges.push({ img: null, title: "Wasteful in front of goal", text: `${App.esc(T.name)} scored ${Math.abs(d.c_finish).toFixed(2)} fewer than their xG of ${T.stats.xg}.` });
+      if (d.c_keep > 0.8) badges.push({ img: "img/gen/keeper_save.webp", title: "Fewer goals conceded than xG", text: `${App.esc(T.name)} conceded ${d.c_keep.toFixed(2)} fewer goals than the xG faced. This difference combines the opponent’s finishing, defending and match variation.` });
+      if (d.c_finish > 1) badges.push({ img: "img/gen/goal_moment.webp", title: "Goals above xG", text: `${App.esc(T.name)} scored ${d.c_finish.toFixed(2)} more goals than their xG of ${T.stats.xg}.` });
+      if (d.c_finish < -1) badges.push({ img: null, title: "Goals below xG", text: `${App.esc(T.name)} scored ${Math.abs(d.c_finish).toFixed(2)} fewer goals than their xG of ${T.stats.xg}.` });
       const archNow = nearestArchetype(T);
       const usual = App.team[T.team_id].archetype;
       if (archNow !== usual) badges.push({ img: App.archArt(archNow), title: `Played like ${App.arch[archNow].name}`, text: `${App.esc(T.name)} are usually ${App.arch[usual].name}, but this match's style dials sit closest to the ${App.arch[archNow].name.replace("The ", "")} profile.` });
     }
     const resultLine = m.pens ? m.pens : m.score[0] === m.score[1] ? "A draw." : `${m.score[0] > m.score[1] ? H.name : A.name} won${m.aet ? " after extra time" : ""}.`;
-    document.getElementById("story-badges").innerHTML = (badges.length ? badges.slice(0, 3) : [{ img: null, title: "No extreme story", text: `${App.esc(resultLine)} Both sides performed close to what their style and opponent predicted.` }])
+    document.getElementById("story-badges").innerHTML = (badges.length ? badges.slice(0, 3) : [{ img: null, title: "Inspect the match evidence", text: `${App.esc(resultLine)} Compare the chance totals, phase profiles and passing connections.` }])
       .map((b) => `<div class="card" style="display:flex;gap:14px;align-items:center">${b.img ? `<img src="${b.img}" alt="" style="width:84px;height:84px;object-fit:contain;flex:none" onerror="this.remove()">` : ""}
         <div><div class="kicker" style="margin-bottom:2px">Story of the match</div><h3>${b.title}</h3><p class="note" style="margin:4px 0 0">${b.text}</p></div></div>`).join("");
 
@@ -863,10 +875,10 @@
       return best;
     }
 
-    document.getElementById("twin-matches").innerHTML = [H, A].map((T) => `<div><div class="row" style="margin-bottom:8px">${App.flag(T.team_id, 26, T === H ? kits[0] : kits[1])}<b>Like ${App.esc(T.name)} today</b></div>
-      <div class="match-list">${T.twins.map((tw) => `<a class="match-row" href="#/match/${tw.match_id}"><span class="stage">M${App.match[tw.match_id].number}</span>${App.resultChip(tw.result)}
+    document.getElementById("twin-matches").innerHTML = [H, A].map((T) => `<div><div class="row" style="margin-bottom:8px">${App.flag(T.team_id, 26, T === H ? kits[0] : kits[1])}<b>Like ${App.esc(T.name)} in this match</b></div>
+      <div class="match-list">${App.analysis.nearest(T.mtid, dials, "all", 4).map(({ key, row: tw, distance }) => `<div class="duel-candidate"><a class="match-row" href="#/match/${tw.match_id}${App.analysis.query(dials, { return: currentUrl })}"><span class="stage">M${App.match[tw.match_id].number}</span>${App.resultChip(tw.result)}
         <span class="team-link">${App.flag(tw.team_id, 22)}<span>${App.esc(App.team[tw.team_id].name)} v ${tw.opp_id}</span></span>
-        <span class="note xg tnum">xG ${tw.xg.toFixed(2)}</span><span class="score tnum">${tw.goals}–${tw.goals_opp}</span></a>`).join("")}</div></div>`).join("");
+        <span class="note xg tnum">xG ${tw.xg.toFixed(2)} · distance ${distance.toFixed(2)}</span><span class="score tnum">${tw.goals}–${tw.goals_opp}</span></a><a href="#/duel/${T.mtid}/${key}${App.analysis.query(dials, { return: currentUrl })}" aria-label="Compare ${App.esc(T.name)} in this match with ${App.esc(App.team[tw.team_id].name)} in match ${tw.number}">Compare →</a></div>`).join("")}</div></div>`).join("");
 
     // ------------------------------------------------------------------ one-screen layout on wide (16:9 / 16:10) screens
     function fitStage() {
@@ -901,6 +913,7 @@
     setT(0, { silent: true });
     drawTokens(false);
     drawFeed(true);
+    if (initialMode === "web" || (initialMode === "lb" && H.lb && A.lb)) setMode(initialMode);
     App.onResize(document.getElementById("timeline"), () => { drawTimeline(); });
     App.onResize(document.getElementById("panel"), () => { drawLower(); });
   }

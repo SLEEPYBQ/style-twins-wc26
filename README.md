@@ -1,57 +1,107 @@
 # Style Twins — World Cup 2026 visual analytics (Group 6)
 
-Interactive site that groups all 48 teams by playing style, explains why "style twins" got different
-results, and replays any of the 104 matches from the event data.
+An interactive retrospective analysis of 48 teams and 104 matches. Style Twins helps football fans who understand basic match statistics investigate why similar playing styles can accompany different chances and scorelines. Start with a team comparison, inspect its match evidence, and test how sensitive the comparison is to individual indicators and matches.
 
-Live: https://baiqiaozhang.cc/style-twins/
+Group 6: Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang.
 
-## Run it
+[Original live deployment](https://baiqiaozhang.cc/style-twins/) · [Source dataset](https://github.com/Alamyy/Worldcup26) · [Design and source notes](RESEARCH.md)
+
+## Run locally
+
+From the repository root:
 
 ```bash
-python3 -m http.server 8642 --directory GP/web
+python -m http.server 8642 --bind 127.0.0.1 --directory web
 ```
 
-Then open http://localhost:8642. The site is plain static files (no build step), so any static host works;
-it needs internet only for D3 and the Google font.
+Open [the local site](http://127.0.0.1:8642/). Use `python3` instead of `python` where appropriate. The frontend is plain HTML, CSS and JavaScript with no build step. D3, match data, flags and player avatars are included in `web/`. Google Fonts has system-font fallbacks; original reports and external reference links require an internet connection.
 
-Views (all linked, every URL is shareable):
+## Explore
 
-| Route | What it shows |
+| Route | What it supports |
 | --- | --- |
-| `#/story` | The guided story: five playstyles, where results come from, the skill-or-luck test, twin stories, style matchups, replays |
-| `#/styles` | The style map (clustering + PCA, dial toggles, team trajectories) and the linked 48-team style DNA heatmap |
-| `#/team/ESP` | Fingerprint vs. archetype, result recipe with per-match dots, style twins, every match |
-| `#/twins`, `#/twins/NED/CRO` | Featured twin pairs; head-to-head verdict and recipe comparison |
-| `#/matches`, `#/match/<id>` | All 104 matches; schematic replay with timeline, passing web, stats, phases, recipe |
-| `#/method` | Data, dials, clustering and decomposition formulas, caveats |
+| `#/story` | Question-led examples, playing-style overview and entry points into the analysis workspaces |
+| `#/styles` | Interactive PCA style map, selected style indicators, team trajectories and linked style heatmap |
+| `#/team/ESP` | Team fingerprint, match records, style neighbours and the original result decomposition |
+| `#/twins/NED/CRO` | Team comparison with match scope, outcome measures, match distributions, opponent context and omission sensitivity |
+| `#/duel/<team-match-id>` | An anchored single-match performance compared with similar performances from other matches |
+| `#/matches`, `#/match/<match-id>` | Match browsing and schematic replay with events, full-match passing links, phases and source reports |
+| `#/lab/<match-id>` | Linked passing network and matrix, line-break explanation, and a brushable match-event workspace |
+| `#/robustness/NED/CRO` | Recomputed similarity rankings after omitting an indicator or one team's match record |
+| `#/method` | Definitions, calculations, model interpretation and data limitations |
+
+Selections are retained in shareable analysis URLs and return links. Comparison tables and selected event records can be exported as CSV; the match-pulse chart can also be exported as a standalone SVG.
+
+### Professional analysis workspaces
+
+- **Pass network:** select a player to connect directed passing links, a passing matrix, incoming/outgoing counts and counterpart details. The display threshold changes visible links without changing the full-network statistics.
+- **Line breaks:** inspect through, around and over attempt counts, the targeted opposition units and overall completion. Route and target-unit counts remain separate distributions; the diagrams explain categories rather than reconstructing actual trajectories.
+- **Match pulse:** select a half or brush a minute range to link cumulative attempts, delivery types, outcomes, body parts and individual events. The selected window applies to timed events, not to the full-match passing network.
+- **Robustness lens:** omit one selected style indicator or one match record, recompute the candidate rankings, and inspect alternative neighbours and feature differences. The reference standardization stays fixed across scenarios. The audit supports both ranking directions and CSV export.
+
+Try Netherlands–Croatia in the robustness lens and England–Croatia (`2026-M022-ENG-CRO`) in Match Lab. `web/examples/` contains exported audit and event examples.
+
+### Languages
+
+English is the default. The language menu supports English, Spanish, French, Portuguese, German, Italian, Arabic, Japanese and Korean. The selected language is stored locally, and Arabic uses a right-to-left interface. Translation catalogs are bundled with the site; no online translation service is required. Source identifiers, player names and external documents retain their original forms. See [localization notes](web/locales/README.md) for catalog maintenance and translation review scope.
+
+## Data and interpretation
+
+The [Worldcup26 dataset](https://github.com/Alamyy/Worldcup26) is distributed under CC BY 4.0; see `data/raw/LICENSE-Worldcup26`. The repository retains the original raw data, Python pipeline, proposal and asset credits.
+
+- The analysis contains 208 team–match records. Live similarity uses selected, standardized style indicators; the standardization reference is the full tournament, while the selected scope controls which matches contribute to team averages.
+- Outcome comparisons distinguish chance volume, total xG, xG per attempt and scorelines. Opponent context uses that opponent's other tournament matches, including later matches, so this is a retrospective tool.
+- The original six-part result decomposition is generated by `pipeline/build_data.py`. Its estimates are fixed in the delivered data. Changing indicators or match scope in the browser does not retrain those regressions or regenerate the original archetypes.
+- Omission ranges describe sensitivity to specific changes, not confidence intervals. Model residuals and additive accounting do not establish causation or isolate player ability.
+- Passing edges are whole-match counts. The data does not provide tracking coordinates, individual-shot xG or timed passing sequences. Pitch layouts and illustrated trajectories are schematic.
+
+The model implementation and the distinction between preprocessing and live analysis are described in [RESEARCH.md](RESEARCH.md).
+
+## Frontend checks
+
+Run these commands from `web/` with Node.js installed:
+
+```bash
+cd web
+node scripts/verify-analysis.cjs
+node scripts/verify-robustness.cjs
+node scripts/verify-lab.cjs
+node scripts/verify-pulse.cjs
+node scripts/verify-i18n.cjs
+```
+
+The checks cover aggregation, comparison scope, nearest-neighbour exclusions, omission calculations, full-network counts, event coverage and event-time boundaries. The localization checks also cover placeholder preservation, persistent preferences, safe text updates and unchanged analytical data. Optional browser integration checks are available in `web/scripts/verify-i18n-browser.cjs` and require Playwright with Chromium available to Node.js. With the local server running on port 8642, run `node scripts/verify-i18n-browser.cjs` from `web/`. Set `STYLE_TWINS_BASE_URL` to use another address. The suite checks all nine languages across the main routes, localized search, persistence, SVG/CSV exports and 390px layouts; artifacts go to the system temporary directory unless `STYLE_TWINS_QA_OUTPUT` is set.
 
 ## Rebuild the data
 
+The generated frontend data is already included. To rebuild it from the raw CSVs, install Python with NumPy, pandas, SciPy and scikit-learn, then run from the repository root:
+
 ```bash
-python3 -I GP/pipeline/build_data.py            # web/data/core.js + web/data/matches/*.js
-python3 -I GP/pipeline/build_avatar_manifest.py # data/avatar_manifest.csv (avatar generation order)
+python -I pipeline/build_data.py
+python -I pipeline/build_avatar_manifest.py
 ```
 
-`GP/data/raw/` holds the Worldcup26 CSVs (CC BY 4.0, see `LICENSE-Worldcup26`).
+The first command writes `web/data/core.js` and `web/data/matches/*.js`; the second rebuilds `data/avatar_manifest.csv`. Rebuilding regenerates the original model and match serialization, so rerun the frontend checks against the output.
 
-## Images
+Optional asset/source refresh commands, run from `web/`:
 
-- `web/img/gen/` — hero, archetype mascots and match illustrations, generated with the ChatGPT-desktop
-  Codex CLI (`gpt-6.1-sol`, built-in image generation) via `pipeline/gen_image.sh`; prompts in
-  `pipeline/image_prompts/` (shared style in `STYLE.txt`).
-- `web/img/avatars/` — capsule-eye player avatars from `pipeline/gen_avatar.sh` and the front-facing
-  template `pipeline/image_prompts/avatar_front_template.txt`. Reference photos come from Wikimedia
-  Commons (freely licensed) where available, otherwise from official or press sources used only as a
-  drawing reference; they stay in `data/ref_photos/` and are never deployed. Credits are in
-  `data/ref_photos/credits.csv` and on each player card. Players without a reliable photo keep a
-  shirt-number badge.
+```bash
+node scripts/prepare-sources.cjs
+node scripts/prepare-avatars.cjs
+```
+
+## Images and credits
+
+- `web/img/gen/` contains the original generated hero image, archetype mascots and match illustrations. They were generated with the ChatGPT-desktop Codex CLI (`gpt-6.1-sol`, built-in image generation) through `pipeline/gen_image.sh`; prompts are in `pipeline/image_prompts/`, with the shared style in `STYLE.txt`.
+- `web/img/avatars/` contains the original capsule-eye player avatars produced through `pipeline/gen_avatar.sh` and `pipeline/image_prompts/avatar_front_template.txt`. Reference photos come from freely licensed Wikimedia Commons images where available, otherwise from official or press sources used as drawing references. Reference photos remain in the ignored `data/ref_photos/` directory and are not deployed. Available credits are retained in `data/ref_photos/credits.csv`, `web/data/avatar_credits.js` and player details. Players without an illustration use a shirt-number badge.
+- D3 retains its upstream copyright notice. Data and asset credits remain visible in the application. This is a non-commercial course project and is not affiliated with FIFA.
 
 ## Deploy
 
-`pipeline/deploy.sh` rsyncs `web/` to a server; put `DEPLOY_TARGET` and `DEPLOY_KEY` in
-`pipeline/deploy.env` (git-ignored).
+Deploy the contents of `web/` to a static host. The original `pipeline/deploy.sh` uses zsh, rsync and SSH to synchronize `web/` to a configured server. Set `DEPLOY_TARGET` and `DEPLOY_KEY` in the git-ignored `pipeline/deploy.env`, then run the script from an environment with those tools available. The script synchronizes deletions as well as additions; use the intended site directory as the target.
+
+Pushing the repository does not itself publish the server deployment.
 
 ## Proposal
 
-`GP/proposal/GP-M3-6-revised.docx` (+ PDF) is the revised proposal, built on the original template by
-`proposal/build_revised_docx.py`.
+`proposal/GP-M3-6-revised.docx` and its PDF are the revised proposal, built on the original template by `proposal/build_revised_docx.py`.
