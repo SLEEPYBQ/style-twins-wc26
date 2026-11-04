@@ -2,7 +2,7 @@
 (function (global) {
   "use strict";
   const App = global.App || (global.App = {});
-  const locales = Object.freeze(["en", "zh-Hans", "zh-Hant", "es", "fr", "pt", "de", "it", "ar", "ja", "ko"]);
+  const locales = Object.freeze(["en", "zh-Hans", "zh-Hant", "es", "fr", "pt", "de", "it", "ar", "ja", "ko", "hi"]);
   const storageKey = "style-twins-language";
   const doc = typeof document === "undefined" ? null : document;
   const missing = new Set();
@@ -252,7 +252,7 @@
     return true;
   }
 
-  App.i18n = { get locale() { return locale; }, locales, missing, setLocale, t, translate, template };
+  App.i18n = { get locale() { return locale; }, locales, missing, setLocale, t, translate, template, source: (node) => textState.get(node)?.source ?? node.nodeValue };
   refreshTeams();
   if (doc) {
     const start = () => {

@@ -43,7 +43,7 @@ Try Netherlands–Croatia in the robustness lens and England–Croatia (`2026-M0
 
 ### Languages
 
-English is the default. The language menu supports eleven languages: English, Simplified Chinese (`zh-Hans`), Traditional Chinese (`zh-Hant`), Spanish, French, Portuguese, German, Italian, Arabic, Japanese and Korean. The selected language is stored locally, and Arabic uses a right-to-left interface. Translation catalogs are bundled with the site; no online translation service is required. Source identifiers, player names and external documents retain their original forms. See [localization notes](web/locales/README.md) for catalog maintenance and translation review scope.
+English is the default. The language menu supports twelve languages: English, Simplified Chinese (`zh-Hans`), Traditional Chinese (`zh-Hant`), Spanish, French, Portuguese, German, Italian, Arabic, Japanese, Korean and Hindi (`hi`). The selected language is stored locally, and Arabic uses a right-to-left interface. Translation catalogs are bundled with the site; no online translation service is required. Source identifiers, player names and external documents retain their original forms. See [localization notes](web/locales/README.md) for catalog maintenance and translation review scope.
 
 ## Data and interpretation
 
@@ -70,7 +70,7 @@ node scripts/verify-pulse.cjs
 node scripts/verify-i18n.cjs
 ```
 
-The checks cover aggregation, comparison scope, nearest-neighbour exclusions, omission calculations, full-network counts, event coverage and event-time boundaries. The localization checks also cover placeholder preservation, persistent preferences, safe text updates and unchanged analytical data, including both Chinese scripts. Optional browser integration checks are available in `web/scripts/verify-i18n-browser.cjs` and require Playwright with Chromium available to Node.js. With the local server running on port 8642, run `node scripts/verify-i18n-browser.cjs` from `web/`. Set `STYLE_TWINS_BASE_URL` to use another address. The suite checks all eleven languages across the main routes, Spanish and Chinese team search, persistence, SVG/CSV exports and 390px layouts; artifacts go to the system temporary directory unless `STYLE_TWINS_QA_OUTPUT` is set. Missing-key reports distinguish Spanish, Simplified Chinese and Traditional Chinese coverage.
+The checks cover aggregation, comparison scope, nearest-neighbour exclusions, omission calculations, full-network counts, event coverage and event-time boundaries. The localization checks also cover placeholder preservation, persistent preferences, safe text updates and unchanged analytical data, including both Chinese scripts. Optional browser integration checks are available in `web/scripts/verify-i18n-browser.cjs` and require Playwright with Chromium available to Node.js. With the local server running on port 8642, run `node scripts/verify-i18n-browser.cjs` from `web/`. Set `STYLE_TWINS_BASE_URL` to use another address. The suite checks all twelve languages across the main routes, Spanish and Chinese team search, persistence, SVG/CSV exports and 390px layouts; artifacts go to the system temporary directory unless `STYLE_TWINS_QA_OUTPUT` is set. Missing-key reports distinguish Spanish, Simplified Chinese and Traditional Chinese coverage.
 
 ## Rebuild the data
 

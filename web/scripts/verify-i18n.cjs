@@ -5,7 +5,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
-const languages = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko", "zh-Hans", "zh-Hant"];
+const languages = ["es", "fr", "pt", "de", "it", "ar", "ja", "ko", "zh-Hans", "zh-Hant", "hi"];
 const chineseLocales = ["zh-Hans", "zh-Hant"];
 const read = (file) => {
   const location = path.join(root, file);

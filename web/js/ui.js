@@ -128,6 +128,50 @@
     if (openSelect && !openSelect.contains(e.target)) openSelect.close();
   });
 
+  /**
+   * Draw a native <select> with the site's own dropdown on desktop. The native
+   * element stays in the DOM as the source of truth (forms, .value, change events
+   * keep working) and remains the visible control on phones; see css/desktop.css.
+   */
+  const nativeValue = Object.getOwnPropertyDescriptor(window.HTMLSelectElement?.prototype || {}, "value");
+  const syncSourceFocus = (el) => { const d = App.isDesktop(); el.tabIndex = d ? -1 : 0; if (d) el.setAttribute("aria-hidden", "true"); else el.removeAttribute("aria-hidden"); };
+  const sourceText = (node) => App.i18n?.source ? App.i18n.source(node) : node.nodeValue;
+  ui.enhanceSelect = function (native) {
+    if (!native || native.classList.contains("sel-source")) return null;
+    const skip = native.hasAttribute("data-i18n-skip");
+    const label = native.labels?.[0];
+    const labelNode = label && [...label.childNodes].find((n) => n.nodeType === 3 && n.nodeValue.trim());
+    const options = [...native.options].map((o) => {
+      const text = o.firstChild ? sourceText(o.firstChild).trim() : o.value;
+      const flags = (o.dataset.flags || "").split(",").filter(Boolean);
+      return { value: o.value, label: text, html: flags.length ? `<span class="sel-team">${flags.map((id) => App.flag(id, 20)).join("")}<span>${App.esc(text)}</span></span>` : null };
+    });
+    const host = document.createElement("div");
+    host.className = "sel-enhanced";
+    native.after(host);
+    const api = ui.select(host, {
+      options, value: native.value, searchable: options.length > 12,
+      ariaLabel: labelNode ? sourceText(labelNode).trim() : native.getAttribute("aria-label") || undefined,
+      onChange: (value) => { nativeValue.set.call(native, value); native.dispatchEvent(new Event("change", { bubbles: true })); },
+    });
+    if (skip) host.querySelectorAll(".sel-val,.sel-list").forEach((el) => el.setAttribute("data-i18n-skip", ""));
+    native.classList.add("sel-source");
+    syncSourceFocus(native);
+    // Views assign select.value directly; keep the drawn control in step with them.
+    Object.defineProperty(native, "value", { configurable: true, get: () => nativeValue.get.call(native), set: (v) => { nativeValue.set.call(native, v); api.set(nativeValue.get.call(native)); } });
+    native.addEventListener("change", () => api.set(nativeValue.get.call(native)));
+    // A click inside a wrapping <label> must not fall through to the hidden source.
+    host.addEventListener("click", (e) => e.preventDefault());
+    label?.addEventListener("click", (e) => { if (App.isDesktop() && !host.contains(e.target)) { e.preventDefault(); host.querySelector(".sel-btn").focus(); } });
+    return api;
+  };
+  ui.enhanceSelects = (root) => root.querySelectorAll?.("select:not(.sel-source)").forEach(ui.enhanceSelect);
+  ui.watchSelects = function (root) {
+    ui.enhanceSelects(root);
+    new MutationObserver(() => ui.enhanceSelects(root)).observe(root, { childList: true, subtree: true });
+  };
+  App.desktopQuery?.addEventListener?.("change", () => document.querySelectorAll("select.sel-source").forEach(syncSourceFocus));
+
   /** Team options with a kit-coloured badge, sorted by name. */
   ui.teamOptions = (extra = []) => extra.concat(App.teams.slice().sort((a, b) => a.name.localeCompare(b.name))
     .map((t) => ({ value: t.id, label: t.name, html: `<span class="sel-team">${App.flag(t.id, 22)}<span>${App.esc(t.name)}</span></span>` })));

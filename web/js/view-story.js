@@ -1,7 +1,11 @@
 /* A guided entry into the same comparisons available throughout the explorer. */
 (function () {
   const App = window.App;
-  const INK = "#1d2433", TEAL = "#087f82", ORANGE = "#bd6234";
+  const INK = "#1d2433", TEAL = App.isDesktop() ? "#0a9396" : "#087f82", ORANGE = App.isDesktop() ? "#e8743b" : "#bd6234";
+  // Lab and audit previews: light on desktop, the existing dark panel on phones.
+  const PREVIEW = App.isDesktop()
+    ? { edge: "#0a9396", ring: "#e8e1d2", leader: "#f2b134", leaderStroke: "#1d2433", node: "#ffffff", nodeStroke: "#0a9396", leaderText: "#1d2433", nodeText: "#1d2433", name: "#4a5263", band: "#0a939614", grid: "#e8e1d2", rankLabel: "#858a96", caption: "#858a96", row: "#1d2433", link: "#cfc7b5", base: "#858a96", near: "#0a9396", far: "#e8743b", value: "#1d2433" }
+    : { edge: "#73d6df", ring: "#d5f4ff15", leader: "#ddf38b", leaderStroke: "#ddf38b", node: "#183743", nodeStroke: "#83d7d9", leaderText: "#122832", nodeText: "#e5fafa", name: "#ccdde6", band: "#ddf38b09", grid: "#d5f4ff20", rankLabel: "#c4d2db", caption: "#8ba2af", row: "#c7d7de", link: "#8ca5ae", base: "#526c7a", near: "#ddf38b", far: "#ffbc8c", value: "#f2f7f8" };
 
   App.views.story = function (root) {
     const analysis = App.analysis;
@@ -41,6 +45,7 @@
             </div>
             <div class="review-coverage"><span><b>48</b> teams</span><span><b>104</b> matches</span><span><b>10</b> style dimensions</span></div>
           </div>
+          <img class="review-hero-art" src="img/gen/hero.webp" alt="" loading="lazy">
           <div class="review-hero-evidence">
             <div class="review-evidence-top"><span>Start with an observation</span><span class="review-live-dot">Tournament data</span></div>
             <div class="review-hero-teams">
@@ -90,7 +95,7 @@
             <div class="card review-style-summary">
               <p>Five groups summarize the tournament's style profiles. Teams within a group can have very different opportunities and scorelines.</p>
               <div class="review-archetype-list">${App.data.archetypes.map((arch) => `
-                <a href="#/styles?arch=${arch.id}"><i style="background:${arch.color}"></i><span><b>${arch.name.replace("The ", "")}</b><small>${arch.members.length} teams</small></span><span aria-hidden="true">→</span></a>`).join("")}</div>
+                <a href="#/styles?arch=${arch.id}"><i style="background:${arch.color}"><img class="review-arch-art" src="${App.archArt(arch.id)}" alt="" loading="lazy"></i><span><b>${arch.name.replace("The ", "")}</b><small>${arch.members.length} teams</small></span><span aria-hidden="true">→</span></a>`).join("")}</div>
               <p class="note">Groups use all ten dimensions and remain fixed when you explore alternative feature selections.</p>
             </div>
             <div class="card review-outcome-card">
@@ -125,7 +130,7 @@
     ];
     root.querySelector("#review-cases").innerHTML = cases.map((c, i) => `
       <a class="review-case" href="${comparisonLink(c.a, c.b)}">
-        <div class="review-case-top"><span>CASE 0${i + 1}</span><span>Similarity percentile ${pairPercentile(c.a, c.b)}</span></div>
+        <div class="review-case-top"><span>Case ${i + 1}</span><span>Similarity percentile ${pairPercentile(c.a, c.b)}</span></div>
         <div class="review-case-teams">${App.flag(c.a, 26)}<b>${App.esc(App.team[c.a].name)}</b><span> / </span>${App.flag(c.b, 26)}<b>${App.esc(App.team[c.b].name)}</b></div>
         <h3>${c.question}</h3><p>${c.note}</p>
         <div class="review-case-bottom"><span>${c.metric}<small>First team minus second · per match</small></span><b>${App.signed(c.value, 2)} <span aria-hidden="true">↗</span></b></div>
@@ -151,24 +156,24 @@
       const svg = d3.select(target.querySelector(".review-network-preview")).append("svg").attr("viewBox", "0 0 410 310").attr("role", "img")
         .attr("aria-label", `England against Croatia: ten strongest directed passing connections, from ${volume} recorded network passes. Schematic circular player layout.`);
       svg.append("defs").append("marker").attr("id", "review-pass-arrow").attr("viewBox", "0 -3 6 6").attr("refX", 5).attr("refY", 0).attr("markerWidth", 4).attr("markerHeight", 4).attr("orient", "auto")
-        .append("path").attr("d", "M0,-3L6,0L0,3Z").attr("fill", "#7ce3e2");
-      svg.append("circle").attr("cx", 205).attr("cy", 154).attr("r", 111).attr("fill", "none").attr("stroke", "#d5f4ff15");
+        .append("path").attr("d", "M0,-3L6,0L0,3Z").attr("fill", PREVIEW.edge);
+      svg.append("circle").attr("cx", 205).attr("cy", 154).attr("r", 111).attr("fill", "none").attr("stroke", PREVIEW.ring);
       const edgeWidth = d3.scaleSqrt().domain([0, d3.max(strongest, (edge) => edge[2])]).range([0.6, 4]);
       strongest.forEach((edge) => {
         const from = positions.get(edge[0]), to = positions.get(edge[1]);
         const dx = to.x - from.x, dy = to.y - from.y, length = Math.hypot(dx, dy);
         svg.append("path").attr("d", `M${from.x + dx / length * 11},${from.y + dy / length * 11} Q205,154 ${to.x - dx / length * 14},${to.y - dy / length * 14}`)
-          .attr("fill", "none").attr("stroke", "#73d6df").attr("stroke-opacity", 0.65).attr("stroke-width", edgeWidth(edge[2])).attr("marker-end", "url(#review-pass-arrow)")
+          .attr("fill", "none").attr("stroke", PREVIEW.edge).attr("stroke-opacity", 0.65).attr("stroke-width", edgeWidth(edge[2])).attr("marker-end", "url(#review-pass-arrow)")
           .append("title").text(`${team.players[edge[0]].short} → ${team.players[edge[1]].short}: ${edge[2]} passes`);
       });
       const radius = d3.scaleSqrt().domain([0, d3.max(involvement)]).range([4, 11]);
       active.forEach(({ player, index }) => {
         const position = positions.get(index), leader = involvement[index] === d3.max(involvement);
         const node = svg.append("a").attr("href", `#/lab/${match.id}?team=ENG&pane=network&player=${index}`).attr("aria-label", `Inspect ${player.name}'s passing connections`);
-        node.append("circle").attr("cx", position.x).attr("cy", position.y).attr("r", radius(involvement[index])).attr("fill", leader ? "#ddf38b" : "#183743").attr("stroke", leader ? "#ddf38b" : "#83d7d9").attr("stroke-width", 1.4);
-        node.append("text").attr("x", position.x).attr("y", position.y + 3).attr("text-anchor", "middle").attr("font-size", 7).attr("font-weight", 750).attr("fill", leader ? "#122832" : "#e5fafa").text(player.num);
+        node.append("circle").attr("cx", position.x).attr("cy", position.y).attr("r", radius(involvement[index])).attr("fill", leader ? PREVIEW.leader : PREVIEW.node).attr("stroke", leader ? PREVIEW.leaderStroke : PREVIEW.nodeStroke).attr("stroke-width", 1.4);
+        node.append("text").attr("x", position.x).attr("y", position.y + 3).attr("text-anchor", "middle").attr("font-size", 7).attr("font-weight", 750).attr("fill", leader ? PREVIEW.leaderText : PREVIEW.nodeText).text(player.num);
         const labelX = position.x + Math.cos(position.angle) * 17, labelY = position.y + Math.sin(position.angle) * 17;
-        node.append("text").attr("x", labelX).attr("y", labelY + 3).attr("text-anchor", Math.cos(position.angle) < -.15 ? "end" : Math.cos(position.angle) > .15 ? "start" : "middle").attr("font-size", 8).attr("fill", "#ccdde6").text(player.short);
+        node.append("text").attr("x", labelX).attr("y", labelY + 3).attr("text-anchor", Math.cos(position.angle) < -.15 ? "end" : Math.cos(position.angle) > .15 ? "start" : "middle").attr("font-size", 8).attr("fill", PREVIEW.name).text(player.short);
         node.append("title").text(`${player.name}: ${involvement[index]} incoming + outgoing network passes. Select to inspect.`);
       });
       target.insertAdjacentHTML("beforeend", '<p class="review-preview-note">Ten strongest directed links · node size = pass involvement · positions schematic</p>');
@@ -192,24 +197,24 @@
       const svg = d3.select(target.querySelector(".review-rank-preview")).append("svg").attr("viewBox", "0 0 410 310").attr("role", "img").attr("aria-label", `Croatia's neighbour rank for the Netherlands ranges from ${bestRank} to ${worstRank} when one match is omitted.`);
       const x = d3.scaleLinear().domain([1, Math.max(10, worstRank)]).range([135, 379]);
       const y = d3.scalePoint().domain(scenarios.map((row) => row.id)).range([55, 264]);
-      svg.append("rect").attr("x", x(1)).attr("y", 37).attr("width", x(5) - x(1)).attr("height", 244).attr("rx", 4).attr("fill", "#ddf38b09");
+      svg.append("rect").attr("x", x(1)).attr("y", 37).attr("width", x(5) - x(1)).attr("height", 244).attr("rx", 4).attr("fill", PREVIEW.band);
       [1, 5, 10].filter((rank) => rank <= Math.max(10, worstRank)).forEach((rank) => {
-        svg.append("line").attr("x1", x(rank)).attr("x2", x(rank)).attr("y1", 37).attr("y2", 282).attr("stroke", "#d5f4ff20").attr("stroke-dasharray", rank === 1 ? null : "3,5");
-        svg.append("text").attr("x", x(rank)).attr("y", 22).attr("text-anchor", "middle").attr("fill", "#c4d2db").attr("font-size", 10).text(`#${rank}`);
+        svg.append("line").attr("x1", x(rank)).attr("x2", x(rank)).attr("y1", 37).attr("y2", 282).attr("stroke", PREVIEW.grid).attr("stroke-dasharray", rank === 1 ? null : "3,5");
+        svg.append("text").attr("x", x(rank)).attr("y", 22).attr("text-anchor", "middle").attr("fill", PREVIEW.rankLabel).attr("font-size", 10).text(`#${rank}`);
       });
-      svg.append("text").attr("x", 0).attr("y", 22).attr("fill", "#8ba2af").attr("font-size", 9).text("OMITTED MATCH");
+      svg.append("text").attr("x", 0).attr("y", 22).attr("fill", PREVIEW.caption).attr("font-size", 9).text("Omitted match");
       scenarios.forEach((scenario) => {
         const row = analysis.records.find((item) => item.key === scenario.omittedKey);
         const label = row ? `${row.team_id} v ${row.opp_id} · M${row.number}` : scenario.label;
         const cy = y(scenario.id);
-        svg.append("text").attr("x", 0).attr("y", cy + 4).attr("fill", "#c7d7de").attr("font-size", 10).text(label);
-        svg.append("line").attr("x1", x(audit.base.rankA)).attr("x2", x(scenario.rankA)).attr("y1", cy).attr("y2", cy).attr("stroke", "#8ca5ae").attr("stroke-width", 2);
-        svg.append("circle").attr("cx", x(audit.base.rankA)).attr("cy", cy).attr("r", 3).attr("fill", "#526c7a");
-        svg.append("circle").attr("cx", x(scenario.rankA)).attr("cy", cy).attr("r", 5).attr("fill", scenario.rankA <= 5 ? "#ddf38b" : "#ffbc8c")
+        svg.append("text").attr("x", 0).attr("y", cy + 4).attr("fill", PREVIEW.row).attr("font-size", 10).text(label);
+        svg.append("line").attr("x1", x(audit.base.rankA)).attr("x2", x(scenario.rankA)).attr("y1", cy).attr("y2", cy).attr("stroke", PREVIEW.link).attr("stroke-width", 2);
+        svg.append("circle").attr("cx", x(audit.base.rankA)).attr("cy", cy).attr("r", 3).attr("fill", PREVIEW.base);
+        svg.append("circle").attr("cx", x(scenario.rankA)).attr("cy", cy).attr("r", 5).attr("fill", scenario.rankA <= 5 ? PREVIEW.near : PREVIEW.far)
           .append("title").text(`${label}: Croatia is neighbour #${scenario.rankA}. Baseline #${audit.base.rankA}.`);
-        svg.append("text").attr("x", x(scenario.rankA) + 9).attr("y", cy + 3).attr("fill", "#f2f7f8").attr("font-size", 9).text(scenario.rankA);
+        svg.append("text").attr("x", x(scenario.rankA) + 9).attr("y", cy + 3).attr("fill", PREVIEW.value).attr("font-size", 9).text(scenario.rankA);
       });
-      svg.append("text").attr("x", 135).attr("y", 303).attr("fill", "#8ba2af").attr("font-size", 9).text(`Baseline: neighbour #${audit.base.rankA} · one omission per row`);
+      svg.append("text").attr("x", 135).attr("y", 303).attr("fill", PREVIEW.caption).attr("font-size", 9).text(`Baseline: neighbour #${audit.base.rankA} · one omission per row`);
     }
 
     let outcomeMetric = "xgd", matchupMetric = "xgd";

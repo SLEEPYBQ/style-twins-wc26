@@ -1,7 +1,7 @@
 /* Team comparison with shared criteria and linked match evidence. */
 (function () {
   const App = window.App, A = App.analysis;
-  const colors = ["#087f81", "#b85d34"];
+  const colors = App.isDesktop() ? ["#0a9396", "#e8743b"] : ["#087f81", "#b85d34"];
   const scopes = { all: "Whole tournament", group: "Group stage", knockout: "Knockout stage" };
   const metrics = {
     xgd: ["Chance balance", "xG difference per match", 2],

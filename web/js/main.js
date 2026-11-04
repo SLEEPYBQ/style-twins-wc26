@@ -5,6 +5,9 @@
   const App = window.App;
   const view = document.getElementById("view");
 
+  App.ui.watchSelects(view);
+  App.ui.enhanceSelect(document.getElementById("language-select"));
+
   const jump = App.ui.select("team-jump", {
     options: App.ui.teamOptions(), placeholder: "Jump to a team", searchable: true, ariaLabel: "Jump to a team",
     onChange: (v) => {

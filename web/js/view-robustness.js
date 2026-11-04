@@ -1,6 +1,6 @@
 (function () {
   const App = window.App, A = App.analysis, R = App.robustness;
-  const colors = ["#087f81", "#b85d34"];
+  const colors = App.isDesktop() ? ["#0a9396", "#e8743b"] : ["#087f81", "#b85d34"];
   const scopes = { all: "Whole tournament", group: "Group stage", knockout: "Knockout stage" };
   const source = "https://blogarchive.statsbomb.com/articles/soccer/modelling-team-playing-style/";
 
@@ -27,9 +27,9 @@
     }
 
     root.innerHTML = `<div class="robust-page">
-      <div class="review-breadcrumb"><a href="${App.esc(back)}">← Return to your comparison</a><span>STYLE LAB / SENSITIVITY</span></div>
+      <div class="review-breadcrumb"><a href="${App.esc(back)}">← Return to your comparison</a><span>Style lab · Sensitivity</span></div>
       <section class="robust-hero"><div><div class="kicker">One pairing. Many checks.</div><h1>Audit the<br><em>resemblance.</em></h1><p>Does a close style pairing survive a different metric choice or the loss of a single match? Inspect every scenario and see the alternatives that move ahead.</p></div>
-        <div class="robust-hero-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><b>01<span>→</span>?</b></div></section>
+        <img class="robust-hero-art" src="img/gen/keeper_save.webp" alt="" loading="lazy" onerror="this.remove()"><div class="robust-hero-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><b>01<span>→</span>?</b></div></section>
       <div class="robust-presets" aria-label="Example comparisons"><span>Explore a case</span>${[["NED", "CRO", "Netherlands & Croatia"], ["ESP", "GER", "Spain & Germany"], ["MEX", "SWE", "Mexico & Sweden"]].map(([left, right, label]) => `<a class="${a === left && b === right ? "active" : ""}" href="#/robustness/${left}/${right}${A.query(dials, { scope })}">${label} ↗</a>`).join("")}</div>
       <form class="robust-controls card"><label>Reference team<select name="first">${teamOptions(a)}</select></label><label>Comparison team<select name="second">${teamOptions(b)}</select></label><label>Match scope<select name="scope">${Object.entries(scopes).map(([key, label]) => `<option value="${key}" ${key === scope ? "selected" : ""}>${label}</option>`).join("")}</select></label><button class="btn" type="submit">Run comparison →</button><p class="note" data-form-error></p></form>
       <details class="robust-metrics"><summary>${dials.length} selected style indicators</summary><p class="note">Your selected indicators define the starting comparison. Each test removes one input while holding the remaining reference scale fixed.</p><div class="review-chips">${App.dials.map((dial, index) => `<button type="button" class="chip ${dials.includes(dial) ? "on" : ""}" aria-pressed="${dials.includes(dial)}" data-dial="${index}">${dial}</button>`).join("")}</div></details>

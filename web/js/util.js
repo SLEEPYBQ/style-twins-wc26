@@ -22,6 +22,9 @@
   App.stageOrder = ["Final", "Bronze final", "Semi-final", "Quarter-final", "Round of 16", "Round of 32", "Group"];
 
   // archetype art + shapes ---------------------------------------------------------
+  // Desktop uses the sticker-book theme; phones keep their own stylesheet and colours.
+  App.desktopQuery = window.matchMedia ? window.matchMedia("(min-width: 601px)") : null;
+  App.isDesktop = () => !!(App.desktopQuery && App.desktopQuery.matches);
   App.archArt = (id) => `img/gen/arch_${id}.webp`;
   App.shape = {
     circle: d3.symbolCircle, triangle: d3.symbolTriangle, diamond: d3.symbolDiamond,

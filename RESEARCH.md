@@ -10,7 +10,7 @@ The new workspaces connect an overview to specific evidence. A selected player h
 
 The visual language combines a quiet cream reading surface with dark navy analysis panels, cyan for passing evidence and lime for sensitivity results. Data diagrams supply the visual interest. The homepage previews are generated from actual England–Croatia passing records and Netherlands–Croatia omission results, rather than illustrative chart shapes.
 
-The interface uses English by default, with bundled catalogs for ten additional languages: Simplified Chinese (`zh-Hans`), Traditional Chinese (`zh-Hant`), Spanish, French, Portuguese, German, Italian, Arabic, Japanese and Korean. Language preference is stored locally; Arabic uses right-to-left layout. Both Chinese scripts use the same analytical records and retain the original numbers, player names and source identifiers. Localized team search resolves translated country labels to canonical team IDs.
+The interface uses English by default, with bundled catalogs for eleven additional languages: Simplified Chinese (`zh-Hans`), Traditional Chinese (`zh-Hant`), Spanish, French, Portuguese, German, Italian, Arabic, Japanese, Korean and Hindi (`hi`). Language preference is stored locally; Arabic uses right-to-left layout. Both Chinese scripts use the same analytical records and retain the original numbers, player names and source identifiers. Localized team search resolves translated country labels to canonical team IDs.
 
 ## Original pipeline and live analysis
 

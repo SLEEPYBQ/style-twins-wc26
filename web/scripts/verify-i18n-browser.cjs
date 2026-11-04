@@ -2,7 +2,7 @@
 const fs=require('fs'),path=require('path'),assert=require('assert/strict');const {chromium}=require('playwright');
 const root=path.resolve(__dirname,'../..'),outDir=process.env.STYLE_TWINS_QA_OUTPUT || path.join(require('os').tmpdir(),'style-twins-i18n-qa');fs.mkdirSync(outDir,{recursive:true});
 const baseURL=(process.env.STYLE_TWINS_BASE_URL || 'http://127.0.0.1:8642').replace(/\/$/,'');
-const locales=['en','zh-Hans','zh-Hant','es','fr','pt','de','it','ar','ja','ko'];
+const locales=['en','zh-Hans','zh-Hant','es','fr','pt','de','it','ar','ja','ko','hi'];
 const routes=['#/story','#/styles?team=ESP','#/team/ESP','#/twins/NED/CRO?scope=group','#/duel/2026-M022-ENG-CRO_ENG','#/robustness/NED/CRO?test=matches','#/matches','#/match/2026-M022-ENG-CRO','#/lab/2026-M022-ENG-CRO?pane=network&player=3&min=4','#/lab/2026-M022-ENG-CRO?pane=network&layout=matrix','#/lab/2026-M022-ENG-CRO?pane=breaks','#/lab/2026-M022-ENG-CRO?pane=pulse&team=ENG&from=52&to=78','#/method'];
 const mobileRoutes=['#/story','#/twins/NED/CRO','#/robustness/NED/CRO','#/lab/2026-M022-ENG-CRO?pane=network','#/lab/2026-M022-ENG-CRO?pane=breaks','#/lab/2026-M022-ENG-CRO?pane=pulse','#/method'];
 (async()=>{const browser=await chromium.launch({headless:true});const page=await browser.newPage({viewport:{width:1440,height:1000},acceptDownloads:true});const errors=[],missing=new Set(),missingByLocale=Object.fromEntries(['es','zh-Hans','zh-Hant'].map(locale=>[locale,new Set()])),overflow=[];page.on('pageerror',e=>errors.push(e.message));

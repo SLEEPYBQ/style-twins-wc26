@@ -1,7 +1,7 @@
 /* Compare two observed team-match performances while retaining the chosen style definition. */
 (function () {
   const App = window.App;
-  const colors = ["#087f8c", "#bd5636"];
+  const colors = App.isDesktop() ? ["#0a9396", "#e8743b"] : ["#087f8c", "#bd5636"];
   const safeReturn = (value) => /^#\/(twins|styles|matches|match|team|duel|lab|robustness)(\/|\?|$)/.test(value || "") ? value : "#/matches";
 
   App.views.duel = function (root, params, firstKey, secondKey) {
