@@ -328,3 +328,4 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 .sel-enhanced .sel-val { flex: 1 1 auto; text-align: start; }
 .duel-replay-note { background: var(--card-2); border: 0; border-radius: 14px; color: var(--ink-2); }
 .duel-replay-note b { color: var(--ink); }
+.review-hero-art, .robust-hero-art { height: auto; aspect-ratio: 1; }
