@@ -30,7 +30,7 @@
 
     root.innerHTML = `
       <div class="duel-topline"><a class="btn small ghost" href="${App.esc(back)}">← Back to analysis</a><span class="kicker">Match evidence · one team in one match</span></div>
-      <section class="duel-intro"><h1>Similar tactics.<br><em>Inspect the difference.</em></h1><p>Keep one performance in view while comparing chances, opponents and the choices behind another.</p></section>
+      <section class="duel-intro"><img class="duel-hero-art" src="img/gen/duel_hero.webp" alt="" width="720" height="720" loading="lazy" onerror="this.remove()"><h1>Similar tactics.<br><em>Inspect the difference.</em></h1><p>Keep one performance in view while comparing chances, opponents and the choices behind another.</p></section>
       <section class="card duel-controls">
         <div><label class="duel-label" for="duel-first">Pinned performance</label><div id="duel-first"></div></div>
         <div><label class="duel-label" for="duel-second">Comparison performance</label><div id="duel-second"></div></div>
