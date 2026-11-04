@@ -26,12 +26,16 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 .language-control .language-globe { z-index: 1; }
 
 /* One row of navigation whenever it fits ----------------------------------- */
-@media (min-width: 1180px) {
+@media (min-width: 1310px) {
   html[lang="en"] .topbar { flex-wrap: nowrap; }
   html[lang="en"] .topbar .tabs { order: 0; flex: 1 1 auto; width: auto; }
   html[lang="en"] .topbar .jump { order: 1; margin-inline-start: 0; }
   html[lang="en"] .topbar .language-control { order: 2; }
 }
+.topbar .github-link { display: inline-flex; align-items: center; justify-content: center; order: 2; flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--card); border: 1.5px solid var(--line); box-shadow: var(--shadow); color: var(--ink); transition: border-color .15s, transform .12s; }
+.topbar .github-link:hover { border-color: var(--axis); transform: translateY(-1px); }
+.foot-github { display: none; }
+@media (max-width: 680px) { .topbar .github-link { display: none; } .foot-github { display: inline; } }
 
 /* Type -------------------------------------------------------------------- */
 .review-eyebrow, .kicker { font: 600 13.5px var(--sans); color: var(--muted); letter-spacing: 0; text-transform: none; margin-bottom: 6px; }

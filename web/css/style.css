@@ -562,6 +562,6 @@ a.arch-card { text-decoration: none; color: inherit; }
 [hidden] { display: none !important; }
 
 /* Desktop-only illustrations; css/desktop.css shows them. */
-.review-hero-art, .review-arch-art, .lab-hero-art, .robust-hero-art, .duel-hero-art { display: none; }
+.review-hero-art, .review-arch-art, .lab-hero-art, .robust-hero-art, .duel-hero-art, .github-link { display: none; }
 /* Phones keep the native picker; css/desktop.css swaps in the drawn dropdown. */
 @media (max-width: 600px) { .sel-enhanced { display: none; } }
