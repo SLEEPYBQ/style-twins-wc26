@@ -45,7 +45,7 @@
             </div>
             <div class="review-coverage"><span><b>48</b> teams</span><span><b>104</b> matches</span><span><b>10</b> style dimensions</span></div>
           </div>
-          <img class="review-hero-art" src="img/gen/hero.webp" alt="" loading="lazy">
+          <img class="review-hero-art" src="img/gen/hero.webp" alt="" width="720" height="720" loading="lazy">
           <div class="review-hero-evidence">
             <div class="review-evidence-top"><span>Start with an observation</span><span class="review-live-dot">Tournament data</span></div>
             <div class="review-hero-teams">
