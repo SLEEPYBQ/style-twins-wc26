@@ -1,274 +1,320 @@
-/* A task-led entry and one coordinated workspace. All aggregates use analysis.js. */
+/* Coordinated visual-analysis workbench. All measures use the delivered records. */
 (function () {
   "use strict";
   const App = window.App, A = App.analysis;
-  const BLUE = "#2859c5", ORANGE = "#b95824", INK = "#263247", MUTED = "#657186", GRID = "#e6e9ed";
-  const tasks = [
-    { id: "twins", title: "Find style twins", question: "Who plays like my team?", detail: "Explore the style map and closest teams." },
-    { id: "results", title: "Compare results", question: "Similar style. Different results?", detail: "Compare chances created and actual scorelines." },
-    { id: "matches", title: "Inspect matches", question: "Which matches make the difference?", detail: "Follow the individual games behind the averages." },
+  const INK = "#29323d", MUTED = "#616c77", GRID = "#e7e9ec", COLORS = ["#2864b7", "#b65a26"];
+  const tasks = [["twins", "Find similar teams"], ["results", "Compare results"], ["matches", "Inspect match variation"]];
+  const measures = [
+    {id:"xgd",label:"xG difference",unit:"per match"}, {id:"gd",label:"Goal difference",unit:"per match"},
+    {id:"xg",label:"Expected goals",unit:"per match"}, {id:"xga",label:"Expected conceded",unit:"per match"},
+    {id:"goals",label:"Goals scored",unit:"per match"}, {id:"conceded",label:"Goals conceded",unit:"per match"},
+    {id:"shots",label:"Attempts",unit:"per match"}, {id:"poss",label:"Possession",unit:"%"},
+    ...App.dials.map((d,i)=>({id:`dial${i}`,label:d,unit:App.dialInfo[d].unit||"per adjusted possession"})),
   ];
-  const teamOptions = () => App.teams.slice().sort((a, b) => a.name.localeCompare(b.name))
-    .map(t => `<option value="${t.id}">${App.esc(t.name)}</option>`).join("");
-  const url = s => `#/styles${A.query(s.dials, { team: s.team, compare: s.compare, task: s.task, scope: s.scope, arch: s.arch, cohort: s.cohort ? s.cohort.join(",") || "none" : null })}`;
-  const validTeam = (id, fallback) => App.team[id] ? id : fallback;
-  const nearest = (team, dials = App.dials, scope = "all") => A.twinTable(A.space(dials, scope)).near[team] || [];
-  const fmt = (n, digits = 2) => Number.isFinite(n) ? App.fix(Number(n.toFixed(digits)), digits) : "–";
-  function activate(selection, action) {
-    selection.attr("tabindex", 0).attr("role", "button").style("cursor", "pointer")
-      .on("click", action).on("keydown", (event, d) => {
-        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); action(event, d); }
-      });
+  const metricById=Object.fromEntries(measures.map(m=>[m.id,m]));
+  const recordByKey=Object.fromEntries(A.records.map(r=>[r.key,r]));
+  const fmt=(v,n=2)=>Number.isFinite(v)?App.fix(Number(v.toFixed(n)),n):"–";
+  const options=(items,value)=>items.map(([id,label])=>`<option value="${id}"${id===value?" selected":""}>${App.esc(label)}</option>`).join("");
+  const teamOptions=()=>options(App.teams.slice().sort((a,b)=>a.name.localeCompare(b.name)).map(t=>[t.id,t.name]));
+  const finiteParam=v=>v!=null&&v!==""&&Number.isFinite(+v)?+v:null;
+  const color=id=>id===currentState?.team?COLORS[0]:id===currentState?.compare?COLORS[1]:"#8c959e";
+  let currentState=null;
+
+  function stateFrom(p) {
+    const dials=A.readDials(p),scope=["group","knockout"].includes(p.scope)?p.scope:"all";
+    const team=App.team[p.team]?p.team:"NED";
+    const near=A.twinTable(A.space(dials,scope)).near[team]||[];
+    let compare=App.team[p.compare]?p.compare:near[0]?.id||"CRO";
+    if(compare===team)compare=App.teams.find(t=>t.id!==team).id;
+    const task=tasks.some(t=>t[0]===p.task)?p.task:"twins";
+    return {team,compare,dials,scope,task,arch:App.arch[p.arch]?p.arch:"",search:p.search||"",
+      view:p.view==="custom"||(!p.view&&task==="results")?"custom":"pca",x:metricById[p.x]?p.x:"xgd",y:metricById[p.y]?p.y:"gd",
+      cohort:p.cohort?[...new Set(p.cohort.split(",").filter(id=>App.team[id]))]:null,
+      filter:metricById[p.filter]?p.filter:"gd",lo:finiteParam(p.lo),hi:finiteParam(p.hi),
+      sort:["name","distance","n","xgd","gd"].includes(p.sort)?p.sort:"distance",desc:p.desc==="1",
+      match:App.tm[p.match]?p.match:null};
   }
-  function chart(host, label) {
-    host.innerHTML = "";
-    const W = Math.max(host.clientWidth, 300), H = Math.max(host.clientHeight, host.id === "ex-profile" ? 215 : 80);
-    const svg = d3.select(host).append("svg").attr("viewBox", `0 0 ${W} ${H}`).attr("role", "group").attr("aria-label", label);
-    return { svg, W, H };
+  function stateUrl(s) {
+    return `#/styles${A.query(s.dials,{team:s.team,compare:s.compare,task:s.task,scope:s.scope,
+      arch:s.arch,search:s.search,view:s.view,x:s.x,y:s.y,cohort:s.cohort?s.cohort.join(",")||"none":null,
+      filter:s.filter,lo:s.lo,hi:s.hi,sort:s.sort,desc:s.desc?"1":null,match:s.match})}`;
   }
-  function profilePreview(host, left, right) {
-    const {svg, W, H} = chart(host, "Selected teams' style profiles");
-    const space = A.space(App.dials), m = {l: 155, r: 25, t: 20, b: 34};
-    const x = d3.scaleLinear().domain([-2.5, 2.5]).range([m.l, W - m.r]);
-    const y = d3.scalePoint().domain(App.dials).range([m.t, H - m.b]).padding(.5);
-    [-2, -1, 0, 1, 2].forEach(v => svg.append("line").attr("x1", x(v)).attr("x2", x(v)).attr("y1", 8).attr("y2", H-m.b).attr("stroke", v === 0 ? "#adb6c5" : GRID).attr("stroke-dasharray", v === 0 ? null : "3 4"));
-    App.dials.forEach((dial, i) => {
-      const a = space.team[left][i], b = space.team[right][i];
-      svg.append("text").attr("x", m.l-16).attr("y", y(dial)+5).attr("text-anchor", "end").text(dial);
-      svg.append("line").attr("x1", x(a)).attr("x2", x(b)).attr("y1", y(dial)).attr("y2", y(dial)).attr("stroke", "#bbc3d1").attr("stroke-width", 3);
-      [a,b].forEach((v,j) => svg.append("circle").attr("cx",x(v)).attr("cy",y(dial)).attr("r",6).attr("fill",j ? ORANGE : BLUE).attr("stroke","white").attr("stroke-width",1.5));
-    });
-    svg.append("text").attr("x",m.l).attr("y",H-7).attr("fill",MUTED).text("Below average");
-    svg.append("text").attr("x",W-m.r).attr("y",H-7).attr("text-anchor","end").attr("fill",MUTED).text("Above average");
+  function interactive(sel,fn) {
+    sel.attr("tabindex",0).attr("role","button").style("cursor","pointer").on("click",fn)
+      .on("keydown",(e,d)=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();fn(e,d);}});
   }
-  function resultPreview(host, left, right, task) {
-    const {svg,W,H}=chart(host,task==="matches"?"Match goal differences for selected teams":"Expected and actual goal differences per match");
-    const ids=[left,right], matchMode=task==="matches";
-    const values=ids.flatMap(id=>matchMode?A.rows(id).slice().sort((a,b)=>a.number-b.number).slice(-4).map(r=>({id,label:`M${r.number} · ${r.opp_id}`,value:A.metric(r,"gd")})):[{id,label:"xG difference",value:A.summary(A.rows(id)).xgd},{id,label:"Goal difference",value:A.summary(A.rows(id)).gd}]);
-    const extent=d3.extent(values,d=>d.value),lo=Math.min(0,extent[0]),hi=Math.max(0,extent[1]);
-    const x=d3.scaleLinear().domain([lo-.3,hi+.4]).nice().range([145,W-40]);
-    const y=d3.scaleBand().domain(values.map((d,i)=>i)).range([15,H-35]).padding(.3);
-    svg.append("line").attr("x1",x(0)).attr("x2",x(0)).attr("y1",10).attr("y2",H-35).attr("stroke","#adb6c5");
-    values.forEach((d,i)=>{
-      const color=d.id===left?BLUE:ORANGE;
-      svg.append("text").attr("x",130).attr("y",y(i)+y.bandwidth()/2+4).attr("text-anchor","end").text(d.label);
-      svg.append("rect").attr("x",x(Math.min(0,d.value))).attr("y",y(i)).attr("height",y.bandwidth()).attr("width",Math.abs(x(d.value)-x(0))).attr("rx",3).attr("fill",color);
-      svg.append("text").attr("x",x(d.value)+(d.value>=0?6:-6)).attr("y",y(i)+y.bandwidth()/2+4).attr("text-anchor",d.value>=0?"start":"end").attr("fill",color).text(fmt(d.value));
-    });
-    svg.append("text").attr("x",W-40).attr("y",H-7).attr("text-anchor","end").attr("fill",MUTED).text(matchMode?"Latest four matches / team · goal difference":"Difference per match");
+  function svgFor(host,label,minHeight=80) {
+    host.replaceChildren();
+    const W=Math.max(230,host.clientWidth),H=Math.max(minHeight,host.clientHeight);
+    return {W,H,svg:d3.select(host).append("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("role","group").attr("aria-label",label)};
   }
 
-  App.views.story = function(root, params) {
-    let team = validTeam(params.team, "NED"), task = tasks.some(t=>t.id===params.task) ? params.task : "twins";
-    root.innerHTML = `<div class="ex-home">
-      <div class="ex-intro"><span class="ex-eyebrow">WORLD CUP 2026 · STYLE TWINS</span><h1>Same style.<br>Different story.</h1><p>Choose a question. Start with your team.</p></div>
-      <div class="ex-start"><section class="ex-setup" aria-label="Choose your analysis">
-        <h2>What do you want to explore?</h2><div class="ex-task-list">${tasks.map((t,i)=>`<button type="button" data-task="${t.id}" aria-pressed="${task===t.id}"><span class="ex-task-num">0${i+1}</span><span><b>${t.question}</b><span>${t.detail}</span></span><span aria-hidden="true">↗</span></button>`).join("")}</div>
-        <label class="ex-field">Your team<select id="ex-home-team">${teamOptions()}</select></label>
-        <a class="ex-primary" id="ex-open" href="#/styles">Explore my team <span aria-hidden="true">→</span></a>
-      </section><section class="ex-preview"><div class="ex-panel-head"><div><span class="ex-eyebrow">YOUR STARTING COMPARISON</span><h2 id="ex-preview-title"></h2></div><span class="ex-live">From match data</span></div>
-        <div class="ex-team-key" id="ex-preview-key"></div><div id="ex-home-chart" class="ex-home-chart"></div><div class="ex-preview-stats" id="ex-preview-stats"></div>
-      </section></div><div class="ex-home-bottom"><span>48 teams · 104 matches · 10 style indicators</span><span>One workspace. Every panel connected.</span><a href="#/method">Data & method ↗</a></div>
-    </div>`;
-    const select = root.querySelector("#ex-home-team"); select.value = team;
-    select.addEventListener("change",()=> {team=select.value; render();});
-    root.querySelectorAll("[data-task]").forEach(button=>button.addEventListener("click",()=> {task=button.dataset.task; render();}));
-    function render() {
-      const n = nearest(team)[0], other = n.id;
-      root.querySelectorAll("[data-task]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.task===task));
-      root.querySelector("#ex-preview-title").textContent = `${App.team[team].name} & ${App.team[other].name}`;
-      root.querySelector("#ex-preview-key").innerHTML = `<span class="ex-key-a">● ${App.flag(team,22)} ${App.team[team].name}</span><span class="ex-key-b">● ${App.flag(other,22)} ${App.team[other].name}</span>`;
-      if(task==="twins") profilePreview(root.querySelector("#ex-home-chart"),team,other);
-      else resultPreview(root.querySelector("#ex-home-chart"),team,other,task);
-      const a = A.summary(A.rows(team)), b = A.summary(A.rows(other));
-      root.querySelector("#ex-preview-stats").innerHTML = `<div><b>${Math.round(n.sim*100)}<span>/100</span></b><span>Style similarity percentile</span></div><div><b>${fmt(a.gd-b.gd)}</b><span>Goal difference gap / match</span></div>`;
-      root.querySelector("#ex-open").href = url({team,compare:other,task,dials:App.dials,scope:"all"});
-      history.replaceState(null,"",`#/story?team=${team}&task=${task}`);
-    }
-    render(); App.onResize(root.querySelector("#ex-home-chart"),render);
-  };
-
-  App.views.styles = function(root, params) {
-    let state, space, table, summaries;
-    const read = p => {
-      const scope = ["group","knockout"].includes(p.scope) ? p.scope : "all";
-      const dials = A.readDials(p), team = validTeam(p.team,"NED");
-      const close = nearest(team,dials,scope);
-      let compare = validTeam(p.compare,close[0]?.id || (team==="CRO" ? "NED" : "CRO"));
-      if(compare===team) compare=close[0]?.id || App.teams.find(t=>t.id!==team).id;
-      return {team,compare,dials,scope,task:tasks.some(t=>t.id===p.task)?p.task:"twins",arch:App.arch[p.arch]?p.arch:null,
-        cohort:p.cohort ? [...new Set(p.cohort.split(",").filter(id=>App.team[id]))] : null};
-    };
-    state=read(params);
-    root.innerHTML = `<div class="ex-workspace">
-      <div class="ex-work-top"><h1>Play alike. Compare the difference.</h1><div class="ex-task-tabs" role="group" aria-label="Analysis task">${tasks.map(t=>`<button type="button" data-mode="${t.id}">${t.title}</button>`).join("")}</div></div>
-      <div class="ex-toolbar"><label class="ex-field ex-a">Team A<select id="ex-team-a">${teamOptions()}</select></label><button class="ex-swap" type="button" aria-label="Swap teams">⇄</button><label class="ex-field ex-b">Team B<select id="ex-team-b">${teamOptions()}</select></label>
-        <label class="ex-field">Match scope<select id="ex-scope"><option value="all">Full tournament</option><option value="group">Group stage</option><option value="knockout">Knockout stage</option></select></label>
-        <details class="ex-settings"><summary id="ex-indicator-label">Style indicators</summary><div class="ex-settings-pop"><b>Choose at least two indicators</b><div id="ex-dials">${App.dials.map((d,i)=>`<label><input type="checkbox" value="${i}">${d}</label>`).join("")}</div><button type="button" id="ex-reset-dials">Reset indicators</button></div></details>
-        <button type="button" class="ex-reset" id="ex-clear">Reset filters</button>
+  function workspace(root,params) {
+    let state=stateFrom(params),space,summaries,profiles,visibleIds=[],hover=null,brushing=false;
+    let mapMode=state.view;
+    let resizeFrame=null;
+    const q=s=>root.querySelector(s);
+    root.innerHTML=`<div class="va-workbench">
+      <aside class="va-controls" aria-label="Analysis controls">
+        <section class="va-control-section"><h2>Analysis</h2>
+          <label>Task<select id="va-task">${options(tasks,state.task)}</select></label>
+          <label class="va-team-a">Team A<select id="va-a">${teamOptions()}</select></label>
+          <label class="va-team-b">Team B<select id="va-b">${teamOptions()}</select></label>
+          <button type="button" id="va-swap">Swap A / B</button>
+        </section>
+        <section class="va-control-section"><h2>Filters</h2>
+          <label>Search teams<input id="va-search" type="search" placeholder="Team name or code"></label>
+          <label>Match scope<select id="va-scope">${options([["all","Full tournament"],["group","Group stage"],["knockout","Knockout stage"]])}</select></label>
+          <label>Original style group<select id="va-group">${options([["","All groups"],...App.data.archetypes.map(a=>[a.id,a.name.replace("The ","")])])}</select></label>
+          <label>Numeric filter<select id="va-filter">${options(measures.map(m=>[m.id,m.label]))}</select></label>
+          <div class="va-range"><label>Minimum<input id="va-min" type="number" step="any" placeholder="Any"></label><label>Maximum<input id="va-max" type="number" step="any" placeholder="Any"></label></div>
+          <button type="button" id="va-reset">Reset filters</button>
+        </section>
+        <section class="va-control-section"><h2>Map encoding</h2>
+          <label>Projection<select id="va-view">${options([["pca","Style PCA"],["custom","Choose X and Y"]])}</select></label>
+          <div id="va-axis-controls"><label>X axis<select id="va-x">${options(measures.map(m=>[m.id,m.label]))}</select></label><label>Y axis<select id="va-y">${options(measures.map(m=>[m.id,m.label]))}</select></label></div>
+        </section>
+        <section class="va-control-section va-indicators"><h2>Similarity indicators <span id="va-dial-count"></span></h2>
+          <div id="va-dials">${App.dials.map((d,i)=>`<label title="${App.esc(App.dialInfo[d].help)}"><input type="checkbox" value="${i}"><span>${d}</span></label>`).join("")}</div>
+          <button type="button" id="va-dials-reset">Select all indicators</button>
+        </section>
+      </aside>
+      <div class="va-gutter" id="va-gutter-left" role="separator" tabindex="0" aria-label="Resize controls" aria-orientation="vertical" aria-valuemin="185" aria-valuemax="320" aria-valuenow="216"></div>
+      <div class="va-center">
+        <section class="va-panel va-map-panel"><header class="va-panel-head"><h2 id="va-map-title">Team map</h2><div class="va-inline-controls"><button type="button" id="va-brush" aria-pressed="false">Brush</button><button type="button" id="va-clear-region" hidden>Clear region</button><button type="button" id="va-reset-map">Reset axes</button></div></header>
+          <div class="va-map-meta"><span id="va-projection"></span><div class="va-key" id="va-key"></div></div>
+          <div id="va-map" class="va-chart"></div><div id="va-hover-detail" class="va-map-detail" aria-live="polite">Click a point to set B. Shift-click to set A.</div>
+        </section>
+        <div class="va-row-gutter" role="separator" tabindex="0" aria-label="Resize map and table" aria-orientation="horizontal" aria-valuemin="35" aria-valuemax="80" aria-valuenow="61"></div>
+        <section class="va-panel va-collection"><header class="va-panel-head"><h2>Team collection <span id="va-row-count"></span></h2><div class="va-inline-controls"><button type="button" id="va-clear-selection" hidden>Clear region</button><button type="button" id="va-export">Export rows</button></div></header>
+          <div class="va-table-scroll"><table id="va-team-table"><thead><tr><th scope="col">Select</th>${[["name","Team"],["n","Matches"],["distance","Style distance"],["xgd","xG diff."],["gd","Goal diff."]].map(([id,label])=>`<th scope="col"><button type="button" data-sort="${id}">${label}<span aria-hidden="true"></span></button></th>`).join("")}</tr></thead><tbody></tbody></table></div>
+        </section>
       </div>
-      <div class="ex-context" aria-live="polite" id="ex-context"></div>
-      <div class="ex-grid">
-        <section class="ex-panel ex-map-panel"><div class="ex-panel-head"><div><h2 id="ex-map-title">Style map</h2><span id="ex-map-sub"></span></div><div class="ex-map-actions"><button type="button" id="ex-brush" aria-pressed="false">Select region</button><select id="ex-arch" aria-label="Filter original style group"><option value="">All style groups</option>${App.data.archetypes.map(a=>`<option value="${a.id}">${a.name.replace("The ","")}</option>`).join("")}</select></div></div><div class="ex-viz" id="ex-map"></div><div class="ex-panel-caption" id="ex-map-caption"></div></section>
-        <section class="ex-panel ex-near-panel"><div class="ex-panel-head"><div><h2>Closest styles</h2><span id="ex-near-sub"></span></div><span class="ex-unit" title="Euclidean distance across the selected standardized indicators. Lower means closer.">Distance ↓</span></div><div id="ex-near" class="ex-near"></div></section>
-        <section class="ex-panel ex-profile-panel"><div class="ex-panel-head"><div><h2>Style fingerprint</h2><span>Selected teams + closest candidates</span></div><div class="ex-heat-legend"><span>Lower</span><i></i><span>Higher</span></div></div><div class="ex-viz" id="ex-profile"></div><div class="ex-panel-caption">Standardized indicators · 0 = tournament average · values shown in σ</div></section>
-        <section class="ex-panel ex-outcomes-panel"><div class="ex-panel-head"><div><h2 id="ex-evidence-title">Chances & results</h2><span id="ex-outcome-sub"></span></div><a id="ex-detail" href="#/twins">Open detail ↗</a></div><div class="ex-viz" id="ex-outcomes"></div><div class="ex-panel-caption" id="ex-outcome-caption"></div></section>
-      </div><div class="ex-desk-foot"><div class="ex-team-key" id="ex-key"></div><a id="ex-audit" href="#/robustness">Test this comparison ↗</a><a href="#/method">Data & method ↗</a></div>
+      <div class="va-gutter" id="va-gutter-right" role="separator" tabindex="0" aria-label="Resize comparison panels" aria-orientation="vertical" aria-valuemin="290" aria-valuemax="540" aria-valuenow="370"></div>
+      <div class="va-right">
+        <section class="va-panel va-fingerprint"><header class="va-panel-head"><h2>Style comparison</h2><span class="va-unit">Standard deviations</span></header><div class="va-chart" id="va-profile"></div></section>
+        <section class="va-panel va-results"><header class="va-panel-head"><h2>Outcomes / match</h2><select id="va-outcome-view" aria-label="Outcome chart">${options([["pair","A / B means"],["distribution","Filtered distribution"]])}</select></header><div class="va-chart" id="va-outcomes"></div></section>
+        <section class="va-panel va-evidence"><header class="va-panel-head"><h2>Match evidence</h2><a id="va-detail" href="#/twins">Pair detail ↗</a></header><div id="va-match-selection" class="va-match-selection"></div><div class="va-table-scroll"><table id="va-matches"><thead><tr><th>Team</th><th>Opponent</th><th>Stage</th><th>Score</th><th>xG diff.</th></tr></thead><tbody></tbody></table></div><div id="va-match-links" class="va-evidence-links"></div></section>
+      </div>
     </div>`;
-    let brushing = false;
-    const q = selector=>root.querySelector(selector);
-    function change(patch) { App.tip.hide(); App.go(url({...state,...patch})); }
-    q("#ex-team-a").addEventListener("change",e=>change({team:e.target.value,compare:e.target.value===state.compare?state.team:state.compare}));
-    q("#ex-team-b").addEventListener("change",e=>change({compare:e.target.value,team:e.target.value===state.team?state.compare:state.team}));
-    q(".ex-swap").addEventListener("click",()=>change({team:state.compare,compare:state.team}));
-    q("#ex-scope").addEventListener("change",e=>change({scope:e.target.value,cohort:null}));
-    q("#ex-arch").addEventListener("change",e=>change({arch:e.target.value||null,cohort:null}));
-    q("#ex-clear").addEventListener("click",()=>{brushing=false; change({arch:null,cohort:null,scope:"all",dials:App.dials.slice()}); render();});
-    q("#ex-brush").addEventListener("click",()=>{brushing=!brushing; drawMap();});
-    q("#ex-reset-dials").addEventListener("click",()=>change({dials:App.dials.slice(),cohort:null}));
-    q("#ex-dials").addEventListener("change",e=>{
-      const inputs=[...q("#ex-dials").querySelectorAll("input")], selected=inputs.filter(i=>i.checked);
-      if(selected.length<2) {e.target.checked=true; return;}
-      change({dials:selected.map(i=>App.dials[+i.value]),cohort:null});
+
+    const change=(patch,{replace=false}={})=>{App.tip.hide();App.go(stateUrl({...state,...patch}),{replace});};
+    const choose=(id,side="B")=>change(side==="A"?{team:id,compare:id===state.compare?state.team:state.compare,match:null}:{compare:id,team:id===state.team?state.compare:state.team,match:null});
+    const noRegion=()=>{brushing=false;change({cohort:null});drawMap();};
+    q("#va-a").onchange=e=>choose(e.target.value,"A");q("#va-b").onchange=e=>choose(e.target.value);
+    q("#va-swap").onclick=()=>change({team:state.compare,compare:state.team,match:null});
+    q("#va-task").onchange=e=>{const task=e.target.value;mapMode=task==="results"?"custom":"pca";change({task,view:mapMode,x:"xgd",y:"gd",cohort:null});};
+    q("#va-scope").onchange=e=>change({scope:e.target.value,cohort:null,match:null});
+    q("#va-group").onchange=e=>change({arch:e.target.value,cohort:null});
+    let searchTimer,rangeTimer;
+    q("#va-search").oninput=e=>{const text=e.target.value;clearTimeout(searchTimer);searchTimer=setTimeout(()=>change({search:text},{replace:true}),180);};
+    q("#va-filter").onchange=e=>change({filter:e.target.value,lo:null,hi:null});
+    [ ["#va-min","lo"], ["#va-max","hi"] ].forEach(([id,key])=>{
+      const input=q(id),apply=()=>{clearTimeout(rangeTimer);change({[key]:finiteParam(input.value)},{replace:true});};
+      input.oninput=()=>{clearTimeout(rangeTimer);rangeTimer=setTimeout(apply,300);};
+      input.onchange=apply;input.onkeydown=e=>{if(e.key==="Enter")apply();};
     });
-    root.querySelectorAll("[data-mode]").forEach(b=>b.addEventListener("click",()=>change({task:b.dataset.mode,cohort:null})));
-    function candidates() {return Object.keys(space.team).filter(id=>(!state.arch||App.team[id].archetype===state.arch)&&(!state.cohort||state.cohort.includes(id)));}
-    function neighbors() {const ids=new Set(candidates());return (table.near[state.team]||[]).filter(n=>ids.has(n.id));}
-    function selectedColor(id) {return id===state.team?BLUE:id===state.compare?ORANGE:"#a6afbe";}
-    function highlight(id) {
-      root.querySelectorAll("[data-team-mark]").forEach(el=>el.classList.toggle("ex-hover",el.dataset.teamMark===id));
+    q("#va-reset").onclick=()=>{brushing=false;change({arch:"",search:"",scope:"all",cohort:null,lo:null,hi:null,match:null});};
+    q("#va-view").onchange=e=>{mapMode=e.target.value;change({view:mapMode,cohort:null});};
+    q("#va-x").onchange=e=>change({x:e.target.value,cohort:null});q("#va-y").onchange=e=>change({y:e.target.value,cohort:null});
+    q("#va-brush").onclick=()=>{brushing=!brushing;drawMap();};q("#va-clear-region").onclick=noRegion;q("#va-clear-selection").onclick=noRegion;
+    q("#va-reset-map").onclick=()=>{mapMode="pca";brushing=false;change({view:"pca",cohort:null});drawMap();};
+    q("#va-dials-reset").onclick=()=>change({dials:App.dials.slice(),cohort:null});
+    q("#va-dials").onchange=e=>{const inputs=[...q("#va-dials").querySelectorAll("input")],selected=inputs.filter(i=>i.checked);if(selected.length<2){e.target.checked=true;return;}change({dials:selected.map(i=>App.dials[+i.value]),cohort:null});};
+    root.querySelectorAll("[data-sort]").forEach(b=>b.onclick=()=>change({sort:b.dataset.sort,desc:b.dataset.sort===state.sort?!state.desc:false}));
+    q("#va-export").onclick=()=>{
+      const rows=[["team","matches","style_distance_from_A","xg_difference_per_match","goal_difference_per_match"],...visibleIds.map(id=>[App.team[id].name,summaries[id].n,distance(id),summaries[id].xgd,summaries[id].gd])];
+      const csv=rows.map(row=>row.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\n");
+      const href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})),link=document.createElement("a");link.href=href;link.download="style-twins-filtered-teams.csv";link.click();setTimeout(()=>URL.revokeObjectURL(href),1000);
+    };
+    q("#va-outcome-view").onchange=drawOutcomes;
+    function metric(id,key) {if(key.startsWith("dial"))return profiles[id]?.[+key.slice(4)]??null;return summaries[id]?.[key]??null;}
+    function recordMetric(row,key) {if(key.startsWith("dial"))return row.dials[+key.slice(4)];if(key==="conceded")return row.goals_opp;return A.metric(row,key);}
+    function distance(id) {return space.team[state.team]&&space.team[id]?App.dist(space.team[state.team],space.team[id]):null;}
+    function matchingIds() {
+      const needle=state.search.toLocaleLowerCase();
+      return Object.keys(space.team).filter(id=>{
+        const t=App.team[id],v=metric(id,state.filter),name=App.i18n?.t(t.name)||t.name;
+        return (!state.arch||t.archetype===state.arch)&&(!state.cohort||state.cohort.includes(id))
+          &&(!needle||`${t.name} ${name} ${id}`.toLocaleLowerCase().includes(needle))
+          &&(state.lo===null||(Number.isFinite(v)&&v>=state.lo))&&(state.hi===null||(Number.isFinite(v)&&v<=state.hi));
+      });
     }
-    function bindMark(selection, idOf) {
-      selection.attr("data-team-mark",idOf)
-        .on("mouseenter",(e,d)=>highlight(idOf(d))).on("mouseleave",()=>{highlight(null);App.tip.hide();});
+    function focusedRecord(){return state.match?recordByKey[state.match]:null;}
+    function highlight(id,{reveal=false}={}) {
+      hover=id;
+      root.querySelectorAll("[data-team-mark]").forEach(el=>el.classList.toggle("va-hover",el.dataset.teamMark===id));
+      if(reveal&&id){const row=q(`#va-team-table tr[data-team-mark="${id}"]`),scroller=q(".va-collection .va-table-scroll");if(row){const r=row.getBoundingClientRect(),s=scroller.getBoundingClientRect();if(r.top<s.top+30)scroller.scrollTop-=s.top+30-r.top;else if(r.bottom>s.bottom)scroller.scrollTop+=r.bottom-s.bottom;}}
+      if(id){const t=App.team[id];q("#va-hover-detail").textContent=`${t.name} · ${summaries[id].n} matches · xG diff. ${fmt(summaries[id].xgd)} · goal diff. ${fmt(summaries[id].gd)}`;}
+      else q("#va-hover-detail").textContent=focusedRecord()?`${App.team[focusedRecord().team_id].name} vs ${App.team[focusedRecord().opp_id].name} · match selected`:"Click a point to set B. Shift-click to set A.";
+      drawProfile();
+    }
+    function updateControls() {
+      [["#va-a",state.team],["#va-b",state.compare],["#va-task",state.task],["#va-scope",state.scope],["#va-group",state.arch],["#va-view",mapMode],["#va-x",state.x],["#va-y",state.y],["#va-filter",state.filter]].forEach(([id,value])=>q(id).value=value);
+      if(document.activeElement!==q("#va-search"))q("#va-search").value=state.search;
+      q("#va-min").value=state.lo??"";q("#va-max").value=state.hi??"";
+      q("#va-min").setCustomValidity(state.lo!==null&&state.hi!==null&&state.lo>state.hi?"Minimum exceeds maximum":"");
+      q("#va-axis-controls").hidden=mapMode!=="custom";
+      q("#va-dial-count").textContent=`(${state.dials.length}/10)`;
+      q("#va-dials").querySelectorAll("input").forEach(i=>{i.checked=state.dials.includes(App.dials[+i.value]);i.disabled=i.checked&&state.dials.length===2;});
+      q("#va-key").innerHTML=`<span class="va-key-a">● A · ${App.team[state.team].name}</span><span class="va-key-b">● B · ${App.team[state.compare].name}</span>`;
+      q("#va-detail").href=`#/twins/${state.team}/${state.compare}${A.query(state.dials,{scope:state.scope,return:stateUrl(state)})}`;
     }
     function render() {
-      const grid=q(".ex-grid");
-      grid.style.height=window.innerWidth>1150?`${Math.max(400,window.innerHeight-grid.getBoundingClientRect().top-48)}px`:"";
-      space=A.space(state.dials,state.scope);table=A.twinTable(space);
+      currentState=state;hover=null;
+      space=A.space(state.dials,state.scope);
       summaries=Object.fromEntries(App.teams.map(t=>[t.id,A.summary(A.rows(t.id,state.scope))]));
-      q("#ex-team-a").value=state.team; q("#ex-team-b").value=state.compare;q("#ex-scope").value=state.scope;q("#ex-arch").value=state.arch||"";
-      q("#ex-indicator-label").textContent=`Style indicators (${state.dials.length})`;
-      q("#ex-dials").querySelectorAll("input").forEach(input=>{input.checked=state.dials.includes(App.dials[+input.value]);input.disabled=input.checked&&state.dials.length<=2;});
-      root.querySelectorAll("[data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===state.task));
-      const a=summaries[state.team],b=summaries[state.compare],n=(table.near[state.team]||[]).find(n=>n.id===state.compare);
-      q("#ex-context").innerHTML=`<b>${App.team[state.team].name} & ${App.team[state.compare].name}</b><span>${n?`Similarity percentile: ${Math.round(n.sim*100)}/100`:"No comparable profile in this scope"}</span><span>${a.n} + ${b.n} matches</span><span>${candidates().length} teams in view</span>${state.cohort?'<button type="button" id="ex-clear-region">Clear region ×</button>':""}`;
-      q("#ex-clear-region")?.addEventListener("click",()=>change({cohort:null}));
-      q("#ex-key").innerHTML=`<span class="ex-key-a">● A · ${App.team[state.team].name}</span><span class="ex-key-b">● B · ${App.team[state.compare].name}</span>`;
-      q("#ex-detail").href=`#/twins/${state.team}/${state.compare}${A.query(state.dials,{scope:state.scope,return:url(state)})}`;
-      q("#ex-audit").href=`#/robustness/${state.team}/${state.compare}${A.query(state.dials,{scope:state.scope,return:url(state)})}`;
-      drawMap();drawNeighbors();drawProfile();drawOutcomes();
+      profiles=Object.fromEntries(App.teams.map(t=>[t.id,App.dials.map((_,i)=>d3.mean(A.rows(t.id,state.scope),r=>r.dials[i]))]));
+      visibleIds=matchingIds();updateControls();drawTable();drawMap();drawProfile();drawOutcomes();drawMatches();
+    }
+    function drawTable() {
+      const ids=[...visibleIds];
+      ids.sort((a,b)=>{
+        let cmp;
+        if(state.sort==="name")cmp=App.team[a].name.localeCompare(App.team[b].name);
+        else {const x=state.sort==="distance"?distance(a):summaries[a][state.sort],y=state.sort==="distance"?distance(b):summaries[b][state.sort];cmp=x==null?(y==null?0:1):y==null?-1:x-y;}
+        return (state.desc?-cmp:cmp)||a.localeCompare(b);
+      });
+      // Pins keep the explicit comparison visible, without adding it to the filtered set.
+      const pins=[state.team,state.compare].filter(id=>!visibleIds.includes(id));
+      const display=[...pins,...ids],cohortSet=new Set(visibleIds);
+      q("#va-row-count").textContent=`${visibleIds.length} / ${Object.keys(space.team).length}`;
+      root.querySelectorAll("[data-sort]").forEach(b=>{b.parentElement.setAttribute("aria-sort",b.dataset.sort===state.sort?(state.desc?"descending":"ascending"):"none");b.querySelector("span").textContent=b.dataset.sort===state.sort?(state.desc?" ↓":" ↑"):"";});
+      q("#va-team-table tbody").innerHTML=display.map(id=>{
+        const t=App.team[id],s=summaries[id],selected=id===state.team?"a":id===state.compare?"b":"";
+        return `<tr data-team-mark="${id}" class="${selected?`va-selected-${selected}`:""}${cohortSet.has(id)?"":" va-pinned"}" tabindex="0" aria-label="${App.esc(t.name)}, select as Team B">
+          <td class="va-select-cell"><button type="button" data-pick="A" aria-label="Set ${App.esc(t.name)} as Team A" aria-pressed="${id===state.team}">A</button><button type="button" data-pick="B" aria-label="Set ${App.esc(t.name)} as Team B" aria-pressed="${id===state.compare}">B</button></td>
+          <th scope="row">${App.flag(id,18)}<span>${t.name}</span>${cohortSet.has(id)?"":'<span class="va-pin" title="Kept as selected comparison; outside the current filter">Pinned</span>'}</th><td>${s.n}</td><td>${id===state.team?"—":fmt(distance(id))}</td><td>${fmt(s.xgd)}</td><td>${fmt(s.gd)}</td></tr>`;
+      }).join("");
+      q("#va-team-table tbody").querySelectorAll("tr").forEach(row=>{
+        const id=row.dataset.teamMark;
+        row.onclick=e=>choose(id,e.target.closest("[data-pick]")?.dataset.pick||"B");
+        row.onkeydown=e=>{if((e.key==="Enter"||e.key===" ")&&e.target===row){e.preventDefault();choose(id,e.shiftKey?"A":"B");}};
+        row.onmouseenter=()=>highlight(id);row.onmouseleave=()=>highlight(null);
+      });
     }
     function drawMap() {
-      const {svg,W,H}=chart(q("#ex-map"),state.task==="results"?"Chance and goal differences by team":"Team playing-style map");
-      const m={l:48,r:26,t:20,b:H<180?32:42}, resultMode=state.task==="results";
-      const ids=Object.keys(space.team), pca=App.pca2(space), positions=Object.fromEntries(ids.map(id=>[id,resultMode?[summaries[id].xgd,summaries[id].gd]:pca.project(space.team[id])]));
-      const scale=axis=> {const vals=Object.values(positions).map(p=>p[axis]);let [lo,hi]=d3.extent(vals); if(lo===hi){lo-=1;hi+=1;} const pad=(hi-lo)*.12;return d3.scaleLinear().domain([lo-pad,hi+pad]).nice().range(axis?[H-m.b,m.t]:[m.l,W-m.r]);};
-      q("#ex-map-title").textContent=resultMode?"Chances vs scorelines":"Style map";
-      q("#ex-map-sub").textContent=resultMode?"One dot per team · averages per match":`PCA projection · ${Math.round(d3.sum(pca.vars)*100)}% of style variation shown`;
-      q("#ex-brush").setAttribute("aria-pressed",brushing);
-      q("#ex-map-caption").textContent=brushing?"Drag a region to filter candidates across panels. A and B stay pinned.":"Click a team to set B · Shift-click to set A · Hover to link panels";
-      if(!ids.length) {svg.append("text").attr("x",25).attr("y",50).text("No teams in this scope");return;}
-      const x=scale(0),y=scale(1);
-      svg.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).ticks(5).tickSize(-(H-m.t-m.b))).call(g=>g.select(".domain").remove());
-      svg.append("g").attr("transform",`translate(${m.l},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W-m.l-m.r))).call(g=>g.select(".domain").remove());
-      svg.selectAll(".tick line").attr("stroke",GRID); svg.selectAll(".tick text").attr("fill",MUTED).attr("font-size",13);
-      svg.append("text").attr("x",W-m.r).attr("y",H-8).attr("text-anchor","end").attr("fill",MUTED).text(resultMode?"xG difference / match →":"Style axis 1 →");
-      svg.append("text").attr("x",m.l).attr("y",16).attr("fill",MUTED).text(resultMode?"Goal difference / match ↑":"Style axis 2 ↑");
-      if(resultMode){const lo=Math.max(x.domain()[0],y.domain()[0]),hi=Math.min(x.domain()[1],y.domain()[1]);svg.append("line").attr("x1",x(lo)).attr("y1",y(lo)).attr("x2",x(hi)).attr("y2",y(hi)).attr("stroke","#9ba6b8").attr("stroke-dasharray","5 5");}
-      const visible=new Set(candidates()), near=new Set(neighbors().slice(0,4).map(n=>n.id));
-      if(positions[state.team]&&positions[state.compare]) svg.append("line").attr("x1",x(positions[state.team][0])).attr("y1",y(positions[state.team][1])).attr("x2",x(positions[state.compare][0])).attr("y2",y(positions[state.compare][1])).attr("stroke",INK).attr("stroke-dasharray","4 4").attr("stroke-opacity",.4);
-      const marks=svg.append("g").selectAll("g").data(ids).join("g").attr("class","ex-map-mark").attr("transform",id=>`translate(${x(positions[id][0])},${y(positions[id][1])})`).attr("opacity",id=>visible.has(id)||id===state.team||id===state.compare?1:.18).attr("aria-label",id=>`${App.team[id].name}: select as Team B`);
-      marks.append("circle").attr("class","ex-mark-halo").attr("r",13).attr("fill","none").attr("stroke",INK).attr("stroke-width",2).attr("opacity",0);
-      marks.append("circle").attr("r",id=>id===state.team||id===state.compare?8:5.5).attr("fill",selectedColor).attr("stroke","white").attr("stroke-width",1.7);
-      marks.filter(id=>id===state.team||id===state.compare).raise();
-      // Label placement adjusts labels only; projected dots remain at their exact positions.
-      const labelIds=ids.filter(id=>id===state.team||id===state.compare||near.has(id));
-      const labels=labelIds.map(id=>({id,x:x(positions[id][0]),y:y(positions[id][1])-14,ax:x(positions[id][0]),ay:y(positions[id][1])-14}));
-      const simulation=d3.forceSimulation(labels).force("x",d3.forceX(d=>d.ax).strength(.5)).force("y",d3.forceY(d=>d.ay).strength(.7)).force("collision",d3.forceCollide(15)).stop();
-      for(let i=0;i<70;i++)simulation.tick();
-      const labelGroup=svg.append("g").attr("pointer-events","none");
-      labelGroup.selectAll("line").data(labels.filter(d=>Math.hypot(d.x-d.ax,d.y-d.ay)>8)).join("line").attr("x1",d=>d.ax).attr("y1",d=>d.ay+10).attr("x2",d=>Math.max(18,Math.min(W-18,d.x))).attr("y2",d=>Math.max(32,Math.min(H-m.b-10,d.y))).attr("stroke","#c6cdd7");
-      labelGroup.selectAll("text").data(labels).join("text").attr("x",d=>Math.max(18,Math.min(W-18,d.x))).attr("y",d=>Math.max(32,Math.min(H-m.b-10,d.y))).attr("text-anchor","middle").attr("font-size",13).attr("font-weight",d=>d.id===state.team||d.id===state.compare?800:500).attr("fill",d=>selectedColor(d.id)=== "#a6afbe"?INK:selectedColor(d.id)).attr("paint-order","stroke").attr("stroke","white").attr("stroke-width",3).text(d=>d.id);
-      activate(marks,(e,id)=>change(e.shiftKey?{team:id,compare:id===state.compare?state.team:state.compare}:{compare:id,team:id===state.team?state.compare:state.team}));
-      bindMark(marks,id=>id);
-      marks.on("mousemove",(e,id)=>App.tip.show(`<b>${App.team[id].name}</b>${App.ttRows([["xG difference / match",fmt(summaries[id].xgd)],["Goal difference / match",fmt(summaries[id].gd)],["Matches",summaries[id].n]])}`,e));
-      if(brushing) svg.append("g").attr("class","ex-brush-layer").call(d3.brush().extent([[m.l,m.t],[W-m.r,H-m.b]]).on("end",e=>{
-        if(!e.sourceEvent)return;
-        const box=e.selection;
-        const cohort=box?ids.filter(id=>{const px=x(positions[id][0]),py=y(positions[id][1]);return px>=box[0][0]&&px<=box[1][0]&&py>=box[0][1]&&py<=box[1][1];}):null;
+      const {svg,W,H}=svgFor(q("#va-map"),"Team map with linked selection");
+      const m={l:43,r:16,t:16,b:38},pca=App.pca2(space),ids=Object.keys(space.team);
+      const pos=Object.fromEntries(ids.map(id=>[id,mapMode==="pca"?pca.project(space.team[id]):[metric(id,state.x),metric(id,state.y)]]).filter(([,v])=>v.every(Number.isFinite)));
+      const focus=focusedRecord();let focusPos=focus?(mapMode==="pca"?pca.project(space.match[focus.key]):[recordMetric(focus,state.x),recordMetric(focus,state.y)]):null;
+      if(focusPos&&!focusPos.every(Number.isFinite))focusPos=null;
+      const plotted=Object.keys(pos),positions=Object.values(pos).concat(focusPos?[focusPos]:[]),scales=[0,1].map(i=>{let [lo,hi]=d3.extent(positions,p=>p[i]);if(lo==null){lo=-1;hi=1;}if(lo===hi){lo-=1;hi+=1;}const pad=(hi-lo)*.09;return d3.scaleLinear().domain([lo-pad,hi+pad]).nice().range(i?[H-m.b,m.t]:[m.l,W-m.r]);}),[x,y]=scales;
+      q("#va-map-title").textContent=mapMode==="pca"?"Style space":"Team measures";
+      q("#va-projection").textContent=mapMode==="pca"?`PCA · ${Math.round(d3.sum(pca.vars)*100)}% variation`:"Team means in the selected match scope";
+      q("#va-brush").setAttribute("aria-pressed",brushing);
+      q("#va-clear-region").hidden=state.cohort===null;q("#va-clear-selection").hidden=state.cohort===null;
+      svg.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).ticks(6).tickSize(-(H-m.t-m.b))).call(g=>g.select(".domain").remove());
+      svg.append("g").attr("transform",`translate(${m.l},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W-m.l-m.r))).call(g=>g.select(".domain").remove());
+      svg.selectAll(".tick line").attr("stroke",GRID);svg.selectAll(".tick text").attr("fill",MUTED).attr("font-size",12);
+      svg.append("text").attr("x",W-m.r).attr("y",H-6).attr("text-anchor","end").attr("fill",MUTED).text(mapMode==="pca"?"Style axis 1":`${metricById[state.x].label} (${metricById[state.x].unit})`);
+      svg.append("text").attr("x",m.l+5).attr("y",12).attr("fill",MUTED).text(mapMode==="pca"?"Style axis 2":`${metricById[state.y].label} (${metricById[state.y].unit})`);
+      if(mapMode==="custom"&&state.x==="xgd"&&state.y==="gd"){
+        const lo=Math.max(x.domain()[0],y.domain()[0]),hi=Math.min(x.domain()[1],y.domain()[1]);
+        svg.append("line").attr("x1",x(lo)).attr("x2",x(hi)).attr("y1",y(lo)).attr("y2",y(hi)).attr("stroke","#9ca4ad").attr("stroke-dasharray","4 4");
+      }
+      const visible=new Set(visibleIds);
+      if(pos[state.team]&&pos[state.compare])svg.append("line").attr("x1",x(pos[state.team][0])).attr("y1",y(pos[state.team][1])).attr("x2",x(pos[state.compare][0])).attr("y2",y(pos[state.compare][1])).attr("stroke",INK).attr("stroke-dasharray","3 4").attr("opacity",.35);
+      const marks=svg.append("g").selectAll("g").data(plotted).join("g").attr("class","va-map-mark").attr("data-team-mark",id=>id).attr("transform",id=>`translate(${x(pos[id][0])},${y(pos[id][1])})`).attr("opacity",id=>visible.has(id)||[state.team,state.compare].includes(id)?1:.16).attr("aria-label",id=>`${App.team[id].name}, select as Team B`);
+      marks.append("circle").attr("class","va-halo").attr("r",12).attr("fill","none").attr("stroke",INK).attr("stroke-width",1.8);
+      marks.append("circle").attr("r",id=>[state.team,state.compare].includes(id)?7:4.5).attr("fill",color).attr("stroke","white").attr("stroke-width",1.2);
+      marks.filter(id=>[state.team,state.compare].includes(id)).raise();
+      interactive(marks,(e,id)=>choose(id,e.shiftKey?"A":"B"));
+      marks.on("mouseenter",(e,id)=>highlight(id,{reveal:true})).on("mouseleave",()=>highlight(null));
+      const labeled=plotted.filter(id=>[state.team,state.compare].includes(id));
+      const labels=labeled.map(id=>({id,x:x(pos[id][0]),y:y(pos[id][1])-13,ax:x(pos[id][0]),ay:y(pos[id][1])-13}));
+      const sim=d3.forceSimulation(labels).force("x",d3.forceX(d=>d.ax).strength(.5)).force("y",d3.forceY(d=>d.ay).strength(.7)).force("collide",d3.forceCollide(17)).stop();for(let i=0;i<60;i++)sim.tick();
+      svg.append("g").attr("pointer-events","none").selectAll("text").data(labels).join("text").attr("x",d=>Math.max(m.l,Math.min(W-m.r,d.x))).attr("y",d=>Math.max(23,Math.min(H-m.b-8,d.y))).attr("text-anchor","middle").attr("fill",d=>color(d.id)).attr("font-weight",700).attr("paint-order","stroke").attr("stroke","white").attr("stroke-width",3).text(d=>d.id);
+      if(focusPos){
+        const [px,py]=[x(focusPos[0]),y(focusPos[1])];
+        if(pos[focus.team_id])svg.append("line").attr("x1",px).attr("y1",py).attr("x2",x(pos[focus.team_id][0])).attr("y2",y(pos[focus.team_id][1])).attr("stroke",INK).attr("stroke-dasharray","2 3");
+        svg.append("path").attr("d",d3.symbol(d3.symbolDiamond,110)()).attr("transform",`translate(${px},${py})`).attr("fill","white").attr("stroke",INK).attr("stroke-width",2);
+        svg.append("text").attr("x",px+10).attr("y",Math.min(H-m.b-6,py+24)).attr("fill",INK).text(`${focus.team_id} · M${focus.number}`);
+      }
+      if(!plotted.length)svg.append("text").attr("x",m.l+10).attr("y",H/2).text("No profiles in this match scope");
+      if(brushing)svg.append("g").attr("class","va-brush-layer").call(d3.brush().extent([[m.l,m.t],[W-m.r,H-m.b]]).on("end",e=>{
+        if(!e.sourceEvent)return;const box=e.selection;
+        const cohort=box?plotted.filter(id=>{const px=x(pos[id][0]),py=y(pos[id][1]);return px>=box[0][0]&&px<=box[1][0]&&py>=box[0][1]&&py<=box[1][1];}):null;
         brushing=false;change({cohort});
       }));
     }
-    function drawNeighbors() {
-      const rows=neighbors().slice(0,4), max= d3.max(rows,n=>n.d)||1;
-      q("#ex-near-sub").textContent=`For ${App.team[state.team].name} · click to set B`;
-      q("#ex-near").innerHTML=rows.length?rows.map((n,i)=>`<button type="button" data-neighbor="${n.id}" data-team-mark="${n.id}" aria-pressed="${n.id===state.compare}"><span class="ex-rank">${i+1}</span>${App.flag(n.id,25)}<span class="ex-neighbor-name">${App.team[n.id].name}<span class="ex-distance-track"><i style="width:${n.d/max*100}%"></i></span></span><b>${fmt(n.d)}</b></button>`).join(""):`<div class="ex-empty">No candidates in this selection.<br>Change the scope or reset filters.</div>`;
-      q("#ex-near").querySelectorAll("button").forEach(button=>{
-        button.addEventListener("click",()=>change({compare:button.dataset.neighbor}));
-        button.addEventListener("mouseenter",()=>highlight(button.dataset.neighbor));button.addEventListener("mouseleave",()=>highlight(null));
-      });
-    }
     function drawProfile() {
-      const {svg,W,H}=chart(q("#ex-profile"),"Standardized style indicators for selected teams and closest candidates");
-      const ids=[...new Set([state.team,state.compare,...neighbors().slice(0,4).map(n=>n.id)])];
-      const m={l:154,r:12,t:29,b:6},x=d3.scaleBand().domain(ids).range([m.l,W-m.r]).padding(.1), y=d3.scaleBand().domain(state.dials).range([m.t,H-m.b]).padding(.12);
-      const color=d3.scaleSequential(d3.interpolatePurples).domain([-2.5,2.5]).clamp(true);
-      const heads=svg.selectAll("g.ex-heat-head").data(ids).join("g").attr("class","ex-heat-head").attr("aria-label",id=>`Select ${App.team[id].name} as Team B`);
-      heads.append("text").attr("x",id=>x(id)+x.bandwidth()/2).attr("y",18).attr("text-anchor","middle").attr("fill",id=>id===state.team||id===state.compare?selectedColor(id):INK).attr("font-weight",700).text(id=>`${id===state.team?"A · ":id===state.compare?"B · ":""}${id}`);
-      activate(heads,(e,id)=>change({compare:id,team:id===state.team?state.compare:state.team}));bindMark(heads,id=>id);
-      state.dials.forEach((dial,j)=>{
-        svg.append("text").attr("x",m.l-12).attr("y",y(dial)+y.bandwidth()/2+4).attr("text-anchor","end").text(dial);
-        const cells=svg.append("g").selectAll("g").data(ids).join("g").attr("aria-label",id=>`${App.team[id].name}, ${dial}: ${fmt(space.team[id]?.[j],1)} standard deviations`);
-        cells.append("rect").attr("x",id=>x(id)).attr("y",y(dial)).attr("width",x.bandwidth()).attr("height",y.bandwidth()).attr("rx",3).attr("fill",id=>space.team[id]?color(space.team[id][j]):"#eceff3");
-        cells.append("text").attr("x",id=>x(id)+x.bandwidth()/2).attr("y",y(dial)+y.bandwidth()/2+4).attr("text-anchor","middle").attr("fill",id=>space.team[id]&&App.luminance(color(space.team[id][j]))<.18?"#fff":"#000").text(id=>fmt(space.team[id]?.[j],1));
-        activate(cells,(e,id)=>change({compare:id,team:id===state.team?state.compare:state.team}));bindMark(cells,id=>id);
-        cells.on("mousemove",(e,id)=>App.tip.show(`<b>${App.team[id].name} · ${dial}</b><div>${fmt(space.team[id]?.[j],2)} σ</div><div>${App.dialInfo[dial].help}</div>`,e));
+      const {svg,W,H}=svgFor(q("#va-profile"),"Style profiles of A, B and the focused record",238);
+      const m={l:122,r:16,t:16,b:25},focus=focusedRecord(),extra=focus?{id:focus.team_id,vector:space.match[focus.key],match:true}:hover&&![state.team,state.compare].includes(hover)?{id:hover,vector:space.team[hover],match:false}:null;
+      const vectors=[space.team[state.team],space.team[state.compare],extra?.vector].filter(Boolean);
+      const extent=Math.max(2,d3.max(vectors,v=>d3.max(v,x=>Math.abs(x)))||2);
+      const x=d3.scaleLinear().domain([-extent,extent]).range([m.l,W-m.r]),y=d3.scalePoint().domain(state.dials).range([m.t,H-m.b]).padding(.35);
+      [-extent,0,extent].forEach(v=>svg.append("line").attr("x1",x(v)).attr("x2",x(v)).attr("y1",7).attr("y2",H-m.b+4).attr("stroke",v===0?"#a0a7af":GRID).attr("stroke-dasharray",v===0?null:"2 3"));
+      state.dials.forEach((dial,i)=>{
+        svg.append("text").attr("x",m.l-10).attr("y",y(dial)+4).attr("text-anchor","end").text(dial);
+        const a=space.team[state.team]?.[i],b=space.team[state.compare]?.[i];
+        if(Number.isFinite(a)&&Number.isFinite(b))svg.append("line").attr("x1",x(a)).attr("x2",x(b)).attr("y1",y(dial)).attr("y2",y(dial)).attr("stroke","#c2c8ce").attr("stroke-width",2);
+        [state.team,state.compare].forEach(id=>{const v=space.team[id]?.[i];if(!Number.isFinite(v))return;const g=svg.append("g").attr("data-team-mark",id);g.append("circle").attr("cx",x(v)).attr("cy",y(dial)).attr("r",4).attr("fill",color(id));g.append("title").text(`${App.team[id].name} · ${dial}: ${fmt(v)} σ`);});
+        if(extra?.vector){const v=extra.vector[i];if(Number.isFinite(v))svg.append("path").attr("d",d3.symbol(extra.match?d3.symbolDiamond:d3.symbolCircle,35)()).attr("transform",`translate(${x(v)},${y(dial)})`).attr("stroke",INK).attr("fill","white").append("title").text(`${extra.id} · ${extra.match?`M${focus.number}`:"hovered"}: ${fmt(v)} σ`);}
       });
+      svg.append("text").attr("x",x(0)).attr("y",H-5).attr("text-anchor","middle").attr("fill",MUTED).text("0 = tournament average");
+      [-extent,extent].forEach(v=>svg.append("text").attr("x",x(v)).attr("y",H-5).attr("text-anchor","middle").attr("fill",MUTED).text(`${fmt(v,1)}σ`));
     }
     function drawOutcomes() {
-      const matches=state.task==="matches";
-      q("#ex-evidence-title").textContent=matches?"Match evidence":"Chances & results";
-      q("#ex-outcome-sub").textContent=matches?"Each dot is a match · click to inspect":"Averages per match · same selected scope";
-      q("#ex-outcome-caption").textContent=matches?"Goal difference by match · dashed line = team average":"Per-match averages · xG = expected goals";
-      if(matches) {drawMatches();return;}
-      const {svg,W,H}=chart(q("#ex-outcomes"),"Selected teams' chances and results per match");
-      const metrics=[["xg","Expected goals"],["goals","Goals scored"],["xga","Expected conceded"],["conceded","Goals conceded"]];
-      const m={l:155,r:38,t:12,b:30}, max=Math.max(1,d3.max([state.team,state.compare],id=>d3.max(metrics,([key])=>summaries[id][key]))||1);
-      const x=d3.scaleLinear().domain([0,max*1.2]).nice().range([m.l,W-m.r]), y=d3.scaleBand().domain(metrics.map(m=>m[0])).range([m.t,H-m.b]).padding(.28);
+      if(q("#va-outcome-view").value==="distribution"){drawDistribution();return;}
+      const {svg,W,H}=svgFor(q("#va-outcomes"),"Observed team averages per match");
+      const metrics=[["xg","xG"],["goals","Goals"],["xga","xG against"],["conceded","Conceded"]],m={l:83,r:35,t:8,b:21};
+      const max=Math.max(1,d3.max([state.team,state.compare],id=>d3.max(metrics,([key])=>summaries[id][key]))||1),x=d3.scaleLinear().domain([0,max*1.18]).nice().range([m.l,W-m.r]),y=d3.scaleBand().domain(metrics.map(m=>m[0])).range([m.t,H-m.b]).padding(.22);
       svg.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).ticks(4).tickSize(-(H-m.t-m.b))).call(g=>g.select(".domain").remove());svg.selectAll(".tick line").attr("stroke",GRID);
       metrics.forEach(([key,label])=>{
-        svg.append("text").attr("x",m.l-12).attr("y",y(key)+y.bandwidth()/2+4).attr("text-anchor","end").text(label);
-        [state.team,state.compare].forEach((id,i)=>{
-          const yy=y(key)+i*y.bandwidth()/2,v=summaries[id][key], valid=Number.isFinite(v);
-          const g=svg.append("g").attr("data-team-mark",id);
-          g.append("rect").attr("x",m.l).attr("y",yy).attr("width",valid?Math.max(0,x(v)-m.l):0).attr("height",Math.max(5,y.bandwidth()/2-2)).attr("rx",2).attr("fill",selectedColor(id));
-          g.append("text").attr("x",valid?x(v)+5:m.l+6).attr("y",yy+y.bandwidth()/4+4).attr("fill",selectedColor(id)).attr("font-weight",650).text(fmt(v));
+        svg.append("text").attr("x",m.l-9).attr("y",y(key)+y.bandwidth()/2+4).attr("text-anchor","end").text(label);
+        [state.team,state.compare].forEach((id,i)=>{const v=summaries[id][key],yy=y(key)+i*y.bandwidth()/2,valid=Number.isFinite(v),g=svg.append("g").attr("data-team-mark",id);
+          g.append("rect").attr("x",m.l).attr("y",yy).attr("width",valid?Math.max(0,x(v)-m.l):0).attr("height",Math.max(3,y.bandwidth()/2-2)).attr("fill",color(id));
+          g.append("text").attr("x",valid?x(v)+4:m.l+4).attr("y",yy+y.bandwidth()/4+4).attr("fill",color(id)).text(fmt(v));
           g.on("mouseenter",()=>highlight(id)).on("mouseleave",()=>highlight(null));
         });
       });
     }
-    function drawMatches() {
-      const {svg,W,H}=chart(q("#ex-outcomes"),"Each selected team's match goal differences");
-      const ids=[state.team,state.compare],rows=ids.flatMap(id=>A.rows(id,state.scope));
-      const m={l:62,r:24,t:24,b:35},extent=d3.extent(rows,r=>A.metric(r,"gd")), max=Math.max(1,Math.abs(extent[0]||0),Math.abs(extent[1]||0));
-      const x=d3.scalePoint().domain(d3.range(d3.max(ids,id=>A.rows(id,state.scope).length)||1)).range([m.l,W-m.r]).padding(.4),y=d3.scaleLinear().domain([-max-1,max+1]).range([H-m.b,m.t]);
-      svg.append("g").attr("transform",`translate(${m.l-14},0)`).call(d3.axisLeft(y).ticks(4).tickSize(-(W-m.l-m.r+14))).call(g=>g.select(".domain").remove());svg.selectAll(".tick line").attr("stroke",GRID);
-      svg.append("text").attr("x",m.l).attr("y",15).attr("fill",MUTED).text("Goal difference");
-      ids.forEach((id,k)=>{
-        const teamRows=A.rows(id,state.scope).slice().sort((a,b)=>a.number-b.number),mean=summaries[id].gd;
-        if(!teamRows.length)return;
-        svg.append("line").attr("x1",m.l).attr("x2",W-m.r).attr("y1",y(mean)).attr("y2",y(mean)).attr("stroke",selectedColor(id)).attr("stroke-dasharray","5 5");
-        const points=svg.append("g").selectAll("g").data(teamRows).join("g").attr("transform",(r,i)=>`translate(${x(i)+(k?5:-5)},${y(A.metric(r,"gd"))})`).attr("aria-label",r=>`${App.team[id].name} against ${App.team[r.opp_id].name}, ${r.goals}–${r.goals_opp}, open match`);
-        points.append("circle").attr("r",8).attr("fill",selectedColor(id)).attr("stroke","white").attr("stroke-width",2);
-        points.append("text").attr("y",k?24:-15).attr("text-anchor","middle").attr("fill",selectedColor(id)).text(r=>r.opp_id);
-        activate(points,(e,r)=>App.go(`#/match/${r.match_id}${A.query(state.dials,{return:url(state)})}`));bindMark(points,()=>id);
-        points.on("mousemove",(e,r)=>App.tip.show(`<b>${App.team[id].name} ${r.goals}–${r.goals_opp} ${App.team[r.opp_id].name}</b><div>${App.stageShort(r.stage)} · xG ${fmt(r.xg)}–${fmt(r.xga)}</div>`,e));
+    function drawDistribution() {
+      const {svg,W,H}=svgFor(q("#va-outcomes"),"Distribution of filtered teams' goal differences");
+      const m={l:29,r:13,t:22,b:27},all=Object.keys(space.team).map(id=>({id,value:summaries[id].gd})).filter(d=>Number.isFinite(d.value));
+      let [lo,hi]=d3.extent(all,d=>d.value);if(lo==null){lo=-1;hi=1;}if(lo===hi){lo-=1;hi+=1;}
+      const x=d3.scaleLinear().domain([lo-.1,hi+.1]).nice().range([m.l,W-m.r]),bins=d3.bin().value(d=>d.value).domain(x.domain()).thresholds(9)(all),visible=new Set(visibleIds);
+      const y=d3.scaleLinear().domain([0,d3.max(bins,b=>b.length)||1]).range([H-m.b,m.t]);
+      bins.forEach(b=>{const xx=x(b.x0)+1,w=Math.max(1,x(b.x1)-x(b.x0)-2),count=b.filter(d=>visible.has(d.id)).length;
+        svg.append("rect").attr("x",xx).attr("y",y(b.length)).attr("width",w).attr("height",H-m.b-y(b.length)).attr("fill","#e3e6e9");
+        svg.append("rect").attr("x",xx).attr("y",y(count)).attr("width",w).attr("height",H-m.b-y(count)).attr("fill","#7d8995").append("title").text(`${fmt(b.x0,1)} to ${fmt(b.x1,1)}: ${count} filtered / ${b.length} teams`);
       });
-      svg.append("text").attr("x",W-m.r).attr("y",H-7).attr("text-anchor","end").attr("fill",MUTED).text("Matches in chronological order →");
-      if(!rows.length)svg.append("text").attr("x",m.l).attr("y",H/2).text("No matches in this scope");
+      [state.team,state.compare].forEach(id=>{const v=summaries[id].gd;if(!Number.isFinite(v))return;svg.append("line").attr("x1",x(v)).attr("x2",x(v)).attr("y1",m.t-3).attr("y2",H-m.b).attr("stroke",color(id)).attr("stroke-width",2);svg.append("text").attr("x",x(v)).attr("y",13).attr("text-anchor","middle").attr("fill",color(id)).text(id);});
+      svg.append("g").attr("transform",`translate(0,${H-m.b})`).call(d3.axisBottom(x).ticks(5));
+      svg.append("text").attr("x",W-m.r).attr("y",H-3).attr("text-anchor","end").attr("fill",MUTED).text("Goal difference / match");
     }
-    render();App.onViewport(render);
-    return {update(p){state=read(p);render();}};
-  };
+    function drawMatches() {
+      const rows=[state.team,state.compare].flatMap(id=>A.rows(id,state.scope)).sort((a,b)=>a.number-b.number||a.team_id.localeCompare(b.team_id));
+      const focus=focusedRecord();
+      q("#va-match-selection").textContent=focus?`${focus.team_id} ${focus.goals}–${focus.goals_opp} ${focus.opp_id} · M${focus.number}`:`A: ${summaries[state.team].n} matches · B: ${summaries[state.compare].n} matches`;
+      q("#va-matches tbody").innerHTML=rows.map(r=>`<tr data-match="${r.key}" data-team-mark="${r.team_id}" tabindex="0" aria-selected="${r.key===state.match}" aria-label="Inspect ${r.team_id} against ${r.opp_id}, match ${r.number}"><th scope="row" style="color:${color(r.team_id)}">${r.team_id}</th><td>${r.opp_id}</td><td>${App.stageShort(r.stage)}</td><td>${r.goals}–${r.goals_opp}</td><td>${fmt(A.metric(r,"xgd"))}</td></tr>`).join("")||'<tr><td colspan="5">No matches in this scope</td></tr>';
+      q("#va-matches tbody").querySelectorAll("tr[data-match]").forEach(row=>{const select=()=>change({match:row.dataset.match===state.match?null:row.dataset.match});row.onclick=select;row.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();select();}};row.onmouseenter=()=>highlight(row.dataset.teamMark);row.onmouseleave=()=>highlight(null);});
+      q("#va-match-links").innerHTML=focus?`<span>◇ Selected match</span><a href="#/match/${focus.match_id}${App.esc(A.query(state.dials,{return:stateUrl(state)}))}">Replay ↗</a><a href="#/lab/${focus.match_id}${App.esc(A.query(state.dials,{team:focus.team_id,return:stateUrl(state)}))}">Match Lab ↗</a><button type="button" id="va-clear-match">Clear</button>`:'<span>Select a match to locate its performance in the map and profile.</span>';
+      q("#va-clear-match")?.addEventListener("click",()=>change({match:null}));
+    }
+    function drawCharts(){if(!root.isConnected)return;drawMap();drawProfile();drawOutcomes();}
+    function scheduleCharts(){cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(drawCharts);}
+    // Splitters change panel allocation; selections and data remain intact.
+    const work=q(".va-workbench");
+    function splitter(el,kind) {
+      const adjust=delta=>{
+        if(kind==="left"){const v=Math.max(185,Math.min(320,(parseFloat(getComputedStyle(work).getPropertyValue("--va-left"))||216)+delta));work.style.setProperty("--va-left",`${v}px`);el.setAttribute("aria-valuenow",Math.round(v));}
+        else if(kind==="right"){const v=Math.max(290,Math.min(540,(parseFloat(getComputedStyle(work).getPropertyValue("--va-right"))||370)-delta));work.style.setProperty("--va-right",`${v}px`);el.setAttribute("aria-valuenow",Math.round(v));}
+        else {const center=q(".va-center"),v=Math.max(35,Math.min(80,(parseFloat(center.style.getPropertyValue("--va-map-share"))||61)+delta/center.clientHeight*100));center.style.setProperty("--va-map-share",v);el.setAttribute("aria-valuenow",Math.round(v));}
+        scheduleCharts();
+      };
+      el.onpointerdown=e=>{if(window.innerWidth<1000)return;el.setPointerCapture(e.pointerId);let last=kind==="row"?e.clientY:e.clientX;
+        el.onpointermove=ev=>{const now=kind==="row"?ev.clientY:ev.clientX;adjust(now-last);last=now;};
+        el.onpointerup=el.onpointercancel=()=>{el.onpointermove=null;};};
+      el.onkeydown=e=>{const keys=kind==="row"?["ArrowUp","ArrowDown"]:["ArrowLeft","ArrowRight"];if(keys.includes(e.key)){e.preventDefault();adjust(e.key===keys[0]?-15:15);}};
+    }
+    splitter(q("#va-gutter-left"),"left");splitter(q("#va-gutter-right"),"right");splitter(q(".va-row-gutter"),"row");
+    render();App.onViewport(scheduleCharts);App.onResize(q("#va-map"),scheduleCharts);
+    const languageChange=()=>{visibleIds=matchingIds();drawTable();drawCharts();};window.addEventListener("languagechange",languageChange);
+    App._stop=()=>{clearTimeout(searchTimer);clearTimeout(rangeTimer);cancelAnimationFrame(resizeFrame);window.removeEventListener("languagechange",languageChange);};
+    return {update(p){state=stateFrom(p);mapMode=state.view;render();}};
+  }
+  App.views.story=workspace;
+  App.views.styles=workspace;
 })();
