@@ -43,7 +43,7 @@
     const fn = App.views[r.name] || App.views.story;
     document.querySelectorAll(".tabs a").forEach((a) => {
       const tab = a.dataset.tab;
-      a.classList.toggle("on", tab === r.name || (tab === "matches" && ["match", "duel"].includes(r.name)) || (tab === "styles" && r.name === "team") || (tab === "twins" && r.name === "robustness"));
+      a.classList.toggle("on", tab === r.name || (tab === "matches" && ["match", "duel"].includes(r.name)) || (tab === "styles" && ["story", "team"].includes(r.name)) || (tab === "twins" && r.name === "robustness"));
     });
     view.innerHTML = "";
     view.classList.toggle("wide", r.name === "match");
