@@ -65,3 +65,18 @@ All 104 match files contain both teams’ passing edges, players, line-break mar
 - The existing fixed six-part model remains an optional interpretation. Its source is available in `pipeline/build_data.py`; the full-tournament fit and retrospective group/knockout calculation described above do not provide causal or out-of-sample validation.
 
 No external platform’s graphical assets, proprietary model outputs or unavailable spatial data were copied into these workspaces.
+
+## 16 November 2026: focused, coordinated team desk
+
+The redesign starts with the requested task and team, then keeps four complementary panels visible together. It reuses the original analytical functions and delivered records; no model or data was regenerated. The original detailed comparison, match, lab and method routes remain available.
+
+Related work reviewed for this revision covers coordinated views, selection, quantitative colour encoding and football style definitions:
+
+- [Oh et al., An Empirical Study on the Relationship Between the Number of Coordinated Views and Visual Analysis (2022)](https://arxiv.org/abs/2204.09524) studies analytic use of coordinated views, including the relationship between view count and analytic processes. Here the four panels are a task-specific design choice, not a claim that four views are universally optimal or that this interface has been user-validated.
+- [D3 brushing documentation](https://d3js.org/d3-brush) supplies rectangular region selection. Here it filters candidate teams across the map, neighbour list and fingerprint. The explicitly selected A/B pair stays pinned, so narrowing candidates does not silently replace the comparison.
+- [D3 sequential colour schemes](https://d3js.org/d3-scale-chromatic/sequential) supplies the single-hue purple heat scale. The numeric domain is fixed at −2.5 to +2.5 standard deviations, with clamped colour endpoints and untruncated displayed values. It encodes relative indicator magnitude, not quality or success. Original cluster identity no longer competes with this scale through coloured header bars. Cell text switches between black and white using fill luminance.
+- [Statsbomb, Modelling Team Playing Style](https://blogarchive.statsbomb.com/articles/soccer/modelling-team-playing-style/) discusses feature choice and the distinction between playing style and team strength. Here indicator choice remains explicit; observed results are shown in a separate linked panel rather than used as the definition of stylistic similarity.
+- [Hudl Statsbomb platform](https://www.hudl.com/products/statsbomb/platform) offers football comparison and supporting analysis workflows. The adaptation here is a task-led route from a team comparison to its available match evidence, without claiming access to that platform's models or video.
+- [FIFA phases-of-play definition](https://www.fifatrainingcentre.com/en/fwc2022/efi-metrics/efi-metric--phases-of-play.php) provides the football vocabulary. The existing project's derived, normalized style indicators retain their original definitions and limitations described above.
+
+The deletion review removed the long homepage narrative, repeated navigation paths, hero illustrations, cluster-colour bars, repeated panel subtitles, and permanent labels for every map point. Selected teams and nearest candidates retain labels; all other dots retain tooltips, keyboard access and selection. Units, reference population, sample sizes, a heat legend and links to the method remain available. Small screens stack panels; a short desktop keeps the dense fingerprint scroll local to its panel.

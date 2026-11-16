@@ -20,8 +20,8 @@ Open [the local site](http://127.0.0.1:8642/). Use `python3` instead of `python`
 
 | Route | What it supports |
 | --- | --- |
-| `#/story` | Question-led examples, playing-style overview and entry points into the analysis workspaces |
-| `#/styles` | Interactive PCA style map, selected style indicators, team trajectories and linked style heatmap |
+| `#/story` | Choose a task and team; preview the team's closest comparison using actual style, result or match data |
+| `#/styles` | Single-screen linked desk: style/outcome map, closest teams, style fingerprint and results/match evidence |
 | `#/team/ESP` | Team fingerprint, match records, style neighbours and the original result decomposition |
 | `#/twins/NED/CRO` | Team comparison with match scope, outcome measures, match distributions, opponent context and omission sensitivity |
 | `#/duel/<team-match-id>` | An anchored single-match performance compared with similar performances from other matches |
@@ -31,6 +31,14 @@ Open [the local site](http://127.0.0.1:8642/). Use `python3` instead of `python`
 | `#/method` | Definitions, calculations, model interpretation and data limitations |
 
 Selections are retained in shareable analysis URLs and return links. Comparison tables and selected event records can be exported as CSV; the match-pulse chart can also be exported as a standalone SVG.
+
+### Linked team desk
+
+Choose either team freely with the searchable A/B selectors. Click a map point, nearest-team row or fingerprint cell to change B; Shift-click a map point to change A. Hover links the same team across panels. The task buttons switch between style discovery, chances versus scorelines, and individual match evidence. Match points open the original match view.
+
+Scope and indicator selections recompute all team profiles, neighbours and displayed outcomes together. Keep at least two indicators. The style-group filter uses the original fixed grouping; map-region selection filters the candidate list and fingerprint columns. A and B remain pinned even when outside that candidate filter. Reset filters restores all indicators, the full tournament and all candidates while keeping the team pair.
+
+The heatmap uses a separate sequential purple scale for standardized indicator values, with numbers in every cell. Team identity uses blue for A and orange for B, reinforced by labels. Cluster colour bars, decorative art and repeated explanatory blocks have been removed from the desk. At desktop widths above 1150px the four panels share one viewport; on shorter screens the fingerprint scrolls within its panel. Narrower screens use a scrolling responsive layout.
 
 ### Professional analysis workspaces
 
