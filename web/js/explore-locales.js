@@ -73,7 +73,13 @@
   "No matches in this scope": "该范围内没有比赛",
   "No teams match these filters.": "没有球队符合筛选条件。",
   "Minimum exceeds maximum": "最小值超过最大值",
-  "Kept as selected comparison; outside the current filter": "当前筛选范围外的所选球队"
+  "Kept as selected comparison; outside the current filter": "当前筛选范围外的所选球队",
+  "Full tournament": "整个赛事",
+  "Reset filters": "重置筛选",
+  "Team": "球队",
+  "Stage": "阶段",
+  "Compare results": "比较比赛结果",
+  "Match scope": "比赛范围"
 });
   Object.assign(window.STYLE_TWINS_MESSAGES["zh-Hant"], {
   "Workspace": "分析工作台",
@@ -148,6 +154,12 @@
   "No matches in this scope": "該範圍內沒有比賽",
   "No teams match these filters.": "沒有球隊符合篩選條件。",
   "Minimum exceeds maximum": "最小值超過最大值",
-  "Kept as selected comparison; outside the current filter": "目前篩選範圍外的所選球隊"
+  "Kept as selected comparison; outside the current filter": "目前篩選範圍外的所選球隊",
+  "Full tournament": "整個賽事",
+  "Reset filters": "重設篩選",
+  "Team": "球隊",
+  "Stage": "階段",
+  "Compare results": "比較比賽結果",
+  "Match scope": "比賽範圍"
 });
 })();
