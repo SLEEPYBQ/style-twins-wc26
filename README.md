@@ -20,8 +20,8 @@ Open [the local site](http://127.0.0.1:8642/). Use `python3` instead of `python`
 
 | Route | What it supports |
 | --- | --- |
-| `#/story` | Choose a task and team; preview the team's closest comparison using actual style, result or match data |
-| `#/styles` | Single-screen linked desk: style/outcome map, closest teams, style fingerprint and results/match evidence |
+| `#/story` | Unified workbench; choose a task and A/B teams alongside linked views |
+| `#/styles` | The same linked workbench with shareable filters, encoding and match selections |
 | `#/team/ESP` | Team fingerprint, match records, style neighbours and the original result decomposition |
 | `#/twins/NED/CRO` | Team comparison with match scope, outcome measures, match distributions, opponent context and omission sensitivity |
 | `#/duel/<team-match-id>` | An anchored single-match performance compared with similar performances from other matches |
@@ -32,13 +32,13 @@ Open [the local site](http://127.0.0.1:8642/). Use `python3` instead of `python`
 
 Selections are retained in shareable analysis URLs and return links. Comparison tables and selected event records can be exported as CSV; the match-pulse chart can also be exported as a standalone SVG.
 
-### Linked team desk
+### Linked analysis workbench
 
-Choose either team freely with the searchable A/B selectors. Click a map point, nearest-team row or fingerprint cell to change B; Shift-click a map point to change A. Hover links the same team across panels. The task buttons switch between style discovery, chances versus scorelines, and individual match evidence. Match points open the original match view.
+The site opens directly in one persistent desktop workspace (`#/story` and `#/styles`). Controls, a large team map, a sortable team collection, a style comparison, outcomes and match evidence remain visible together. Neutral panel headers replace the landing-page task cards, coloured side stripes, hero copy and promotional footer. Drag the dividers to allocate space to controls, the map/table or the comparison panels.
 
-Scope and indicator selections recompute all team profiles, neighbours and displayed outcomes together. Keep at least two indicators. The style-group filter uses the original fixed grouping; map-region selection filters the candidate list and fingerprint columns. A and B remain pinned even when outside that candidate filter. Reset filters restores all indicators, the full tournament and all candidates while keeping the team pair.
+Choose a task and either team with the searchable A/B selectors. Map clicks and table A/B buttons share the same selection; Shift-click a map point to set A. Hover links a map mark, its table row and a third profile candidate. Brush a map region or filter by team name, fixed style group and a numeric measure to narrow the collection; A/B remain explicit pins outside that subset. Export uses only the filtered rows. The outcome panel can switch between pair averages and the filtered distribution against the full scope.
 
-The heatmap uses a separate sequential purple scale for standardized indicator values, with numbers in every cell. Team identity uses blue for A and orange for B, reinforced by labels. Cluster colour bars, decorative art and repeated explanatory blocks have been removed from the desk. At desktop widths above 1150px the four panels share one viewport; on shorter screens the fingerprint scrolls within its panel. Narrower screens use a scrolling responsive layout.
+Choose PCA or freely assign X/Y from style and outcome measures. Scope and indicator selection recompute the relevant profiles and similarity distances with the full-tournament standardization held fixed. At least two indicators remain selected. The fixed original style groups are not retrained. Click a match row to add its individual performance to both the map and style profile; clear it or open the existing replay and Match Lab. Analytical state is retained in the URL. At desktop sizes the interface uses one viewport with internal scrolling; narrow screens stack panels.
 
 ### Professional analysis workspaces
 
