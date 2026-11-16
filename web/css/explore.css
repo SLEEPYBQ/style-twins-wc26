@@ -116,3 +116,10 @@ body.explore-route { background:#eceef0; color:#29323d; font:13px/1.4 system-ui,
   .va-map-meta { font-size:11px; }.va-key { gap:6px; }
   .va-panel-head a,.va-panel-head .va-unit { font-size:11px; }
 }
+
+/* The workspace keeps a compact header when translated labels are active. */
+@media (min-width:601px) {
+  html:not([lang="en"]) body.explore-route .topbar { flex-wrap:nowrap; gap:20px; }
+  html:not([lang="en"]) body.explore-route .topbar .tabs { order:0; flex:1 1 auto; width:auto; }
+  html:not([lang="en"]) body.explore-route .topbar .language-control { order:1; }
+}
