@@ -39,6 +39,7 @@
     }
     currentKey = key;
     App.cleanup();
+    document.body.classList.toggle("explore-route", ["story", "styles"].includes(r.name));
     const fn = App.views[r.name] || App.views.story;
     document.querySelectorAll(".tabs a").forEach((a) => {
       const tab = a.dataset.tab;
