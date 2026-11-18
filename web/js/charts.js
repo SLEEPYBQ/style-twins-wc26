@@ -2,7 +2,7 @@
 (function () {
   const App = window.App;
   const C = (App.charts = {});
-  const POS = "#0a9396", NEG = "#e8743b", INK = "#1d2433", GRID = "#efe9dc", AXIS = "#cfc7b5", MUTED = "#858a96";
+  const POS = "#5b4a9e", NEG = "#a8601e", INK = "#1f2933", GRID = "#eceef1", AXIS = "#c3c9d0", MUTED = "#858a96";
 
   /** Rounded-end bar path from x0 to x1 (data end rounded, baseline end square). */
   function hbar(x0, x1, y, h, r = 4) {
@@ -173,8 +173,8 @@
       row.append("div").attr("class", "lbl").text(r.label);
       row.append("div").attr("class", "v tnum").text(r.fmt ? r.fmt(r.a) : r.a);
       const bar = row.append("div").attr("class", "dual-bar");
-      bar.append("i").style("width", `${(a / tot) * 100}%`).style("background", kits[0]).style("box-shadow", App.isLight(kits[0]) ? "inset 0 0 0 1.5px #cfc7b5" : null);
-      bar.append("i").style("width", `${(b / tot) * 100}%`).style("background", kits[1]).style("box-shadow", App.isLight(kits[1]) ? "inset 0 0 0 1.5px #cfc7b5" : null);
+      bar.append("i").style("width", `${(a / tot) * 100}%`).style("background", kits[0]).style("box-shadow", App.isLight(kits[0]) ? "inset 0 0 0 1.5px #c3c9d0" : null);
+      bar.append("i").style("width", `${(b / tot) * 100}%`).style("background", kits[1]).style("box-shadow", App.isLight(kits[1]) ? "inset 0 0 0 1.5px #c3c9d0" : null);
       row.append("div").attr("class", "v r tnum").text(r.fmt ? r.fmt(r.b) : r.b);
     }
   };

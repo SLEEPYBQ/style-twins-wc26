@@ -34,11 +34,16 @@ Selections are retained in shareable analysis URLs and return links. Comparison 
 
 ### Linked analysis workbench
 
-The site opens directly in one persistent desktop workspace (`#/story` and `#/styles`). Controls, a large team map, a sortable team collection, a style comparison, outcomes and match evidence remain visible together. Neutral panel headers replace the landing-page task cards, coloured side stripes, hero copy and promotional footer. Drag the dividers to allocate space to controls, the map/table or the comparison panels.
+The site opens directly in one desktop workspace (`#/story` and `#/styles`). A context bar holds the current A/B pair and the match scope. Below it, six views each answer one question. Drag the gutters between views to resize them; double-click a gutter to reset it.
 
-Choose a task and either team with the searchable A/B selectors. Map clicks and table A/B buttons share the same selection; Shift-click a map point to set A. Hover links a map mark, its table row and a third profile candidate. Brush a map region or filter by team name, fixed style group and a numeric measure to narrow the collection; A/B remain explicit pins outside that subset. Export uses only the filtered rows. The outcome panel can switch between pair averages and the filtered distribution against the full scope.
+- **Team Table**: which teams are in play? Search by name, filter by style group or by xG-difference and goal-difference ranges, sort, pin A or B, and export the filtered rows as CSV.
+- **Similarity Search**: who plays most like A? Toggle the indicators used (at least two). Teams are ranked by style distance and show a similarity percentile; click one to compare it as B.
+- **Style Map**: where does every team sit? Use style PCA or choose X/Y from style and outcome measures. Colour points by selection state or style group, and brush a region to filter. Click a point to set B; Shift-click sets A.
+- **Style Profile**: how do A and B differ? All ten indicators are shown in fixed or largest-gap order, and indicators left out of the similarity calculation are dimmed.
+- **Outcomes**: do similar styles bring similar results? A and B per-match xG and goals are drawn against the average of A's five closest teams and the tournament average.
+- **Match List**: which matches back it up? Selecting a match row places that single performance in the map and profile and links to the replay and Match Lab.
 
-Choose PCA or freely assign X/Y from style and outcome measures. Scope and indicator selection recompute the relevant profiles and similarity distances with the full-tournament standardization held fixed. At least two indicators remain selected. The fixed original style groups are not retrained. Click a match row to add its individual performance to both the map and style profile; clear it or open the existing replay and Match Lab. Analytical state is retained in the URL. At desktop sizes the interface uses one viewport with internal scrolling; narrow screens stack panels.
+Hovering a team in any panel highlights it everywhere and describes it below the map. Pinned A/B teams stay visible outside the current filters. Scope and indicator changes recompute profiles and distances, with full-tournament standardization held fixed; the original style groups are not retrained. Analytical state is kept in the URL. Narrow screens stack the panels. Design sources are recorded in `RESEARCH.md`.
 
 ### Professional analysis workspaces
 

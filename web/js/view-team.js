@@ -52,7 +52,7 @@
 
       <div class="grid-2 section">
         <div class="card">
-          <h3>Style fingerprint</h3>
+          <h3>Style profile</h3>
           <div class="sub">Bars show ${App.esc(t.name)}'s averages for your ${dials.length} selected metrics, in standard deviations from the tournament reference. Diamonds show the original ${arch.name.replace("The ", "")} cluster profile.</div>
           <div id="fp"></div>
         </div>
@@ -66,7 +66,7 @@
 
       <div class="grid-2 section">
         <div class="card">
-          <h3>Style twins</h3>
+          <h3>Closest teams</h3>
           <div class="sub">The five closest teams across your ${dials.length} selected metrics. Similarity is a percentile among all 1,128 team pairs. Click a team to investigate the difference.</div>
           <div class="twin-list">${near.map((n) => {
             const o = App.team[n.id];
@@ -80,7 +80,7 @@
             <a href="#/styles${A.query(dials, { team: t.id })}">See the trajectory on the map →</a></p>
         </div>
         <div class="card">
-          <h3>Every match</h3>
+          <h3>Matches</h3>
           <div class="sub">Inspect match events, passing structure and the original report.</div>
           <div class="match-list">${t.matches.map((k) => {
             const r = App.tm[k];

@@ -14,8 +14,8 @@
     root.innerHTML = `
       ${returnTo ? `<a class="btn small ghost" href="${App.esc(returnTo)}">← Back to analysis</a>` : ""}
       <div class="section-head" style="margin-top:0">
-        <div><div class="kicker">Match evidence · 104 matches</div><h2 style="font-size:40px">Find the matches behind the pattern</h2>
-          <p>Inspect a scoreline alongside expected goals, then explore events, passing connections and similar performances.</p></div>
+        <div><h2>Matches</h2>
+          <p>Scorelines with expected goals (xG). Select a match for its events, passing network and similar performances.</p></div>
         <div class="filters"><div id="f-team"></div><div id="f-sort"></div></div>
       </div>
       ${pairFilter ? `<div class="duel-filter-context"><div><b>${App.esc(context)}</b><div class="note">Teams are classified by their whole-tournament style. Both home and away orientations are included.</div></div><a href="#/matches${App.analysis.query(dials)}">Clear matchup</a></div>` : ""}

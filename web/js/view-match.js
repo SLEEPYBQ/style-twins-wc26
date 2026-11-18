@@ -110,7 +110,7 @@
       <div class="grid-3 section" id="story-badges"></div>
 
       <div class="section card">
-        <h3>Same style, other matches</h3>
+        <h3>Similar performances in other matches</h3>
         <div class="sub">Nearest performances by other teams across your ${dials.length} selected style metrics. Both sides of this physical match are excluded. Compare keeps the current performance pinned.</div>
         <div class="grid-2" id="twin-matches"></div>
       </div>`;
@@ -505,8 +505,8 @@
       const periods = m.aet ? [[0, 45], [45, 90], [90, 105], [105, m.duration]] : [[0, 45], [45, m.duration]];
       tl.append("g").selectAll("rect").data(periods).join("rect")
         .attr("x", (d) => tlx(d[0]) + 1).attr("width", (d) => tlx(d[1]) - tlx(d[0]) - 2).attr("y", 4).attr("height", TLH - 8).attr("rx", 8)
-        .attr("fill", (d, i) => (i % 2 ? "#f6f1e6" : "#fbf7ee"));
-      tl.append("line").attr("x1", tlx(0)).attr("x2", tlx(m.duration)).attr("y1", axisY).attr("y2", axisY).attr("stroke", "#cfc7b5").attr("stroke-width", 1.5);
+        .attr("fill", (d, i) => (i % 2 ? "#f6f7f9" : "#f3f4f6"));
+      tl.append("line").attr("x1", tlx(0)).attr("x2", tlx(m.duration)).attr("y1", axisY).attr("y2", axisY).attr("stroke", "#c3c9d0").attr("stroke-width", 1.5);
       const ticks = [0, 15, 30, 45, 60, 75, 90, ...(m.aet ? [105, 120] : [])];
       tl.append("g").selectAll("text").data(ticks).join("text").attr("x", (d) => tlx(d)).attr("y", axisY + 4).attr("text-anchor", "middle")
         .attr("dominant-baseline", "hanging").attr("font-size", 9.5).attr("font-weight", 700).attr("fill", "#858a96").text((d) => (d === 45 ? "HT" : d === 90 && !m.aet ? "90" : d))
@@ -655,8 +655,8 @@
         case "goal": case "own_goal": return wrap(ball, "#f2b134");
         case "shot":
           if (e.outcome === "saved") return wrap(`<circle r="5.5" fill="none" stroke="${INK}" stroke-width="1.7"/><circle r="1.9" fill="${INK}"/>`, "#e7edf6");
-          if (e.outcome === "blocked") return wrap(`<path d="M-4.5,-4.5 L4.5,4.5 M4.5,-4.5 L-4.5,4.5" stroke="#858a96" stroke-width="2" stroke-linecap="round"/>`, "#efe9dc");
-          return wrap(`<path d="M-5,4 L4,-5 M0,-5 L4,-5 L4,-1" fill="none" stroke="#858a96" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`, "#efe9dc");
+          if (e.outcome === "blocked") return wrap(`<path d="M-4.5,-4.5 L4.5,4.5 M4.5,-4.5 L-4.5,4.5" stroke="#858a96" stroke-width="2" stroke-linecap="round"/>`, "#eceef1");
+          return wrap(`<path d="M-5,4 L4,-5 M0,-5 L4,-5 L4,-1" fill="none" stroke="#858a96" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`, "#eceef1");
         case "yellow": return wrap(`<rect x="-3.6" y="-5" width="7.2" height="10" rx="1.6" fill="#f6c638"/>`, "#fbf1cf");
         case "second_yellow": case "red": return wrap(`<rect x="-3.6" y="-5" width="7.2" height="10" rx="1.6" fill="#e23b3b"/>`, "#fbe0dc");
         default: return wrap(`<path d="M-4,-1 L-1,-4.5 L2,-1 M-1,-4.5 V4.5" fill="none" stroke="#2f9e5b" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-1.2,0)"/><path d="M1,1 L4,4.5 L7,1 M4,4.5 V-4.5" fill="none" stroke="#d9534f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(-2.8,0)"/>`, "#e4f2e8");
@@ -862,7 +862,7 @@
     const resultLine = m.pens ? m.pens : m.score[0] === m.score[1] ? "A draw." : `${m.score[0] > m.score[1] ? H.name : A.name} won${m.aet ? " after extra time" : ""}.`;
     document.getElementById("story-badges").innerHTML = (badges.length ? badges.slice(0, 3) : [{ img: null, title: "Inspect the match evidence", text: `${App.esc(resultLine)} Compare the chance totals, phase profiles and passing connections.` }])
       .map((b) => `<div class="card" style="display:flex;gap:14px;align-items:center">${b.img ? `<img src="${b.img}" alt="" style="width:84px;height:84px;object-fit:contain;flex:none" onerror="this.remove()">` : ""}
-        <div><div class="kicker" style="margin-bottom:2px">Story of the match</div><h3>${b.title}</h3><p class="note" style="margin:4px 0 0">${b.text}</p></div></div>`).join("");
+        <div><div class="kicker" style="margin-bottom:2px">Match summary</div><h3>${b.title}</h3><p class="note" style="margin:4px 0 0">${b.text}</p></div></div>`).join("");
 
     function nearestArchetype(T) {
       const space = App.styleSpace(App.dials);

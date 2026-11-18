@@ -3,7 +3,7 @@
 (function () {
   const App = window.App;
   const A = App.analysis;
-  const INK = "#1d2433", GRID = "#efe9dc", MUTED = "#858a96";
+  const INK = "#1d2433", GRID = "#eceef1", MUTED = "#858a96";
   const DUR = 550;
 
   App.views.styles = function (root, params) {
@@ -271,7 +271,7 @@
       lg.append("line").attr("x1", (l) => l.ax).attr("y1", (l) => l.ay + 20).attr("x2", (l) => l.x).attr("y2", (l) => l.y)
         .attr("stroke", MUTED).attr("stroke-width", 1).attr("display", (l) => (Math.hypot(l.x - l.ax, l.y - l.ay) > 10 ? null : "none"));
       lg.append("rect").attr("x", (l) => l.x - l.w / 2).attr("y", (l) => l.y - 9).attr("width", (l) => l.w).attr("height", 18).attr("rx", 9)
-        .attr("fill", "#fff").attr("stroke", "#e8e1d2");
+        .attr("fill", "#fff").attr("stroke", "#e1e4e8");
       lg.append("text").attr("x", (l) => l.x).attr("y", (l) => l.y).attr("text-anchor", "middle").attr("dominant-baseline", "central")
         .attr("font-size", 11).attr("font-weight", 700).attr("fill", INK).text((l) => l.text);
       lg.transition().delay((l, i) => 200 + i * 60).duration(300).attr("opacity", 1);
@@ -371,7 +371,7 @@
       const gap = 8, rows = state.dials, top = 34;
       const W = labelW + cols.length * cell + (order.length - 1) * gap + 10, H = top + rows.length * cell + 44;
       const hs = d3.select(heatEl).append("svg").attr("width", W).attr("height", H);
-      const color = d3.scaleLinear().domain([-2, 0, 2]).range(["#e8743b", "#f1ece2", "#0a9396"]).clamp(true);
+      const color = d3.scaleLinear().domain([-2, 0, 2]).range(["#e8743b", "#eceef1", "#0a9396"]).clamp(true);
       const xOf = {};
       let cx = labelW;
       order.forEach((o) => {
