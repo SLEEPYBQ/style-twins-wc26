@@ -8,6 +8,9 @@
   App.dialInfo = Object.fromEntries(WC.dials.map((d) => [d.id, d]));
   App.teams = WC.teams;
   App.team = Object.fromEntries(WC.teams.map((t) => [t.id, t]));
+  // Muted style-group hues that stay clear of the A/B/closest-team state colours (see css/theme.css).
+  const GROUP_COLORS = { architects: "#7a6bb0", stormers: "#b5536f", allrounders: "#5e8c3a", counterpunchers: "#c09a2a", fortress: "#6e6a5c" };
+  WC.archetypes.forEach((a) => { if (GROUP_COLORS[a.id]) a.color = GROUP_COLORS[a.id]; });
   App.arch = Object.fromEntries(WC.archetypes.map((a) => [a.id, a]));
   App.tm = WC.teamMatches;
   App.match = Object.fromEntries(WC.matches.map((m) => [m.id, m]));

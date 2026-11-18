@@ -115,7 +115,7 @@ async function main() {
     App.views.lab(host, { pane: "breaks" }, match.id);
     await new Promise((resolve) => setImmediate(resolve));
     assert.ok(host.innerHTML.includes(App.esc(match.pens)), `${match.id}: shootout text rendered without array assumptions`);
-    assert.ok(host.innerHTML.includes("Match intelligence"), `${match.id}: main view rendered`);
+    assert.ok(host.innerHTML.includes("<h1>Match Lab</h1>"), `${match.id}: main view rendered`);
     assert.ok(pane.innerHTML.includes("Opposition unit targeted"), `${match.id}: detail pane rendered`);
     assert.ok(!host.innerHTML.includes("Match data is unavailable"), `${match.id}: no async render error`);
     App._stop?.();

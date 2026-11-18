@@ -3,7 +3,7 @@
   const App = window.App, P = App.matchPulseData;
   const P_THEMES = {
     phone: { teams: ["#54e0c5", "#ffb782"], bg: "#102531", shade: "#73d8cb", grid: "#29424f", tick: "#9db8c7", axis: "#547181", label: "#90acbc", period: "#789bad", divider: "#476270", strip: "#1a3441", mark: "#102531", selected: "#fff", ink: ["#edf7f9", "#b2cfdb", "#8caebf"] },
-    desktop: { teams: ["#0a9396", "#e8743b"], bg: "#ffffff", shade: "#0a9396", grid: "#efe9dc", tick: "#858a96", axis: "#cfc7b5", label: "#858a96", period: "#4a5263", divider: "#cfc7b5", strip: "#f6f1e6", mark: "#ffffff", selected: "#1d2433", ink: ["#1d2433", "#4a5263", "#858a96"] },
+    desktop: { teams: ["#2f6bd8", "#e0702a"], bg: "#ffffff", shade: "#2f6bd8", grid: "#eceef1", tick: "#858a96", axis: "#c3c9d0", label: "#858a96", period: "#4a5263", divider: "#c3c9d0", strip: "#f6f7f9", mark: "#ffffff", selected: "#1d2433", ink: ["#1d2433", "#4a5263", "#858a96"] },
   };
   const outcome = (event) => event.type === "goal" ? "Goal" : ({ saved: "Saved", blocked: "Blocked", off: "Off target", other: "Other recorded outcome" })[event.outcome] || "Not recorded";
   const player = (match, event) => match.teams[event.team]?.players[event.p];

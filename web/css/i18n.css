@@ -11,7 +11,7 @@
 .topbar .jump .sel-val { display:block; min-inline-size:0; overflow:hidden; text-overflow:ellipsis; }
 .language-control { position:relative; flex:0 0 auto; inline-size:140px; }
 .language-control .language-globe { position:absolute; inset-inline-start:11px; top:50%; transform:translateY(-50%); inline-size:18px; block-size:18px; color:var(--ink-2); fill:none; stroke:currentColor; stroke-width:1.4; pointer-events:none; }
-#language-select { display:block; inline-size:100%; min-inline-size:0; min-block-size:40px; margin:0; padding-block:7px; padding-inline:36px 8px; border:1.5px solid var(--line); border-radius:10px; background:var(--card); color:var(--ink); font:500 13px/1.4 var(--sans); cursor:pointer; }
+#language-select { display:block; inline-size:100%; min-inline-size:0; min-block-size:40px; margin:0; padding-block:7px; padding-inline:36px 8px; border:1.5px solid var(--line); border-radius: 4px; background:var(--card); color:var(--ink); font:500 13px/1.4 var(--sans); cursor:pointer; }
 #language-select:hover { border-color:var(--axis); }
 #language-select:focus-visible { outline:3px solid var(--review-teal,#087f81); outline-offset:3px; }
 #language-select option { font-family:system-ui,"Segoe UI",sans-serif; }
