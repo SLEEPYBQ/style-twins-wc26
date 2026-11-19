@@ -32,7 +32,7 @@
     lastHash = location.hash;
     const r = parse();
     if (!r) return;
-    const key = `${r.name}/${r.args.join("/")}`;
+    const key = ["story", "styles"].includes(r.name) ? "workspace" : `${r.name}/${r.args.join("/")}`;
     if (key === currentKey && instance && typeof instance.update === "function") {
       instance.update(r.params);
       return;

@@ -96,7 +96,7 @@ body.ws-route .topbar { position: relative; padding: 0 12px; }
 @media (max-width: 760px) {
   .topbar { height: auto; min-height: 48px; flex-wrap: wrap; row-gap: 4px; padding: 6px 10px; }
   body.ws-route .topbar { padding: 6px 10px; }
-  .topbar .tabs { order: 2; flex-basis: 100%; overflow-x: auto; }
+  .topbar .tabs { order: 4; flex-basis: 100%; overflow-x: auto; }
   .tabs a { padding: 5px 6px; font-size: 12px; }
   .language-control { width: 112px; }
   .topbar .jump { display: none; }

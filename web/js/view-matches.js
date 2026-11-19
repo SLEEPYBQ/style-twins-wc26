@@ -10,7 +10,7 @@
     const pairFilter = archA && archB;
     const metric = params.metric === "gd" ? "gd" : "xgd";
     const returnTo = /^#\/(twins|styles|story|team|duel)(\/|\?|$)/.test(params.return || "") ? params.return : "";
-    const context = pairFilter ? `${App.arch[archA].name} × ${App.arch[archB].name}` : "";
+    const context = pairFilter ? `${App.groupLabel(archA)} × ${App.groupLabel(archB)}` : "";
     root.innerHTML = `
       ${returnTo ? `<a class="btn small ghost" href="${App.esc(returnTo)}">← Back to analysis</a>` : ""}
       <div class="section-head" style="margin-top:0">
@@ -56,7 +56,7 @@
         const direction = App.team[match.home].archetype === archA ? 1 : -1;
         return direction * (values[0] - values[1]);
       });
-      element.innerHTML = `<div class="kicker">${App.esc(App.arch[archA].name)} perspective · current selection</div><h3>${App.signed(average, 2)} ${label.toLowerCase()} per match</h3><p class="note">${matches.length} distinct fixture${matches.length === 1 ? "" : "s"}. ${sameGroup ? "Both teams belong to the same style group. Including both perspectives gives a mean of zero by construction." : `Each fixture is oriented toward ${App.esc(App.arch[archA].name)}, regardless of home or away side.`}</p>`;
+      element.innerHTML = `<div class="kicker">${App.esc(App.groupLabel(archA))} perspective · current selection</div><h3>${App.signed(average, 2)} ${label.toLowerCase()} per match</h3><p class="note">${matches.length} distinct fixture${matches.length === 1 ? "" : "s"}. ${sameGroup ? "Both teams belong to the same style group. Including both perspectives gives a mean of zero by construction." : `Each fixture is oriented toward ${App.esc(App.groupLabel(archA))}, regardless of home or away side.`}</p>`;
     }
 
     function draw() {

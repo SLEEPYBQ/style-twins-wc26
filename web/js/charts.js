@@ -31,7 +31,7 @@
       .attr("fill", "transparent")
       .on("mousemove", (evt, d) => {
         const i = dialIds.indexOf(d);
-        App.tip.show(`<div class="tt-title">${d}</div><div class="tt-dim">${App.dialInfo[d].help}</div>` +
+        App.tip.show(`<div class="tt-title">${App.esc(App.indicator(d).label)}</div><div class="tt-dim">${App.esc(App.indicator(d).help)}</div>` +
           App.ttRows([["vs. tournament average", `${App.signed(z[i], 1)} sd`]]), evt);
       })
       .on("mouseleave", App.tip.hide);
@@ -55,7 +55,7 @@
       const y = i * rowH;
       const row = g.append("g").attr("transform", `translate(0,${y})`);
       row.append("text").attr("x", 0).attr("y", rowH / 2).attr("dominant-baseline", "central")
-        .attr("font-size", 12.5).attr("font-weight", 600).attr("fill", INK).text(r.dial);
+        .attr("font-size", 12.5).attr("font-weight", 600).attr("fill", INK).text(App.indicator(r.dial).label);
       row.append("path").attr("d", hbar(x(0), x(r.z), rowH / 2 - 6, 12)).attr("fill", r.z >= 0 ? POS : NEG);
       if (compare) {
         const c = compare[i];
@@ -68,8 +68,8 @@
       row.append("rect").attr("x", 0).attr("width", W).attr("height", rowH).attr("fill", "transparent")
         .on("mousemove", (evt) => {
           const extra = compare ? [[compareLabel || "comparison", `${App.signed(compare[i].z, 1)} sd`]] : [];
-          App.tip.show(`<div class="tt-title">${r.dial}</div><div class="tt-dim">${App.dialInfo[r.dial].help}</div>` +
-            App.ttRows([[App.dialInfo[r.dial].label, App.fix(r.raw, 1)], [mainLabel || "vs. average", `${App.signed(r.z, 1)} sd`], ...extra]), evt);
+          App.tip.show(`<div class="tt-title">${App.esc(App.indicator(r.dial).label)}</div><div class="tt-dim">${App.esc(App.indicator(r.dial).help)}</div>` +
+            App.ttRows([[App.indicator(r.dial).label, `${App.fix(r.raw, 1)} ${App.indicator(r.dial).unit}`], [mainLabel || "vs. average", `${App.signed(r.z, 1)} sd`], ...extra]), evt);
         })
         .on("mouseleave", App.tip.hide);
     });

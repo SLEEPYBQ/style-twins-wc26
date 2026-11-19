@@ -152,7 +152,7 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 .review-intro h1, .review-compare-head h1 { font-size: 15px; font-weight: 600; line-height: 1.08; letter-spacing: -.01em; margin: 6px 0 12px; text-wrap: balance; }
 .review-intro p { font-size: 17px; line-height: 1.5; color: var(--ink-2); }
 .review-intro { padding: 16px 0 18px; }
-.review-compare-head { padding: clamp(18px, 2.4vw, 30px) clamp(20px, 3vw, 36px); background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); }
+.review-compare-head { padding: 14px 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); }
 .review-compare-head h1 { margin-bottom: 0; }
 .review-compare-head h1 span { color: var(--axis); }
 .review-sim { flex: none; padding: 14px 22px; border: 0; border-radius: 4px; background: var(--card-2); }
@@ -196,12 +196,11 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 
 /* Audit the resemblance --------------------------------------------------- */
 .robust-page { max-width: none; }
-.robust-hero { grid-template-columns: minmax(0, 1.15fr) minmax(180px, .6fr); gap: 20px; padding: clamp(20px, 3vw, 40px); margin-bottom: 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden; }
+.robust-hero { padding: 14px 18px; margin-bottom: 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); overflow: hidden; }
 .robust-hero h1 { margin: 2px 0 12px; font-size: 15px; font-weight: 600; line-height: 1.06; letter-spacing: -.01em; }
 .robust-hero h1 em { font-family: var(--display); font-weight: 600; font-style: normal; color: var(--a-stormers); }
 .robust-hero p { font-size: 17px; line-height: 1.5; max-width: 560px; }
-.robust-hero-mark { display: none; }
-.robust-hero-art { display: block; width: 100%; max-width: 300px; justify-self: center; }
+
 .robust-presets { gap: 6px; margin-bottom: 16px; font-size: 13.5px; font-weight: 600; }
 .robust-presets a { padding: 5px 13px; border: 1.5px solid var(--line); border-radius: 3px; background: var(--card); color: var(--ink-2); font-weight: 650; }
 .robust-presets a:hover { color: var(--ink); background: var(--card); border-color: var(--axis); }
@@ -265,8 +264,8 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 
 /* Style duel --------------------------------------------------------------- */
 .duel-topline { margin-bottom: 14px; }
-.duel-intro { position: relative; grid-template-columns: minmax(0, 1fr) minmax(0, .9fr) minmax(120px, 190px); gap: 20px; align-items: center; margin: 0 0 16px; padding: clamp(18px, 2.4vw, 30px) clamp(20px, 3vw, 36px); background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); }
-.duel-hero-art { display: block; grid-column: 3; grid-row: 1; width: 100%; height: auto; aspect-ratio: 1; }
+.duel-intro { grid-template-columns: minmax(0, .65fr) minmax(0, 1fr); gap: 12px; align-items: center; margin: 0 0 16px; padding: 14px 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); }
+
 .duel-intro h1 { font-size: 15px; font-weight: 600; line-height: 1.08; letter-spacing: -.01em; }
 .duel-intro em { color: var(--a-stormers); }
 .duel-intro p { margin: 0; font-size: 16px; line-height: 1.5; color: var(--ink-2); }
@@ -282,7 +281,7 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 .duel-reading b { color: var(--ink); }
 .duel-reading > span { font-size: 13px; }
 .duel-reading > span b { font: 600 18px var(--display); color: var(--pos); }
-.duel-section-heading > span { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 34px; height: 34px; padding: 0; border: 0; background: var(--ink); color: var(--paper); font: 600 14px var(--display); }
+
 .duel-section-heading h2 { margin-bottom: 2px; }
 .duel-track { background: var(--card-2); }
 .duel-values, .duel-values th, .duel-values td, .duel-opponent dl > div { border-color: var(--line); }
@@ -320,12 +319,10 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
   .review-hero-evidence { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .review-hero-teams, .review-similarity { grid-column: 1 / -1; grid-row: auto; }
   .review-hero-metric { grid-row: auto; }
-  .robust-hero { grid-template-columns: minmax(0, 1fr) 180px; }
 }
 @media (max-width: 950px) {
-  .duel-intro { grid-template-columns: minmax(0, 1fr) 130px; }
+  .duel-intro { grid-template-columns: minmax(0, 1fr); }
   .duel-intro p { grid-column: 1; }
-  .duel-hero-art { grid-column: 2; grid-row: 1 / span 2; }
 }
 @media (max-width: 760px) {
   .review-hero { grid-template-columns: minmax(0, 1fr) 200px; }
@@ -338,5 +335,5 @@ html[dir="rtl"] .language-control .sel-enhanced .sel-pop { right: auto; }
 .sel-enhanced .sel-val { flex: 1 1 auto; text-align: start; }
 .duel-replay-note { background: var(--card-2); border: 0; border-radius: 4px; color: var(--ink-2); }
 .duel-replay-note b { color: var(--ink); }
-.review-hero-art, .robust-hero-art { height: auto; aspect-ratio: 1; }
+.review-hero-art { height: auto; aspect-ratio: 1; }
 @media (max-width: 800px) { .review-tools-heading { align-items: flex-start; } }

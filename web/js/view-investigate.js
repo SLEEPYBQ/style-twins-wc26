@@ -12,7 +12,6 @@
     quality: ["Chance quality", "xG per shot · all shots pooled", 3],
   };
   const fmt = (v, digits = 2) => App.fix(v, digits);
-  const percentile = (sim) => Math.max(1, Math.ceil((1 - sim) * 100));
   const options = (id) => App.teams.slice().sort((a, b) => a.name.localeCompare(b.name)).map((t) =>
     `<option value="${t.id}" ${t.id === id ? "selected" : ""}>${App.esc(t.name)}</option>`).join("");
 
@@ -31,7 +30,7 @@
       <label>Match scope<select data-scope>${Object.entries(scopes).map(([id, label]) => `<option value="${id}" ${id === scope ? "selected" : ""}>${label}</option>`).join("")}</select></label>
       <label>Question to investigate<select data-metric>${Object.entries(metrics).map(([id, m]) => `<option value="${id}" ${id === metric ? "selected" : ""}>${m[0]}</option>`).join("")}</select></label>
       <details><summary>${dials.length} style indicators selected</summary><p class="note">Keep at least two. Similarity uses this scope and these indicators, standardized against all 208 records.</p>
-      <div class="review-chips">${App.dials.map((d, i) => `<button type="button" class="chip ${dials.includes(d) ? "on" : ""}" data-dial="${i}" aria-pressed="${dials.includes(d)}" title="${App.esc(App.dialInfo[d].help)}">${d}</button>`).join("")}</div>
+      <div class="review-chips">${App.dials.map((d, i) => `<button type="button" class="chip ${dials.includes(d) ? "on" : ""}" data-dial="${i}" aria-pressed="${dials.includes(d)}" title="${App.esc(App.indicator(d).help)}">${App.esc(App.indicator(d).label)}</button>`).join("")}</div>
       <button class="btn small ghost" data-reset>Use all ten</button></details></div>`;
     if (isPair) renderPair();
     else renderLanding();
@@ -53,17 +52,17 @@
         .filter((p) => Number.isFinite(summaries[p.a][metric]) && Number.isFinite(summaries[p.b][metric])).sort((p, q) => Math.abs(q.gap) - Math.abs(p.gap));
       root.innerHTML = `<section class="review-intro"><h1>Performance comparison</h1>
         <p>Find a pair, compare the chances they created and allowed, then inspect the matches behind the averages.</p></section>
-        ${controls}<form class="review-picker card"><label>First team<select name="first">${options("NED")}</select></label><span>vs</span><label>Second team<select name="second">${options("CRO")}</select></label><button class="btn" type="submit">Investigate this pair →</button><p class="note" data-picker-note></p></form>
+        ${controls}<form class="review-picker card"><label>First team<select name="first" required><option value="">Choose a team</option>${options()}</select></label><span>vs</span><label>Second team<select name="second" required><option value="">Choose a team</option>${options()}</select></label><button class="btn" type="submit">Investigate this pair →</button><p class="note" data-picker-note></p></form>
         <div class="review-section-title"><div><div class="kicker">Pairs worth investigating</div><h2>Close in style, apart in ${metricName.toLowerCase()}</h2></div><p class="note">${pairs.length} pairs in the closest 10%<br>Ordered by the absolute gap in ${unit}.</p></div>
         <div class="review-pair-grid">${pairs.map((p) => `<a class="card review-pair" href="#/twins/${p.a}/${p.b}${query()}">
-          <span class="review-badge">Closest ${percentile(p.sim)}% of pairs</span>
+          <span class="review-badge">${Math.round(p.sim * 100)}% · Similarity percentile</span>
           <div class="review-pair-names"><span>${App.flag(p.a, 32)}<b>${App.esc(App.team[p.a].name)}</b></span><span>${App.flag(p.b, 32)}<b>${App.esc(App.team[p.b].name)}</b></span></div>
           <div class="review-numbers"><b>${fmt(summaries[p.a][metric], digits)}</b><span>vs</span><b>${fmt(summaries[p.b][metric], digits)}</b></div>
           <p>${unit}</p><div class="review-pair-footer"><span>${summaries[p.a].n} and ${summaries[p.b].n} matches</span><span>Trace evidence ↗</span></div></a>`).join("") || '<p class="card">No pairs in this scope. Try another match scope or style definition.</p>'}</div>`;
       root.querySelector("form").onsubmit = (event) => {
         event.preventDefault();
         const x = event.target.elements.first.value, y = event.target.elements.second.value;
-        if (x === y) { root.querySelector("[data-picker-note]").textContent = "Choose two different teams."; return; }
+        if (!x || !y || x === y) { root.querySelector("[data-picker-note]").textContent = "Choose two different teams."; return; }
         App.go(`#/twins/${x}/${y}${query()}`);
       };
     }
@@ -71,9 +70,9 @@
     function renderPair() {
       const teams = [App.team[a], App.team[b]], rows = [A.rows(a, scope), A.rows(b, scope)], sums = rows.map(A.summary);
       const valid = sums.every((s) => s.n > 0), sim = twins.near[a]?.find((n) => n.id === b)?.sim;
-      root.innerHTML = `<div class="review-breadcrumb"><a href="${App.esc(params.return?.startsWith("#/") ? params.return : "#/twins" + query())}">← ${params.return?.startsWith("#/") ? "Back to your exploration" : "Discover pairs"}</a><a href="#/styles${A.query(dials, { team: a })}">Check the full-tournament style map ↗</a></div>
+      root.innerHTML = `<div class="review-breadcrumb"><a href="${App.esc(params.return?.startsWith("#/") ? params.return : "#/twins" + query())}">← ${params.return?.startsWith("#/") ? "Back to your exploration" : "Discover pairs"}</a><a href="#/styles${A.query(dials, { team: a, compare: b, scope })}">Style Map</a></div>
         <section class="review-compare-head"><div><div class="kicker">Pair report</div><h1>${App.esc(teams[0].name)} <span>&</span><br>${App.esc(teams[1].name)}</h1></div>
-          <div class="review-sim"><strong>${sim == null ? "—" : `Top ${percentile(sim)}%`}</strong><span>closest style pairs</span><small>${dials.length} indicators · ${twins.pairs} pair benchmark</small></div></section>
+          <div class="review-sim"><strong>${sim == null ? "—" : `${fmt(sim * 100, 1)}%`}</strong><span>Similarity percentile</span><small>${dials.length} indicators · ${twins.pairs} pair benchmark</small></div></section>
         ${controls}<div class="review-team-switch"><label>First team<select data-team-a>${options(a)}</select></label><label>Second team<select data-team-b>${options(b)}</select></label><a class="btn small ghost" href="#/twins/${b}/${a}${query()}">⇄ Swap</a></div>
         <div class="review-team-legend">${teams.map((t, i) => `<span><i style="background:${colors[i]}"></i>${App.flag(t.id, 22)}<b>${App.esc(t.name)}</b> · ${sums[i].n} matches · ${t.stage} overall</span>`).join("")}</div>
         ${valid ? `<section class="review-scorecards">${["xgd", "gd", "quality"].map((key) => `<div class="card"><span class="kicker">${metrics[key][0]}</span><div class="review-numbers"><b>${fmt(sums[0][key], metrics[key][2])}</b><span>vs</span><b>${fmt(sums[1][key], metrics[key][2])}</b></div><span class="note">${metrics[key][1]}</span></div>`).join("")}</section>
@@ -90,7 +89,7 @@
         <div class="card review-export"><div><h3>Save or export</h3><p class="note">The address preserves your teams, indicators, scope and question. Download the observed match rows used in this comparison.</p></div><button class="btn small" data-export>Download comparison CSV</button></div>` : '<div class="card review-section"><h2>No matches in this scope</h2><p>One selected team has no records for this stage. Change the scope or select another team.</p></div>'}`;
       root.querySelectorAll("[data-team-a], [data-team-b]").forEach((el) => { el.onchange = () => {
         const x = root.querySelector("[data-team-a]").value, y = root.querySelector("[data-team-b]").value;
-        if (x === y) { el.value = el.hasAttribute("data-team-a") ? a : b; return; }
+        if (!x || !y || x === y) { el.value = el.hasAttribute("data-team-a") ? a : b; return; }
         App.go(`#/twins/${x}/${y}${query()}`);
       }; });
       if (!valid) return;
@@ -169,9 +168,9 @@
     svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 0).attr("y2", h - 35).attr("stroke", "#d2dbd4");
     dials.forEach((dial, i) => {
       const y = i * 46 + 21, values = teams.map((t) => space.team[t.id][i]);
-      svg.append("text").attr("x", 0).attr("y", y + 4).attr("class", "review-svg-label").text(dial);
+      svg.append("text").attr("x", 0).attr("y", y + 4).attr("class", "review-svg-label").text(App.indicator(dial).label);
       svg.append("line").attr("x1", x(values[0])).attr("x2", x(values[1])).attr("y1", y).attr("y2", y).attr("stroke", "#bbc8bf").attr("stroke-width", 3);
-      values.forEach((v, side) => svg.append("circle").attr("cx", x(v)).attr("cy", y + (values[0] === values[1] ? side * 3 - 1.5 : 0)).attr("r", 5).attr("fill", colors[side]).append("title").text(`${teams[side].name} · ${dial} · ${App.signed(v)} sd`));
+      values.forEach((v, side) => svg.append("circle").attr("cx", x(v)).attr("cy", y + (values[0] === values[1] ? side * 3 - 1.5 : 0)).attr("r", 5).attr("fill", colors[side]).append("title").text(`${teams[side].name} · ${App.indicator(dial).label} · ${App.signed(v)} sd`));
       const index = App.dials.indexOf(dial);
       svg.append("text").attr("x", width).attr("y", y + 4).attr("text-anchor", "end").attr("class", "review-svg-label").text(rows.map((list) => fmt(d3.mean(list, (r) => r.dials[index]), 1)).join(" / "));
     });

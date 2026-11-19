@@ -16,12 +16,12 @@
 .lab-page .lab-back { display: inline-flex; align-items: center; padding: 5px 13px; font-size: 13px; font-weight: 600; text-decoration: none; border-radius: 3px; background: var(--card); border: 1.5px solid var(--line); box-shadow: var(--shadow); }
 .lab-page .lab-back:hover { border-color: var(--axis); }
 .lab-page .lab-status { display: none; }
-.lab-page .lab-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "copy art" "picker art"; gap: 14px 24px; align-items: center; padding: clamp(20px, 2.6vw, 34px) clamp(20px, 3vw, 40px); background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); margin-bottom: 18px; }
+.lab-page .lab-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "copy picker"; gap: 14px 24px; align-items: center; padding: 14px 18px; background: var(--card); border: 1.5px solid var(--line); border-radius: 4px; box-shadow: var(--shadow); margin-bottom: 18px; }
 .lab-page .lab-header > div:first-child { grid-area: copy; min-width: 0; }
 .lab-page .lab-header h1 { font-size: 15px; font-weight: 600; }
 .lab-page .lab-header h1 > span { display: none; }
 .lab-page .lab-header p { margin: 10px 0 0; font-size: 17px; max-width: 560px; }
-.lab-page .lab-hero-art { display: block; grid-area: art; width: clamp(170px, 19vw, 250px); height: auto; aspect-ratio: 1; }
+
 .lab-page .lab-match-picker { grid-area: picker; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; min-width: 0; }
 .lab-page .lab-match-picker label { font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
 .lab-page .lab-match-picker .sel-enhanced { flex: 0 1 380px; min-width: 240px; }
@@ -297,6 +297,6 @@ html:not([lang="en"]) .lab-page .lab-tabs button { white-space: nowrap; }
   .lab-page .lab-network-sidebar { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
   .lab-page .lab-route-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .lab-page .lab-header { grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "picker"; }
-  .lab-page .lab-hero-art { display: none; }
+
   .pulse-summary { grid-template-columns: minmax(0, 1fr); }
 }

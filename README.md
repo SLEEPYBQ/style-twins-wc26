@@ -1,6 +1,6 @@
 # Style Twins — World Cup 2026 visual analytics (Group 6)
 
-An interactive retrospective analysis of 48 teams and 104 matches. Style Twins helps football fans who understand basic match statistics investigate why similar playing styles can accompany different chances and scorelines. Start with a team comparison, inspect its match evidence, and test how sensitive the comparison is to individual indicators and matches.
+An interactive retrospective analysis of 48 teams and 104 matches. Style Twins helps football fans who understand basic match statistics investigate why similar playing styles can accompany different chances and scorelines. Explore all teams on the Style Map and Style DNA Heatmap, choose teams to compare, then inspect their match evidence.
 
 Group 6: Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang.
 
@@ -20,7 +20,7 @@ Open [the local site](http://127.0.0.1:8642/). Use `python3` instead of `python`
 
 | Route | What it supports |
 | --- | --- |
-| `#/story` | Unified workbench; choose a task and A/B teams alongside linked views |
+| `#/story` | All-team map and heatmap overview with optional A/B selection |
 | `#/styles` | The same linked workbench with shareable filters, encoding and match selections |
 | `#/team/ESP` | Team fingerprint, match records, style neighbours and the original result decomposition |
 | `#/twins/NED/CRO` | Team comparison with match scope, outcome measures, match distributions, opponent context and omission sensitivity |
@@ -34,16 +34,15 @@ Selections are retained in shareable analysis URLs and return links. Comparison 
 
 ### Linked analysis workbench
 
-The site opens directly in one desktop workspace (`#/story` and `#/styles`). A context bar holds the current A/B pair and the match scope. Below it, six views each answer one question. Drag the gutters between views to resize them; double-click a gutter to reset it.
+The site opens on the Style Map and the Style DNA Heatmap. Hover or focus a point or row to locate the same team in the other view. Click a team to set A, then another to set B. The searchable pickers also accept a team name or code. Shift-click sets A. Use **Clear comparison** in the B picker to return to one team, or **Reset view** to return to the full tournament.
 
-- **Team Table**: which teams are in play? Search by name, filter by style group or by xG-difference and goal-difference ranges, sort, pin A or B, and export the filtered rows as CSV.
-- **Similarity Search**: who plays most like A? Toggle the indicators used (at least two). Teams are ranked by style distance and show a similarity percentile; click one to compare it as B.
-- **Style Map**: where does every team sit? Use style PCA or choose X/Y from style and outcome measures. Colour points by selection state or style group, and brush a region to filter. Click a point to set B; Shift-click sets A.
-- **Style Profile**: how do A and B differ? All ten indicators are shown in fixed or largest-gap order, and indicators left out of the similarity calculation are dimmed.
-- **Outcomes**: do similar styles bring similar results? A and B per-match xG and goals are drawn against the average of A's five closest teams and the tournament average.
-- **Match List**: which matches back it up? Selecting a match row places that single performance in the map and profile and links to the replay and Match Lab.
+- **Style Map** projects team means onto two principal components fitted to tournament team-match records using the selected indicators. Switch to X / Y for raw indicator means or per-match outcomes. Drag the divider to resize the two views. The Brush button selects a region and the filter bar clears it.
+- **Style DNA Heatmap** shows all ten team means in standard deviations from the full-tournament team-match average. Inspect a cell for its raw value and z-score. Arrow keys navigate rows and cells. Click a column heading to order teams by that indicator, or use Row order for groups, outcomes and distance from A. Filtering by an original style group adds its mean profile across the group’s teams in scope. Hollow circles on headings identify indicators omitted from the similarity calculation.
+- **Similar teams** ranks teams against A using two or more selected indicators. Its percentile is the share of all in-scope team pairs at least as far apart as that pair, including ties. Search, group, outcome and brush filters restrict the overview cohort. The similarity ranking retains all eligible teams in the match scope.
+- **Team Table** gives sortable outcomes and a CSV for the current filters. Pinned teams outside the filters remain identifiable in the table and map. The CSV contains just the filtered rows.
+- **Style Profile, Outcomes and Match evidence** open with the first team. With two teams, order the profile by gap or open the full pair report. Outcome benchmarks show the mean of A’s five closest team means and the average across team-match records in the chosen scope. Select a match performance to overlay it on the map and profile, then open its replay or Match Lab.
 
-Hovering a team in any panel highlights it everywhere and describes it below the map. Pinned A/B teams stay visible outside the current filters. Scope and indicator changes recompute profiles and distances, with full-tournament standardization held fixed; the original style groups are not retrained. Analytical state is kept in the URL. Narrow screens stack the panels. Design sources are recorded in `RESEARCH.md`.
+Both workspace routes preserve selections, match scope, indicators, filters, heatmap order and map encodings in the URL. For example, `#/styles?team=ECU&compare=USA&scope=group&heatSort=near` opens a group-stage comparison. The ten canonical indicator IDs, the fitted groups and the full-tournament standardization stay fixed across views.
 
 ### Professional analysis workspaces
 
@@ -84,6 +83,14 @@ node scripts/verify-i18n.cjs
 ```
 
 The checks cover aggregation, comparison scope, nearest-neighbour exclusions, omission calculations, full-network counts, event coverage and event-time boundaries. The localization checks also cover placeholder preservation, persistent preferences, safe text updates and unchanged analytical data, including both Chinese scripts. Optional browser integration checks are available in `web/scripts/verify-i18n-browser.cjs` and require Playwright with Chromium available to Node.js. With the local server running on port 8642, run `node scripts/verify-i18n-browser.cjs` from `web/`. Set `STYLE_TWINS_BASE_URL` to use another address. The suite checks all twelve languages across the main routes, Spanish and Chinese team search, persistence, SVG/CSV exports and 390px layouts; artifacts go to the system temporary directory unless `STYLE_TWINS_QA_OUTPUT` is set. Missing-key reports distinguish Spanish, Simplified Chinese and Traditional Chinese coverage.
+
+The workspace browser regression runs with the same server and Playwright setup:
+
+```bash
+node scripts/verify-workspace-browser.cjs
+```
+
+It checks all 480 heatmap values against the delivered records, linked selections, sorting, custom axis units, scoped outcome benchmarks, filtering, history and exports. For a slow SSH tunnel, either browser suite accepts a navigation timeout in milliseconds through `STYLE_TWINS_NAV_TIMEOUT_MS`. Desktop, laptop and phone screenshots are written to `STYLE_TWINS_QA_OUTPUT` or the system temporary directory.
 
 ## Rebuild the data
 

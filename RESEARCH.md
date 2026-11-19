@@ -119,3 +119,13 @@ Implementation:
 - Decorative generated illustrations are hidden.
 - Workspace views can be resized by dragging the gutters; the layout is stored per browser, and double-clicking a gutter resets it.
 - Page copy outside the workspace now uses plain view titles instead of question headlines and taglines. Examples: “Where do their styles align?” → “Style indicators”, “Match intelligence.” → “Match Lab”, “Audit the resemblance.” → “Similarity robustness”, “Find the matches behind the pattern” → “Matches”. Numbered step kickers such as “01 / Establish the comparison” were removed. Simplified and Traditional Chinese labels are in `web/js/copy-locales.js`; the other ten languages show these new titles in English until their catalogs are updated. `scripts/verify-lab.cjs` now checks for the new Match Lab heading.
+
+## 19 November 2026 — Exploratory team selection and the Style DNA Heatmap
+
+The opening view displays all teams on the map and in the matrix. A chosen team supplies the reference for similarity search, and selecting a second team opens a comparison. The following decisions adapt the interaction roles visible in the three papers.
+
+- VITALITY distinguishes collection filters, similarity results, projected positions and details on demand. Here a hover identifies a team across views, a brush defines a subset, and A/B selections persist through filtering. Distances are computed across the selected indicators independently of the map projection. [VITALITY, Figure 1 and system description](https://arxiv.org/html/2108.03366v3)
+- Lumos places encoding choices next to the plot and supplies distribution context. The workspace keeps raw X/Y controls by the map, the standardized scale above the heatmap and the current scope’s reference mean beside the outcomes. [Lumos project and interface](https://lumos-vis.github.io/)
+- DataPilot separates attribute selection from record filtering. Style Twins makes the corresponding distinction visible through similarity checkboxes, matrix header markers and a separate original-group filter. A group filter exposes the group’s mean for each indicator. [DataPilot, Figure 1](https://jhoffswell.github.io/website/resources/papers/2023-DataPilot-CHI.pdf#page=7)
+
+The presentation labels follow the transformations in `pipeline/features.py`. For example, attacking transitions are shown as “Attacks after regains”, and “Defending high” includes both high press and high block. Custom map axes and cell readouts use raw indicator units, while heatmap colours use the fixed full-tournament standardization. Team outcomes use the selected scope’s matches. The all-ten-indicator PCA shows approximately 68% of team-match variation on its first two axes.

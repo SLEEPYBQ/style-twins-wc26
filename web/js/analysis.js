@@ -142,5 +142,5 @@
     };
   }
 
-  App.analysis = { records, readDials, query, rows, space, twinTable, summary, metric, distance, nearest, opponent };
+  App.analysis = { records, inScope, readDials, query, rows, space, twinTable, summary, metric, distance, nearest, opponent };
 })();

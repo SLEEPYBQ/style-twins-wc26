@@ -33,7 +33,7 @@
         <div>
           <div class="kicker">${t.stage} · ${t.n} matches</div>
           <h1>${App.esc(t.name)}</h1>
-          <div class="row" style="margin-top:8px">${App.archPill(t.archetype, dials)}<span class="note">${arch.tagline}</span></div>
+          <div class="row" style="margin-top:8px">${App.archPill(t.archetype, dials)}</div>
           <div class="facts">
             <div class="fact"><b>${t.record.W}-${t.record.D}-${t.record.L}</b><span>W-D-L</span></div>
             <div class="fact"><b>${t.gf}–${t.ga}</b><span>Goals</span></div>
@@ -47,13 +47,12 @@
           <div><div class="kicker" style="margin:0">Passing hub</div><b style="font-size:17px">${App.esc(t.hub.name)}</b>
             <div class="note">${t.hub.passes.toLocaleString()} passes sent + received</div></div>
         </div>
-        <img src="${App.archArt(arch.id)}" alt="" style="display:none">
       </div>
 
       <div class="grid-2 section">
         <div class="card">
           <h3>Style profile</h3>
-          <div class="sub">Bars show ${App.esc(t.name)}'s averages for your ${dials.length} selected metrics, in standard deviations from the tournament reference. Diamonds show the original ${arch.name.replace("The ", "")} cluster profile.</div>
+          <div class="sub"><span>Standard deviations from the tournament mean</span> · <span>◇</span> <span>Group mean</span></div>
           <div id="fp"></div>
         </div>
         <div class="card">
@@ -72,12 +71,12 @@
             const o = App.team[n.id];
             const gap = t.gd_per_match - o.gd_per_match;
             return `<a class="twin-item" href="${detailUrl(`#/twins/${t.id}/${o.id}`)}">${App.flag(o.id, 30)}
-              <div><b>${App.esc(o.name)}</b> <span class="note">${App.arch[o.archetype].name.replace("The ", "")}</span>
+              <div><b>${App.esc(o.name)}</b> <span class="note">${App.groupLabel(o.archetype)}</span>
               <div class="why">${Math.abs(gap) < 0.05 ? "Similar goal difference" : gap > 0 ? `${App.esc(t.name)} ahead by ${App.signed(gap, 2)} GD/match` : `${App.esc(o.name)} ahead by ${App.signed(-gap, 2)} GD/match`}</div></div>
               <span class="sim">${Math.round(n.sim * 100)}<small style="display:block;font-size:10px">percentile</small></span></a>`;
           }).join("")}</div>
           <p class="note" style="margin-top:10px">Average match-to-team style distance is <b>${drift.toFixed(2)}</b> standard deviations per selected metric (root mean square).
-            <a href="#/styles${A.query(dials, { team: t.id })}">See the trajectory on the map →</a></p>
+            <a href="#/styles${A.query(dials, { team: t.id })}">Style Map</a></p>
         </div>
         <div class="card">
           <h3>Matches</h3>
@@ -99,7 +98,7 @@
       const z = space.team[t.id];
       const raw = dials.map((d) => d3.mean(t.matches, (k) => App.tm[k].dials[App.dials.indexOf(d)]));
       App.charts.fingerprint(fp, dials.map((d, i) => ({ dial: d, z: z[i], raw: raw[i] })), {
-        compare: dials.map((d) => ({ dial: d, z: arch.centroid[d] })), compareLabel: `typical ${arch.name.replace("The ", "")}`, mainLabel: t.name,
+        compare: dials.map((d) => ({ dial: d, z: arch.centroid[d] })), compareLabel: "Group mean", mainLabel: t.name,
       });
       App.charts.recipe(rc, [{ label: t.name, values: t.decomp, dots: t.matches.map((k) => App.tm[k].decomp), dotKeys: t.matches }], {
         onMatch: (key) => App.go(detailUrl(`#/match/${App.tm[key].match_id}`)),

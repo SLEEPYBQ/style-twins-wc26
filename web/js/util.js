@@ -6,6 +6,29 @@
   App.data = WC;
   App.dials = WC.dials.map((d) => d.id);
   App.dialInfo = Object.fromEntries(WC.dials.map((d) => [d.id, d]));
+  // Display names follow pipeline/features.py. Source IDs stay stable in URLs, files and models.
+  const indicators = {
+    "Ball share": { label: "Possession", unit: "%", help: "Share of match time with the ball. The reports count contested time separately." },
+    "Patient build-up": { label: "Build-up play", unit: "%", help: "Building from the back, with or without pressure, as a share of attacking phases." },
+    "Direct play": { label: "Long balls & counters", unit: "%", help: "Long balls and counterattacks as a share of attacking phases." },
+    "Transition attacks": { label: "Attacks after regains", unit: "%", help: "Attacking immediately after winning the ball, as a share of attacking phases." },
+    "Final-third camp": { label: "Final-third play", unit: "%", help: "Play in the third nearest the opponent’s goal, as a share of attacking phases." },
+    "Wing crosses": { label: "Crosses", unit: "per 50% possession", help: "Crosses per match, scaled to 50% team possession." },
+    "High press": { label: "Defending high", unit: "%", help: "Pressing or forming a block high up the pitch, as a share of defensive phases." },
+    "Deep block": { label: "Defending deep", unit: "%", help: "Pressing or forming a block near the team’s own goal, as a share of defensive phases." },
+    "Counter-press": { label: "Press after loss", unit: "%", help: "Pressing immediately after losing the ball, as a share of defensive phases." },
+    "Press intensity": { label: "Pressures", unit: "per 50% opponent possession", help: "Pressures per match, scaled to 50% opponent possession." },
+  };
+  App.indicator = (id) => indicators[id];
+  // Descriptive names summarize the stored full-tournament centroids.
+  const groupLabels = {
+    architects: "Possession build-up",
+    stormers: "Final-third pressure",
+    allrounders: "Balanced profile",
+    counterpunchers: "Counterattacking",
+    fortress: "Deep and direct",
+  };
+  App.groupLabel = (id) => groupLabels[id] || "";
   App.teams = WC.teams;
   App.team = Object.fromEntries(WC.teams.map((t) => [t.id, t]));
   // Muted style-group hues that stay clear of the A/B/closest-team state colours (see css/theme.css).
@@ -87,7 +110,7 @@
   App.archPill = (archId, dials) => {
     const a = App.arch[archId];
     const query = dials ? App.analysis.query(dials, { arch: a.id }) : `?arch=${a.id}`;
-    return `<a class="pill" href="#/styles${query}"><span class="sw" style="background:${a.color}"></span>${a.name}</a>`;
+    return `<a class="pill" href="#/styles${query}">${App.groupLabel(archId)}</a>`;
   };
   App.resultChip = (r) => `<span class="result ${r}" title="${({ W: "Win", D: "Draw", L: "Loss" })[r]}">${r}</span>`;
   App.avatarUrl = (pid) => {
@@ -184,7 +207,7 @@
       for (const n of near[a]) if (a < n.id) all.push(n.d);
     }
     all.sort(d3.ascending);
-    const similarity = (d) => 1 - d3.bisectLeft(all, d) / all.length; // share of team pairs that are LESS alike
+    const similarity = (d) => 1 - d3.bisectLeft(all, d) / all.length; // share of pair distances at or above d
     for (const a of ids) for (const n of near[a]) n.sim = similarity(n.d);
     return { near, similarity, pairs: all.length };
   };

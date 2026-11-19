@@ -30,13 +30,13 @@
 
     root.innerHTML = `
       <div class="duel-topline"><a class="btn small ghost" href="${App.esc(back)}">← Back to analysis</a><span class="kicker">Single-match comparison</span></div>
-      <section class="duel-intro"><img class="duel-hero-art" src="img/gen/duel_hero.webp" alt="" width="720" height="720" loading="lazy" onerror="this.remove()"><h1>Performance comparison</h1><p>One team&#8217;s performance in one match, compared with a stylistically similar performance by another team.</p></section>
+      <section class="duel-intro"><h1>Performance comparison</h1><p>One team&#8217;s performance in one match, compared with a stylistically similar performance by another team.</p></section>
       <section class="card duel-controls">
         <div><label class="duel-label" for="duel-first">Reference performance</label><div id="duel-first"></div></div>
         <div><label class="duel-label" for="duel-second">Comparison performance</label><div id="duel-second"></div></div>
         <div><label class="duel-label" for="duel-scope">Find neighbours in</label><select id="duel-scope"><option value="all">All tournament matches</option><option value="group">Group stage</option><option value="knockout">Knockout stage</option></select></div>
       </section>
-      <details class="card duel-definition"><summary>Similarity uses ${dials.length} selected style metrics</summary><p class="note">Each selected metric has equal weight after standardization across all 208 team-match records. Distance is the root mean square standardized difference. Lower means closer.</p><div class="duel-dials">${App.dials.map((dial) => `<label><input type="checkbox" value="${App.dials.indexOf(dial)}" ${dials.includes(dial) ? "checked" : ""}> ${App.esc(dial)}</label>`).join("")}</div><p class="note" data-dial-note>Keep at least two metrics. Scores and xG are excluded from similarity.</p></details>
+      <details class="card duel-definition"><summary>Similarity uses ${dials.length} selected style metrics</summary><p class="note">Each selected metric has equal weight after standardization across all 208 team-match records. Distance is the root mean square standardized difference. Lower means closer.</p><div class="duel-dials">${App.dials.map((dial) => `<label><input type="checkbox" value="${App.dials.indexOf(dial)}" ${dials.includes(dial) ? "checked" : ""}> ${App.esc(App.indicator(dial).label)}</label>`).join("")}</div><p class="note" data-dial-note>Keep at least two metrics. Scores and xG are excluded from similarity.</p></details>
       <div id="duel-evidence"></div>
       <section class="section"><div class="section-head"><div><h2>Other close performances</h2><p>Different teams and different physical matches. Candidates use the selected style metrics and stage range.</p></div></div><div class="duel-neighbours" id="duel-neighbours"></div></section>`;
 
@@ -84,13 +84,13 @@
     evidence.innerHTML = `
       <div class="duel-match-heads">${rows.map((row, side) => `<article class="card duel-match-head" style="--duel-color:${colors[side]}"><div class="kicker">${side === 0 ? "Reference performance" : "Comparison"} · M${row.number}</div><h2>${App.flag(row.team_id, 40)} ${App.esc(name(row))}</h2><p>v ${App.esc(App.team[row.opp_id].name)} · ${App.esc(row.stage)}</p><div class="duel-score">${row.goals}–${row.goals_opp}<span>${App.esc(App.match[row.match_id].date)}${App.match[row.match_id].aet ? " · extra time" : ""}</span></div><a class="btn small ghost" href="${App.esc(replay(row))}">Inspect match →</a>${sourceLink(row)}</article>`).join("")}</div>
       <div class="duel-reading"><span><b>${format(distance)}</b> style distance</span><p>${App.esc(name(first))} ${xgComparison} in these two matches. Compare shot quantity and quality below, then inspect the opponents.</p></div>
-      <div class="duel-section-heading"><span>01</span><div><h2>Chance creation</h2><p>Observed full-match totals. Within each metric both teams share a scale. Extra time is included where played.</p></div></div>
+      <div class="duel-section-heading"><div><h2>Chance creation</h2><p>Observed full-match totals. Within each metric both teams share a scale. Extra time is included where played.</p></div></div>
       <section class="card"><div class="duel-legend">${rows.map((row, i) => `<span><i style="background:${colors[i]}"></i>${App.esc(name(row))}</span>`).join("")}</div><div class="duel-metrics">${metricCards}</div></section>
-      <div class="duel-section-heading"><span>02</span><div><h2>Style similarity</h2><p>Standardized style values on one common scale. The middle line is the tournament reference mean.</p></div></div>
+      <div class="duel-section-heading"><div><h2>Style similarity</h2><p>Standardized style values on one common scale. The middle line is the tournament reference mean.</p></div></div>
       <section class="card"><div id="duel-style-chart"></div><div class="duel-legend">${rows.map((row, i) => `<span><i style="background:${colors[i]}"></i>${App.esc(name(row))}</span>`).join("")}</div>
-        <details class="duel-values"><summary>Inspect the original metric values</summary><div class="duel-values-scroll"><table><thead><tr><th scope="col">Style measure</th>${rows.map((row) => `<th scope="col">${App.esc(name(row))}</th>`).join("")}</tr></thead><tbody>${dials.map((dial) => `<tr><th scope="row">${App.esc(App.dialInfo[dial].label)}</th>${rows.map((row) => `<td>${format(row.dials[App.dials.indexOf(dial)])}</td>`).join("")}</tr>`).join("")}</tbody></table></div><p class="note">Phase measures are normalized relative profiles. <a href="#/method">Definitions and units</a></p></details>
+        <details class="duel-values"><summary>Inspect the original metric values</summary><div class="duel-values-scroll"><table><thead><tr><th scope="col">Style measure</th>${rows.map((row) => `<th scope="col">${App.esc(name(row))}</th>`).join("")}</tr></thead><tbody>${dials.map((dial) => `<tr><th scope="row">${App.esc(App.indicator(dial).label)} (${App.esc(App.indicator(dial).unit)})</th>${rows.map((row) => `<td>${format(row.dials[App.dials.indexOf(dial)])}</td>`).join("")}</tr>`).join("")}</tbody></table></div><p class="note">Phase measures are normalized relative profiles. <a href="#/method">Definitions and units</a></p></details>
       </section>
-      <div class="duel-section-heading"><span>03</span><div><h2>Opponent context</h2><p>Opponent averages across their other tournament matches. Each estimate excludes the match being inspected and includes later matches.</p></div></div>
+      <div class="duel-section-heading"><div><h2>Opponent context</h2><p>Opponent averages across their other tournament matches. Each estimate excludes the match being inspected and includes later matches.</p></div></div>
       <div class="duel-match-heads">${rows.map((row) => {
         const opponent = analysis.opponent(row);
         return `<article class="card duel-opponent"><div class="kicker">${App.esc(name(row))} faced</div><h3>${App.flag(row.opp_id, 28)} ${App.esc(App.team[row.opp_id].name)}</h3><dl><div><dt>Other matches</dt><dd>${opponent.n}</dd></div><div><dt>xG created per match</dt><dd>${format(opponent.xg)}</dd></div><div><dt>xG conceded per match</dt><dd>${format(opponent.xga)}</dd></div></dl><p class="note">A descriptive comparison of this opponent’s schedule and performance. The matches and opponents differ across estimates.</p><a href="#/team/${row.opp_id}${analysis.query(dials, { return: currentUrl })}">Explore this opponent →</a></article>`;
@@ -110,11 +110,11 @@
       svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 5).attr("y2", height - 28).attr("stroke", "#bec3c3");
       dials.forEach((dial, index) => {
         const y = index * 49 + 17;
-        svg.append("text").attr("x", 0).attr("y", y + 7).attr("font-size", width < 540 ? 10 : 12).attr("fill", "#34424a").text(dial);
+        svg.append("text").attr("x", 0).attr("y", y + 7).attr("font-size", width < 540 ? 10 : 12).attr("fill", "#34424a").text(App.indicator(dial).label);
         values.forEach((vector, side) => {
           const value = vector[index];
           svg.append("rect").attr("x", Math.min(x(0), x(value))).attr("y", y + side * 12 - 6).attr("width", Math.abs(x(value) - x(0))).attr("height", 9).attr("rx", 2).attr("fill", colors[side])
-            .append("title").text(`${name(rows[side])}, ${dial}, ${App.signed(value, 2)} standard deviations`);
+            .append("title").text(`${name(rows[side])} · ${App.indicator(dial).label} · ${App.signed(value, 2)} σ`);
         });
       });
       svg.append("g").attr("transform", `translate(0,${height - 23})`).call(d3.axisBottom(x).ticks(5).tickFormat((value) => App.signed(value, 1))).call((group) => group.select(".domain").remove());

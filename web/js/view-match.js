@@ -850,18 +850,18 @@
 
     // story badges: the same rules for every match
     const badges = [];
-    for (const [s, T] of [[0, H], [1, A]]) {
+    for (const T of [H, A]) {
       const d = T.decomp;
-      if (d.c_keep > 0.8) badges.push({ img: "img/gen/keeper_save.webp", title: "Fewer goals conceded than xG", text: `${App.esc(T.name)} conceded ${d.c_keep.toFixed(2)} fewer goals than the xG faced. This difference combines the opponent’s finishing, defending and match variation.` });
-      if (d.c_finish > 1) badges.push({ img: "img/gen/goal_moment.webp", title: "Goals above xG", text: `${App.esc(T.name)} scored ${d.c_finish.toFixed(2)} more goals than their xG of ${T.stats.xg}.` });
-      if (d.c_finish < -1) badges.push({ img: null, title: "Goals below xG", text: `${App.esc(T.name)} scored ${Math.abs(d.c_finish).toFixed(2)} fewer goals than their xG of ${T.stats.xg}.` });
+      if (d.c_keep > 0.8) badges.push({ title: "Fewer goals conceded than xG", text: `${App.esc(T.name)} conceded ${d.c_keep.toFixed(2)} fewer goals than the xG faced. This difference combines the opponent’s finishing, defending and match variation.` });
+      if (d.c_finish > 1) badges.push({ title: "Goals above xG", text: `${App.esc(T.name)} scored ${d.c_finish.toFixed(2)} more goals than their xG of ${T.stats.xg}.` });
+      if (d.c_finish < -1) badges.push({ title: "Goals below xG", text: `${App.esc(T.name)} scored ${Math.abs(d.c_finish).toFixed(2)} fewer goals than their xG of ${T.stats.xg}.` });
       const archNow = nearestArchetype(T);
       const usual = App.team[T.team_id].archetype;
-      if (archNow !== usual) badges.push({ img: App.archArt(archNow), title: `Played like ${App.arch[archNow].name}`, text: `${App.esc(T.name)} are usually ${App.arch[usual].name}, but this match's style dials sit closest to the ${App.arch[archNow].name.replace("The ", "")} profile.` });
+      if (archNow !== usual) badges.push({ title: `${App.esc(T.name)} · ${App.groupLabel(archNow)} (match profile)`, text: `Original style group · ${App.groupLabel(usual)}` });
     }
     const resultLine = m.pens ? m.pens : m.score[0] === m.score[1] ? "A draw." : `${m.score[0] > m.score[1] ? H.name : A.name} won${m.aet ? " after extra time" : ""}.`;
-    document.getElementById("story-badges").innerHTML = (badges.length ? badges.slice(0, 3) : [{ img: null, title: "Inspect the match evidence", text: `${App.esc(resultLine)} Compare the chance totals, phase profiles and passing connections.` }])
-      .map((b) => `<div class="card" style="display:flex;gap:14px;align-items:center">${b.img ? `<img src="${b.img}" alt="" style="width:84px;height:84px;object-fit:contain;flex:none" onerror="this.remove()">` : ""}
+    document.getElementById("story-badges").innerHTML = (badges.length ? badges.slice(0, 3) : [{ title: "Inspect the match evidence", text: `${App.esc(resultLine)} Compare the chance totals, phase profiles and passing connections.` }])
+      .map((b) => `<div class="card" style="display:flex;gap:14px;align-items:center">
         <div><div class="kicker" style="margin-bottom:2px">Match summary</div><h3>${b.title}</h3><p class="note" style="margin:4px 0 0">${b.text}</p></div></div>`).join("");
 
     function nearestArchetype(T) {
