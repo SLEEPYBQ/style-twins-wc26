@@ -1,7 +1,7 @@
 /* Site-wide theme, loaded after every other stylesheet.
  * Neutral analytic surfaces; colour carries data only (A blue, B orange, A's closest teams teal,
- * five muted style-group hues, purple/brown for signed values). One sans family (Inter, with
- * CJK fallbacks), 12px minimum for text that must be read, small radii, hairlines, no shadows. */
+ * five muted style-group hues, purple/brown for signed values). System UI type on Apple devices, with Inter and
+ * script-specific fallbacks elsewhere. Small radii, hairlines, no shadows. */
 :root {
   --paper: #f3f4f6;
   --card: #ffffff;
@@ -24,12 +24,9 @@
   --radius: 4px;
   --radius-s: 3px;
   --shadow: none;
-  --font-latin: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --display: var(--font-latin);
-  --sans: var(--font-latin);
+  --sans: -apple-system, BlinkMacSystemFont, var(--script-fonts, "Inter", system-ui, "Segoe UI", Roboto, sans-serif);
+  --display: var(--sans);
 }
-html[lang="zh-Hans"] { --display: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif; --sans: var(--display); }
-html[lang="zh-Hant"] { --display: "Inter", "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; --sans: var(--display); }
 
 body { background: var(--paper); color: var(--ink); font: 400 13px/1.5 var(--sans); font-feature-settings: "tnum" 1; }
 h1, h2, h3, h4 { font-family: var(--sans); letter-spacing: 0; line-height: 1.25; font-weight: 600; }
@@ -39,9 +36,9 @@ h3 { font-size: 14px; }
 .tnum, td, th { font-variant-numeric: tabular-nums; }
 
 /* Top bar (all routes) */
+html { scrollbar-gutter: stable; scroll-padding-block-start: 48px; }
 .topbar { position: sticky; top: 0; height: 48px; min-height: 48px; padding: 0 max(12px, calc((100vw - 1360px) / 2 + 16px)); gap: 20px; flex-wrap: nowrap;
   background: #ffffff; backdrop-filter: none; border-bottom: 1px solid var(--line); box-shadow: none; }
-body.ws-route .topbar { position: relative; padding: 0 12px; }
 .brand { font: 600 15px var(--sans); gap: 8px; color: var(--ink); }
 .brand-ball { transform: scale(.62); transform-origin: left center; margin: -6px -11px -6px 0; }
 .topbar .tabs { gap: 2px; flex: 1; }
@@ -92,14 +89,19 @@ body.ws-route .topbar { position: relative; padding: 0 12px; }
 .hero img, .lab-page .lab-hero-art, .lab-hero img, img[src*="img/gen/"] { display: none !important; }
 .hero { grid-template-columns: 1fr; }
 
-/* Phones */
+/* Keep the tabs on their own row when the header controls need the space. */
+@media (max-width: 960px) {
+  html { scroll-padding-block-start: 6rem; }
+  .topbar { height: auto; flex-wrap: wrap; gap: 4px 12px; padding: 6px 10px; }
+  .topbar .tabs { order: 3; flex: 1 1 100%; }
+  .topbar .jump { margin-inline: auto 0; }
+}
 @media (max-width: 760px) {
-  .topbar { height: auto; min-height: 48px; flex-wrap: wrap; row-gap: 4px; padding: 6px 10px; }
-  body.ws-route .topbar { padding: 6px 10px; }
-  .topbar .tabs { order: 4; flex-basis: 100%; overflow-x: auto; }
   .tabs a { padding: 5px 6px; font-size: 12px; }
+  .topbar .language-control { margin-inline-start: auto; }
   .language-control { width: 112px; }
-  .topbar .jump { display: none; }
+  .topbar .jump, .topbar .github-link { display: none; }
+  .foot-github { display: inline; }
 }
 
 /* Page and section headings outside the workspace: one modest scale */

@@ -29,6 +29,182 @@ async function overview(page) {
   assert.equal(await page.locator("#ws-twins [data-team]:visible, #ws-profile [data-team]:visible, #ws-matches [data-match]:visible").count(), 0);
 }
 
+async function checkHeaderNavigation(page) {
+  const controls = page.locator(".topbar, .topbar .brand, .topbar [data-tab], .language-control .sel-btn");
+  const bounds = () => controls.evaluateAll(nodes => nodes.map(node => {
+    const {x, y, width, height} = node.getBoundingClientRect();
+    return [node.dataset.tab || node.className, ...[x, y, width, height].map(Math.round)];
+  }));
+  const workspaceBounds = await bounds();
+  for (const tab of ["matches", "lab", "method", "styles"]) {
+    const link = `[data-tab="${tab}"]`;
+    await page.locator(link).click();
+    await page.locator(link + ".on").waitFor();
+    assert.deepEqual(await bounds(), workspaceBounds, "Top navigation moved on " + tab);
+  }
+}
+
+// The heatmap and map should paint the same team with exactly the same colour.
+async function checkIndicatorFills(page, index) {
+  const wrongTeams = await page.locator(heatRows).evaluateAll((rows, i) => rows.filter(row => {
+    const cell = row.querySelector('td[data-i="' + i + '"]');
+    const point = document.querySelector('#ws-map .mark[data-team="' + row.dataset.team + '"] circle:not(.halo)');
+    return getComputedStyle(point).fill !== getComputedStyle(cell).backgroundColor;
+  }).map(row => row.dataset.team), index);
+  assert.deepEqual(wrongTeams, [], "Map colours should match heatmap column " + index);
+}
+
+async function checkIndicatorPreview(page) {
+  const header = page.locator("#ws-heat th[data-i='8'] button");
+  const ranks = await ids(page, "#ws-twins [data-team]");
+  const url = page.url();
+  const marks = page.locator(mapMarks);
+  const positions = () => marks.evaluateAll(nodes => nodes.map(node => [node.dataset.team, node.getAttribute("transform")]));
+  const fills = () => marks.evaluateAll(nodes => nodes.map(node => getComputedStyle(node.querySelector("circle:not(.halo)")).fill));
+  const originalPositions = await positions(), originalFills = await fills();
+
+  await header.hover();
+  await checkIndicatorFills(page, 8);
+  assert.deepEqual(await positions(), originalPositions, "Inspecting an indicator must keep points in place");
+  assert.deepEqual(await ids(page, "#ws-twins [data-team]"), ranks);
+  await page.locator(".ws-primary").screenshot({path:path.join(output, "workspace-indicator-preview.png")});
+  assert.equal(page.url(), url, "Inspecting a column must preserve the model, pins and URL");
+  await page.locator("#ws-C-title").hover();
+  assert.deepEqual(await fills(), originalFills, "Restore the chosen encoding on pointer exit");
+
+  await page.locator("#ws-heat thead th[data-i='7'] button").focus();
+  await page.keyboard.press("Tab");
+  assert.equal(await header.evaluate(el => el === document.activeElement), true);
+  await checkIndicatorFills(page, 8);
+  await page.locator("#ws-reset").focus();
+  assert.deepEqual(await fills(), originalFills, "Restore the chosen encoding on keyboard focus exit");
+}
+
+async function checkTeamRanks(page) {
+  await page.goto(base + "/#/styles?team=GER&compare=URU&color=group");
+  await page.locator("#ws-heat tbody tr[data-team]").first().waitFor();
+  await checkIndicatorPreview(page);
+  const readout = page.locator("#ws-readout");
+  const url = page.url();
+  await mapTeam(page, "FRA").locator("circle").last().hover();
+  const france = await readout.innerText();
+  assert.match(france, /PCA distance rank\s*#1\b/i);
+  assert.match(france, /Style similarity rank\s*#8\b/i);
+  assert.match(france, /crosses/i);
+  const gap = page.locator("#ws-heat tr.is-compared td.is-gap");
+  assert.deepEqual(await gap.evaluateAll(cells => cells.map(c => [c.parentElement.dataset.team, c.dataset.i]).sort()),
+    [["FRA","5"],["GER","5"]], "Crosses has the largest standardized gap for this pair");
+  assert.equal(page.url(), url, "Hovering France must keep Uruguay pinned as B");
+  await page.locator(".ws-primary").screenshot({path:path.join(output, "workspace-pca-rank.png")});
+  await mapTeam(page, "URU").focus();
+  assert.match(await readout.innerText(), /Style similarity rank\s*#1\b/i);
+  await page.locator("#ws-view [data-v='custom']").click();
+  await mapTeam(page, "FRA").focus();
+  const custom = await readout.innerText();
+  assert.doesNotMatch(custom, /PCA/i, "Only PCA mode can identify a PCA neighbour");
+  assert.match(custom, /Style similarity rank\s*#8\b/i);
+  await page.locator("#ws-dials input[data-i='5']").uncheck();
+  await mapTeam(page, "FRA").focus();
+  assert.match(await readout.innerText(), /Style similarity rank\s*#6\b/i);
+  assert.deepEqual(await gap.evaluateAll(cells => cells.map(c => c.dataset.i)), ["8","8"],
+    "With crosses omitted the largest selected difference is press after loss");
+}
+
+async function checkTouchIndicator(page) {
+  const picker = page.locator("#ws-color");
+  await picker.selectOption("dial8");
+  assert.equal(params(page).get("color"), "dial8");
+  await checkIndicatorFills(page, 8);
+  await page.reload();
+  assert.equal(await picker.inputValue(), "dial8");
+  await checkIndicatorFills(page, 8);
+  await picker.selectOption("state");
+}
+
+async function checkPairExplorer(page) {
+  await page.goto(base + "/#/styles");
+  await page.locator("#ws-view [data-v='pairs']").click();
+  const pointSelector = "#ws-pairs .wp-chart circle[data-pair]";
+  const points = page.locator(pointSelector);
+  assert.equal(await points.count(), 1128);
+  assert.equal(new Set(await points.evaluateAll(nodes => nodes.map(node => node.dataset.pair))).size, 1128);
+  await checkPairFilters(page, points);
+
+  const pair = page.locator(pointSelector + "[data-pair='ECU-USA']");
+  assert.ok(Math.abs(Number(await pair.getAttribute("data-gap")) - 1.1) < 1e-8);
+  assert.ok(Math.abs(Number(await pair.getAttribute("data-sim")) - 99.73404255319149) < 1e-8);
+  await pair.scrollIntoViewIfNeeded();
+  // Find a blank starting point to the left of this pair, as nearby pairs can overlap.
+  const rect = await pair.evaluate(node => {
+    const chart = node.ownerSVGElement, overlay = chart.querySelector(".brush .overlay");
+    const hit = node.getBoundingClientRect();
+    const x = hit.x + hit.width / 2, y = hit.y + hit.height / 2;
+    for (let dx = 10; dx <= 60; dx += 5) for (let dy = 6; dy <= 30; dy += 3) {
+      const start = {x:x - dx, y:y - dy};
+      if (document.elementFromPoint(start.x, start.y) === overlay) {
+        return {start, end:{x:x + 4, y:y + 4}};
+      }
+    }
+    throw new Error("Could not start the pair brush on blank space");
+  });
+  await mouseDrag(page, rect.start, rect.end);
+  const included = await page.locator(pointSelector + ":not(.is-out)").count();
+  assert.ok(included > 0 && included < 1128, "The pair brush should narrow the shortlist");
+  assert.equal(await page.locator(heatRows).count(), 48, "A pair region must preserve the team cohort");
+  assert.equal(params(page).has("team"), false, "Brushing pairs leaves the comparison open until a pair is chosen");
+  assert.ok(params(page).get("pairRegion"), "The pair region should be shareable");
+  await page.reload();
+  assert.equal(await page.locator(pointSelector + ":not(.is-out)").count(), included);
+  const result = page.locator("#ws-pairs .wp-result[data-pair='ECU-USA']");
+  for (let seen = 0; !(await result.count()) && seen < included; seen += 8) {
+    await page.locator("#ws-pairs .wp-next").click();
+  }
+  await page.locator("#ws-pairs").screenshot({path:path.join(output, "workspace-pair-region.png")});
+  await result.focus();
+  await result.press("Enter");
+  assert.equal(params(page).get("team"), "ECU");
+  assert.equal(params(page).get("compare"), "USA");
+  assert.equal(await page.locator(mapMarks).count(), 48);
+  await page.goBack();
+  assert.equal(await page.locator(pointSelector + ":not(.is-out)").count(), included);
+  await page.locator("#ws-clear-pair-region").click();
+  assert.equal(await page.locator(pointSelector + ":not(.is-out)").count(), 1128);
+  await pair.click();
+  assert.equal(params(page).get("team"), "ECU");
+  assert.equal(params(page).get("compare"), "USA");
+}
+
+async function checkTouchPairs(page) {
+  await page.locator("#ws-view [data-v='pairs']").tap();
+  const first = page.locator("#ws-pairs .wp-result[data-pair]").first();
+  const ids = (await first.getAttribute("data-pair")).split("-");
+  const priorA = params(page).get("team");
+  if (ids[1] === priorA) ids.reverse();
+  await first.tap();
+  assert.equal(params(page).get("team"), ids[0]);
+  assert.equal(params(page).get("compare"), ids[1]);
+  assert.ok(await page.locator("#ws-map").isVisible());
+}
+
+async function checkPairFilters(page, points) {
+  const group = await page.evaluate(() => App.team.ECU.archetype);
+  await page.locator("#ws-group").selectOption(group);
+  const eligible = await ids(page, heatRows);
+  assert.equal(await points.count(), eligible.length * (eligible.length - 1) / 2);
+  await page.locator("#ws-group").selectOption("");
+
+  const search = page.locator("#ws-search");
+  await search.fill("Ecuador");
+  await page.waitForFunction(() => document.querySelectorAll("#ws-heat tbody tr[data-team]").length === 1);
+  assert.equal(await points.count(), 0, "One team has no unordered pairs");
+  await search.fill("no such team");
+  await page.waitForFunction(() => !document.querySelector("#ws-heat tbody tr[data-team]"));
+  assert.equal(await points.count(), 0);
+  await search.fill("");
+  await page.waitForFunction(() => document.querySelectorAll("#ws-heat tbody tr[data-team]").length === 48);
+  assert.equal(await points.count(), 1128);
+}
+
 async function checkCustomUnits(page, teamId, matchId = null) {
   // Independently invert the rendered linear scales using their labeled ticks.
   const readings = await page.evaluate(({teamId, matchId}) => {
@@ -54,52 +230,129 @@ async function checkCustomUnits(page, teamId, matchId = null) {
   assert.match(await page.locator("#ws-map .axis .title").first().textContent(), /%/);
 }
 
+// Work in viewport coordinates, just as a user dragging on the rendered plot would.
+// Canada's isolated point makes a top strip a reproducible small cohort at each size.
+async function topStrip(page) {
+  await page.locator("#ws-map").scrollIntoViewIfNeeded();
+  const plot = await page.locator("#ws-map .grid").boundingBox();
+  const canada = await mapTeam(page, "CAN").locator("circle").last().boundingBox();
+  const start = {x: plot.x + 3, y: plot.y + 3};
+  const end = {x: plot.x + plot.width - 3, y: canada.y + canada.height / 2 + 3};
+  assert.ok(end.y - start.y > 5, "Brush starts in blank plot space above Canada");
+  return {start, end};
+}
+
+async function mouseDrag(page, start, end) {
+  await page.mouse.move(start.x, start.y);
+  await page.mouse.down();
+  await page.mouse.move(end.x, end.y, {steps:6});
+  await page.mouse.up();
+}
+
+async function touchDrag(session, start, end, beforeRelease) {
+  await session.send("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [start]});
+  for (let i = 1; i <= 6; i++) {
+    const x = start.x + (end.x - start.x) * i / 6;
+    const y = start.y + (end.y - start.y) * i / 6;
+    await session.send("Input.dispatchTouchEvent", {type: "touchMove", touchPoints: [{x, y}]});
+  }
+  if (beforeRelease) await beforeRelease();
+  await session.send("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+}
+
+async function checkTouchBrush(page) {
+  const button = page.locator("#ws-brush");
+  assert.ok(await button.isVisible(), "Touch users can explicitly arm a brush");
+  assert.equal(await button.getAttribute("aria-pressed"), "false");
+  const session = await page.context().newCDPSession(page);
+  const {start} = await topStrip(page);
+  const scrollY = await page.evaluate(() => window.scrollY);
+  await touchDrag(session, {x:start.x, y:start.y + 85}, start);
+  await page.waitForFunction(y => window.scrollY > y + 15, scrollY);
+  assert.equal(params(page).has("cohort"), false, "A normal swipe scrolls without filtering");
+
+  await button.tap();
+  assert.equal(await button.getAttribute("aria-pressed"), "true");
+  const strip = await topStrip(page);
+  const beforeBrush = await page.evaluate(() => window.scrollY);
+  await touchDrag(session, strip.start, strip.end, async () => {
+    const whileBrushing = await page.evaluate(() => window.scrollY);
+    assert.ok(Math.abs(whileBrushing - beforeBrush) < 2, "Armed brush keeps the plot stationary during the gesture");
+  });
+  await page.waitForFunction(() => new URLSearchParams(location.hash.split("?")[1]).has("cohort"));
+  const cohort = await ids(page, heatRows);
+  assert.ok(cohort.includes("CAN") && cohort.length < 48);
+  assert.equal(await button.getAttribute("aria-pressed"), "false");
+  assert.equal(params(page).get("team"), "ECU");
+  assert.equal(params(page).get("compare"), "USA");
+  await page.locator("[data-clear='cohort']").tap();
+  assert.equal(await page.locator(heatRows).count(), 48);
+  // A connected mouse still supports direct dragging on a touch-capable device.
+  const hybridStrip = await topStrip(page);
+  await mouseDrag(page, hybridStrip.start, hybridStrip.end);
+  assert.deepEqual(await ids(page, heatRows), cohort);
+  await session.detach();
+}
+
 async function run() {
   fs.mkdirSync(output, {recursive:true});
   const browser = await chromium.launch({headless:true});
   try {
     const page = await browser.newPage({viewport:{width:1440,height:900}, acceptDownloads:true});
+    const phone = await browser.newPage({viewport:{width:390,height:844}, isMobile:true, hasTouch:true});
     const navigationTimeout = Number(process.env.STYLE_TWINS_NAV_TIMEOUT_MS);
-    if (navigationTimeout > 0 && Number.isFinite(navigationTimeout)) page.setDefaultNavigationTimeout(navigationTimeout);
     const errors = [];
-    page.on("pageerror", err => errors.push(err.message));
-    // The router catches rendering exceptions and reports them through console.error.
-    page.on("console", message => {
-      if (message.type() === "error" && /(?:Type|Syntax|Reference|Range)Error/.test(message.text())) errors.push(message.text());
-    });
-    for (const [name, width, height] of [["desktop",1440,900],["laptop",1280,800],["phone",390,844]]) {
+    for (const client of [page, phone]) {
+      if (navigationTimeout > 0 && Number.isFinite(navigationTimeout)) client.setDefaultNavigationTimeout(navigationTimeout);
+      client.on("pageerror", err => errors.push(err.message));
+      // The router catches rendering exceptions and reports them through console.error.
+      client.on("console", message => {
+        if (message.type() === "error" && /(?:Type|Syntax|Reference|Range)Error/.test(message.text())) errors.push(message.text());
+      });
+    }
+    for (const [name, width, height, client] of [["desktop",1440,900,page],["laptop",1280,800,page],["phone",390,844,phone]]) {
       console.log("Viewport", name, width, height);
-      await page.setViewportSize({width,height});
-      await page.mouse.move(0, 0);
-      await overview(page);
-      await page.waitForFunction(() => {
+      await client.setViewportSize({width,height});
+      await client.mouse.move(0, 0);
+      await overview(client);
+      await checkHeaderNavigation(client);
+      await client.waitForFunction(() => {
         const host = document.querySelector("#ws-map");
         const box = host.querySelector("svg").viewBox.baseVal;
         return Math.abs(box.width - host.clientWidth) <= 1 && Math.abs(box.height - host.clientHeight) <= 1;
       });
-      const layout = await page.evaluate(() => ({
+      const layout = await client.evaluate(() => ({
         pageWidth: document.documentElement.scrollWidth,
         map: document.querySelector("#ws-map").getBoundingClientRect().width,
         heat: document.querySelector("#ws-heat").getBoundingClientRect().width
       }));
       assert.ok(layout.pageWidth <= width + 1, name + " page overflow: " + layout.pageWidth);
       assert.ok(layout.map >= 200 && layout.heat >= 200, name + " chart width: " + JSON.stringify(layout));
-      await page.screenshot({path:path.join(output,"workspace-" + name + ".png")});
+      await client.screenshot({path:path.join(output,"workspace-" + name + ".png")});
       if (name === "phone") {
-        await page.locator("#ws-heat").scrollIntoViewIfNeeded();
-        await page.screenshot({path:path.join(output,"workspace-phone-heatmap.png")});
+        await client.locator("#ws-heat").scrollIntoViewIfNeeded();
+        await client.screenshot({path:path.join(output,"workspace-phone-heatmap.png")});
       }
       // Exercise the narrow/desktop scroll containers and team selection at every size.
-      await heatTeam(page, "ECU").locator("button").first().click();
-      assert.equal(params(page).get("team"), "ECU");
-      assert.equal(params(page).has("compare"), false);
-      assert.equal(await page.locator("#ws-twins [data-team]").first().getAttribute("data-team"), "USA");
-      await page.locator("#ws-twins [data-team]").first().click();
-      assert.equal(params(page).get("compare"), "USA");
-      assert.equal(await page.locator("#ws-matches [data-match]").count(), 9);
+      if (client === phone) await mapTeam(client, "ECU").locator("circle").last().tap();
+      else await heatTeam(client, "ECU").locator("button").first().click();
+      assert.equal(params(client).get("team"), "ECU");
+      assert.equal(params(client).has("compare"), false);
+      assert.equal(await client.locator("#ws-twins [data-team]").first().getAttribute("data-team"), "USA");
+      await client.locator("#ws-twins [data-team]").first().click();
+      assert.equal(params(client).get("compare"), "USA");
+      assert.equal(await client.locator("#ws-matches [data-match]").count(), 9);
+      if (client === phone) {
+        await checkTouchIndicator(client);
+        await checkTouchBrush(client);
+        await client.locator("[data-clear='cohort']").tap();
+        await checkTouchPairs(client);
+      }
     }
 
     await page.setViewportSize({width:1440,height:900});
+    await checkPairExplorer(page);
+    await checkTeamRanks(page);
     await overview(page);
     assert.match(await page.locator("#ws-projection").innerText(), /variation.*10.*indicators/i);
     const maxError = await page.evaluate(() => {
@@ -123,13 +376,14 @@ async function run() {
     await heatTeam(page, "ECU").locator("td[data-i]").first().hover();
     assert.match(await mapTeam(page, "ECU").getAttribute("class"), /is-hover/);
     assert.equal(page.url(), initialUrl, "Hover must be transient");
-    await page.locator("#ws-brush").hover();
+    assert.equal(await page.locator("#ws-brush").isVisible(), false, "Mouse selection requires no brush button");
+    await page.locator("#ws-C-title").hover();
     assert.doesNotMatch(await mapTeam(page, "ECU").getAttribute("class"), /is-hover/);
     await mapTeam(page, "ECU").focus();
     assert.match(await heatTeam(page, "ECU").getAttribute("class"), /is-hover/);
     await mapTeam(page, "ECU").press("Enter");
     assert.equal(params(page).get("team"), "ECU");
-    await heatTeam(page, "USA").locator("button").first().click();
+    await mapTeam(page, "USA").locator("circle").last().click();
     assert.equal(params(page).get("compare"), "USA");
 
     await page.locator("#ws-swap").click();
@@ -188,18 +442,18 @@ async function run() {
     assert.deepEqual(await ids(page, heatRows), order, "Column ordering should survive reload");
 
     // A brush changes the visible cohort in both tables while preserving pinned teams.
-    await page.locator("#ws-brush").click();
-    const overlay = await page.locator("#ws-map .brush .overlay").boundingBox();
-    const center = await mapTeam(page, "ECU").locator("circle").first().boundingBox();
-    const targetX = center.x + center.width/2, targetY = center.y + center.height/2;
-    await page.mouse.move(Math.max(overlay.x + 1, targetX - 8), Math.max(overlay.y + 1, targetY - 8));
-    await page.mouse.down();
-    await page.mouse.move(Math.min(overlay.x + overlay.width - 1, targetX + 8), Math.min(overlay.y + overlay.height - 1, targetY + 8), {steps:5});
-    await page.mouse.up();
+    const {start, end} = await topStrip(page);
+    await mouseDrag(page, start, end);
     const brushedIds = await ids(page, heatRows);
-    assert.ok(brushedIds.includes("ECU") && brushedIds.length < 48, "Brush should restrict heatmap");
+    assert.ok(brushedIds.includes("CAN") && brushedIds.length < 48, "Brush should restrict heatmap");
     assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out)")).sort(), brushedIds.sort());
+    assert.equal(params(page).get("team"), "ECU");
     assert.equal(params(page).get("compare"), "USA");
+    const retainedCohort = page.url();
+    const blank = (await topStrip(page)).start;
+    await page.mouse.click(blank.x, blank.y);
+    await mouseDrag(page, blank, {x:blank.x + 3, y:blank.y + 1});
+    assert.equal(page.url(), retainedCohort, "A blank click or a slight movement preserves the current cohort");
     await page.locator("[data-clear='cohort']").click();
     assert.equal(await page.locator(heatRows).count(), 48);
 
@@ -280,7 +534,7 @@ async function run() {
     await page.waitForFunction(() => !document.querySelector("#ws-heat tbody tr[data-team]"));
     assert.equal(await page.locator("#ws-map .mark").count(), 32);
     assert.deepEqual(errors, []);
-    console.log("Workspace browser checks passed for overview, A/B selection, linked hover, indicator changes, sorting, group/brush filtering, raw units, scope references, match evidence, navigation and three viewport sizes.");
+    console.log("Workspace browser checks passed for overview, A/B selection, linked indicator colours, team-pair exploration, PCA and similarity ranks, indicator changes, sorting, group filters, direct mouse brushing, touch scrolling and brushing, raw units, scope references, match evidence, navigation and three viewport sizes.");
   } finally {
     await browser.close();
   }

@@ -7,6 +7,7 @@
   const sortKeys = ["group", "near", "xgd", "gd", ...App.dials.map((_, i) => `dial${i}`)];
   const sortKey = (value) => sortKeys.includes(value) ? value : "group";
   const color = d3.scaleLinear().domain([-2, 0, 2]).range(["#985522", "#f4f3f2", "#594899"]).clamp(true);
+  const legend = '<span class="hm-scale"><span>≤ −2</span><i class="hm-low" aria-hidden="true"></i><span>0</span><i class="hm-high" aria-hidden="true"></i><span>≥ +2</span></span>';
   const groupIndex = new Map(App.data.archetypes.map((group, i) => [group.id, i]));
 
   function ordered(ids, order, { state, full, summaries, near }) {
@@ -27,7 +28,7 @@
     });
   }
 
-  function workspaceHeatmap(host, { change, choose, highlight }) {
+  function workspaceHeatmap(host, { change, choose, highlight, inspectIndicator }) {
     host.classList.add("ws-heat");
     host.innerHTML = `<div class="hm-tools">
         <label for="ws-heat-sort">Row order</label><span id="ws-heat-sort-host"></span>
@@ -35,7 +36,7 @@
         <span class="hm-count"></span>
       </div>
       <div class="hm-legend"><span>Standard deviations from the tournament mean</span>
-        <span class="hm-scale"><span>≤ −2</span><i class="hm-low" aria-hidden="true"></i><span>0</span><i class="hm-high" aria-hidden="true"></i><span>≥ +2</span></span>
+        ${legend}
         <span class="hm-excluded" hidden><i aria-hidden="true">○</i> <span>Outside similarity</span></span>
       </div>
       <span class="sr-only" id="ws-heat-keys">Arrow keys inspect values. Enter selects a team.</span>
@@ -50,7 +51,27 @@
     const viewport = get(".hm-scroll"), table = get(".hm-table"), body = table.tBodies[0];
     const info = App.dials.map((dial) => App.indicator(dial));
     let model, pickSort, canRank, previousLayout, focusTeam, currentCell, raw = {};
-    const defaultReadout = () => { get("#ws-heat-value").textContent = "Inspect a cell for its team average."; };
+    let pointerColumn = null, markedColumn = null;
+    const defaultReadout = () => {
+      get("#ws-heat-value").textContent = model.state.view !== "pairs" && window.matchMedia("(hover: hover)").matches
+        ? "Hover or focus a column heading to colour the map. Select it to sort teams."
+        : "Inspect a cell for its team average.";
+    };
+
+    function markIndicator(index) {
+      markedColumn = index;
+      table.tHead.querySelector(".is-inspected")?.classList.remove("is-inspected");
+      if (index != null) table.tHead.querySelector(`th[data-i="${index}"]`)?.classList.add("is-inspected");
+    }
+    function compareHover(teamA, other, index) {
+      for (const el of body.querySelectorAll(".is-compared, .is-gap")) el.classList.remove("is-compared", "is-gap");
+      if (!teamA || !other || teamA === other || index == null) return;
+      for (const id of [teamA, other]) {
+        const row = body.querySelector(`tr[data-team="${id}"]`);
+        row?.classList.add("is-compared");
+        row?.querySelector(`td[data-i="${index}"]`)?.classList.add("is-gap");
+      }
+    }
 
     function buildSort(hasRank) {
       const options = [["group", "Original style group"], ...(hasRank ? [["near", "Nearest to Team A"]] : []),
@@ -111,6 +132,7 @@
           <button type="button" data-order="dial${i}" title="${esc(measure.help)}"><span>${esc(measure.label)}</span>${!included ? '<i aria-label="Outside similarity">○</i>' : ""}</button>
           </th>`;
       }).join("")}</tr>`;
+      markIndicator(markedColumn);
       const heading = (arch, count) => `<tr class="hm-group-heading"><th scope="row" colspan="${info.length + 1}">
         <span class="hm-group-title"><span>${esc(App.groupLabel(arch))}</span><span class="hm-group-count">${count}</span></span></th></tr>`;
       const sections = [];
@@ -153,16 +175,25 @@
         : [info[i].label, rawText(Number(cell.dataset.raw), i), `${App.signed(Number(cell.dataset.z), 2)} σ`];
       get("#ws-heat-value").innerHTML = `<b>${esc(name)}</b>${details.map((part) => `<span>${esc(part)}</span>`).join("")}`;
     }
-    function inspectTarget(target) {
-      const row = target.closest("tr[data-team], .hm-group-mean");
-      const id = row?.dataset.team;
-      highlight(id || null);
-      inspect(row, target.closest("td[data-i]"));
+    function headerColumn(target) {
+      const header = target?.closest("thead th[data-i]");
+      return header ? Number(header.dataset.i) : null;
     }
-    table.addEventListener("pointerover", (e) => inspectTarget(e.target));
+    function inspectTarget(target, column) {
+      const row = target?.closest("tr[data-team], .hm-group-mean");
+      highlight(row?.dataset.team || null);
+      inspectIndicator(model.state.view === "pairs" ? null : column);
+      inspect(row, target?.closest("td[data-i]"));
+    }
+    table.addEventListener("pointerover", (e) => {
+      pointerColumn = e.pointerType === "touch" ? null : headerColumn(e.target);
+      inspectTarget(e.target, pointerColumn);
+    });
     table.addEventListener("pointerleave", () => {
-      if (body.contains(document.activeElement) && document.activeElement.matches(":focus-visible")) inspectTarget(document.activeElement);
-      else { highlight(null); inspect(null); }
+      pointerColumn = null;
+      const focus = document.activeElement;
+      const target = table.contains(focus) && focus.matches(":focus-visible") ? focus : null;
+      inspectTarget(target, headerColumn(target));
     });
     table.addEventListener("focusin", (e) => {
       const row = e.target.closest("tr[data-team]");
@@ -171,10 +202,12 @@
         row.querySelector(".hm-team").tabIndex = 0;
         focusTeam = row.dataset.team;
       }
-      inspectTarget(e.target);
+      // Mouse focus following a click should release the preview on pointerleave.
+      const column = e.target.matches(":focus-visible") ? headerColumn(e.target) : pointerColumn;
+      inspectTarget(e.target, column);
     });
     table.addEventListener("focusout", (e) => {
-      if (!table.contains(e.relatedTarget)) { highlight(null); inspect(null); }
+      if (!table.contains(e.relatedTarget)) inspectTarget(null, null);
     });
     table.addEventListener("click", (e) => {
       const order = e.target.closest("button[data-order]");
@@ -223,7 +256,7 @@
       }
     });
     return {
-      render,
+      render, markIndicator, compareHover,
       highlight(id) {
         const row = id && body.querySelector(`tr[data-team="${id}"]`);
         if (row && !row.matches(":hover, :focus-within")) revealRow(row);
@@ -232,5 +265,7 @@
     };
   }
   workspaceHeatmap.sortKey = sortKey;
+  workspaceHeatmap.color = color;
+  workspaceHeatmap.legend = legend;
   App.workspaceHeatmap = workspaceHeatmap;
 })();

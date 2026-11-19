@@ -25,6 +25,16 @@
     brush: '<svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true"><rect x="1.5" y="1.5" width="11" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="2.5 2"/></svg>',
   };
 
+  const colourOptions = [["state", "Selection"], ["group", "Style group"],
+    ...App.dials.map((dial, i) => [`dial${i}`, App.indicator(dial).label])];
+  function pairRegionFrom(value) {
+    if (!value) return null;
+    const bounds = value.split(",").map(num);
+    if (bounds.length !== 4 || !bounds.every(Number.isFinite)) return null;
+    const [left, right, bottom, top] = bounds;
+    return left >= 0 && left < right && right <= 100 && bottom >= 0 && bottom < top ? bounds : null;
+  }
+
   function stateFrom(p) {
     const dials = A.readDials(p), scope = ["group", "knockout"].includes(p.scope) ? p.scope : "all";
     const validTeam = (id) => Object.hasOwn(App.team, id);
@@ -37,8 +47,9 @@
     return {
       team, compare, dials, scope, heatSort: heatSort === "near" && !team ? "group" : heatSort,
       arch: Object.hasOwn(App.arch, p.arch) ? p.arch : "", search: p.search || "",
-      view: p.view === "custom" ? "custom" : "pca", x: axis(p.x, "xgd"), y: axis(p.y, "gd"),
-      color: p.color === "group" ? "group" : "state", order: p.order === "gap" ? "gap" : "fixed",
+      view: ["pairs", "custom"].includes(p.view) ? p.view : "pca",
+      pairRegion: p.view === "pairs" ? pairRegionFrom(p.pairRegion) : null, x: axis(p.x, "xgd"), y: axis(p.y, "gd"),
+      color: colourOptions.some(([key]) => key === p.color) ? p.color : "state", order: p.order === "gap" ? "gap" : "fixed",
       cohort: p.cohort ? [...new Set(p.cohort.split(",").filter(validTeam))] : null,
       xlo: num(p.xlo), xhi: num(p.xhi), glo: num(p.glo), ghi: num(p.ghi),
       sort: ["name", "group", "n", "xgd", "gd"].includes(p.sort) ? p.sort : "xgd", desc: p.desc !== "0",
@@ -49,6 +60,7 @@
     return `#/styles${A.query(s.dials, {
       team: s.team, compare: s.compare, heatSort: s.heatSort === "group" ? null : s.heatSort, scope: s.scope === "all" ? null : s.scope, arch: s.arch, search: s.search,
       view: s.view === "pca" ? null : s.view, x: s.view === "custom" ? s.x : null, y: s.view === "custom" ? s.y : null,
+      pairRegion: s.view === "pairs" && s.pairRegion ? s.pairRegion.join(",") : null,
       color: s.color === "state" ? null : s.color, order: s.order === "fixed" ? null : s.order,
       cohort: s.cohort ? s.cohort.join(",") || "none" : null, xlo: s.xlo, xhi: s.xhi, glo: s.glo, ghi: s.ghi,
       sort: s.sort === "xgd" ? null : s.sort, desc: s.desc ? null : "0", match: s.match,
@@ -70,7 +82,10 @@
 
   function workspace(root, params) {
     let state = stateFrom(params);
-    let space, full, twins, near, summaries, scopeAvg, visible = [], pos = {}, hover = null, brushing = false, frame = null;
+    let space, full, twins, near, summaries, scopeAvg, visible = [], pos = {}, hover = null, touchBrushArmed = false, frame = null;
+    let nearByTeam, pca, mapRanks = new Map(), previewIndicator = null;
+    const coarsePointer = window.matchMedia("(any-pointer: coarse)");
+    const hasTouch = () => coarsePointer.matches || navigator.maxTouchPoints > 0;
     const q = (s) => root.querySelector(s);
     const qa = (s) => root.querySelectorAll(s);
 
@@ -99,12 +114,15 @@
         <span id="ws-count" aria-live="polite"></span>
       </div>
       <div class="ws-primary">
-        ${panel("C", "Style Map", seg("ws-view", [["pca", "PCA"], ["custom", "X / Y"]], "Map projection"),
-          `<div class="ws-map-controls"><span class="ws-pc-label">Colour</span>${seg("ws-color", [["state", "Selection"], ["group", "Style group"]], "Colour points by")}
-             <button type="button" class="ws-btn" id="ws-brush" aria-pressed="false" title="Drag a rectangle to filter teams">${ICON.brush}Brush</button></div>
+        ${panel("C", "Style Map", seg("ws-view", [["pca", "PCA"], ["custom", "X / Y"], ["pairs", "Team pairs"]], "Map view"),
+          `<div class="ws-map-controls"><label id="ws-colour-control"><span>Colour</span> <select id="ws-color" aria-label="Colour points by">${selectOptions(colourOptions)}</select></label>
+             <span class="ws-pc-label" id="ws-pair-unit" hidden>One dot per team pair.</span>
+             <button type="button" class="ws-link" id="ws-clear-pair-region" hidden>Clear pair selection</button>
+             <button type="button" class="ws-btn" id="ws-brush" hidden aria-pressed="false" title="Drag a rectangle to filter teams">${ICON.brush}Brush</button></div>
              <div id="ws-axes" hidden><label>X <select id="ws-x" aria-label="X axis">${selectOptions(measures.map((m) => [m.id, m.label]))}</select></label>
              <label>Y <select id="ws-y" aria-label="Y axis">${selectOptions(measures.map((m) => [m.id, m.label]))}</select></label></div>
-           <div class="ws-legend" id="ws-legend"></div>
+           <div class="ws-legend ws-map-colour-key" id="ws-legend"></div>
+           <div id="ws-pairs" hidden></div>
            <div class="ws-chart ws-map" id="ws-map"></div>
            <p class="ws-projection" id="ws-projection"></p>
            <div class="ws-readout" id="ws-readout" aria-live="polite"></div>`)}
@@ -192,7 +210,16 @@
     });
     const pickA = picker("A", state.team, "Clear teams");
     const pickB = picker("B", state.compare, "Clear comparison");
-    const heat = App.workspaceHeatmap(q("#ws-heat"), { change, choose, highlight });
+    const heat = App.workspaceHeatmap(q("#ws-heat"), { change, choose, highlight, inspectIndicator });
+    const pairView = App.workspacePairs(q("#ws-pairs"), {
+      choosePair(first, second) {
+        const keepA = state.team === second;
+        change({ team: keepA ? second : first, compare: keepA ? first : second, match: null, view: "pca", pairRegion: null });
+        q("#ws-view [data-v='pca']").focus({ preventScroll: true });
+      },
+      setRegion: (region) => commitBrush({ pairRegion: region }), setupBrush, hasTouch,
+    });
+    q("#ws-clear-pair-region").onclick = () => change({ pairRegion: null });
     q("#ws-to-analysis").onclick = () => {
       const heading = q("#ws-B-title");
       heading.tabIndex = -1;
@@ -201,13 +228,16 @@
     };
     q("#ws-swap").onclick = () => change({ team: state.compare, compare: state.team, match: null });
     const segBind = (id, key, extra = {}) => q(`#${id}`).addEventListener("click", (e) => { const b = e.target.closest("button[data-v]"); if (b && b.dataset.v !== state[key]) change({ [key]: b.dataset.v, ...extra }); });
-    segBind("ws-scope", "scope", { cohort: null, match: null, xlo: null, xhi: null, glo: null, ghi: null });
-    segBind("ws-view", "view", { cohort: null });
-    segBind("ws-color", "color");
+    segBind("ws-scope", "scope", { pairRegion: null, cohort: null, match: null, xlo: null, xhi: null, glo: null, ghi: null });
+    q("#ws-view").onclick = (e) => {
+      const view = e.target.closest("button[data-v]")?.dataset.v;
+      if (view && view !== state.view) change({ view, pairRegion: null, cohort: view === "pairs" || state.view === "pairs" ? state.cohort : null });
+    };
+    q("#ws-color").onchange = (e) => change({ color: e.target.value });
     segBind("ws-order", "order");
     q("#ws-reset").onclick = () => {
       clearTimeout(searchTimer);
-      brushing = false;
+      touchBrushArmed = false;
       q(".ws-range-filters").open = false;
       if (location.hash === "#/styles") render();
       else App.go("#/styles");
@@ -217,13 +247,13 @@
     q("#ws-group").onchange = (e) => change({ arch: e.target.value });
     q("#ws-x").onchange = (e) => change({ x: e.target.value, cohort: null });
     q("#ws-y").onchange = (e) => change({ y: e.target.value, cohort: null });
-    q("#ws-brush").onclick = () => { brushing = !brushing; drawMap(); readout(); };
-    q("#ws-dials-all").onclick = () => change({ dials: App.dials.slice(), cohort: null });
+    q("#ws-brush").onclick = () => { touchBrushArmed = !touchBrushArmed; drawMap(); readout(); };
+    q("#ws-dials-all").onclick = () => change({ dials: App.dials.slice(), cohort: null, pairRegion: null });
     q("#ws-dials").onchange = (e) => {
       const b = e.target.closest("[data-i]"); if (!b) return;
       const dial = App.dials[+b.dataset.i], on = state.dials.includes(dial);
       if (on && state.dials.length <= 2) { b.checked = true; return; }
-      change({ dials: on ? state.dials.filter((d) => d !== dial) : App.dials.filter((d) => d === dial || state.dials.includes(d)), cohort: null });
+      change({ dials: on ? state.dials.filter((d) => d !== dial) : App.dials.filter((d) => d === dial || state.dials.includes(d)), cohort: null, pairRegion: null });
     };
     qa("[data-sort]").forEach((b) => (b.onclick = () => change({ sort: b.dataset.sort, desc: b.dataset.sort === state.sort ? !state.desc : b.dataset.sort !== "name" && b.dataset.sort !== "group" })));
     q("#ws-export").onclick = () => {
@@ -272,15 +302,40 @@
     function render() {
       space = A.space(state.dials, state.scope);
       full = A.space(App.dials, state.scope);
-      near = A.twinTable(space).near[state.team] || [];
+      nearByTeam = A.twinTable(space).near;
+      near = nearByTeam[state.team] || [];
       twins = near.slice(0, K).map((n) => n.id);
       summaries = Object.fromEntries(App.teams.map((t) => [t.id, A.summary(A.rows(t.id, state.scope))]));
       scopeAvg = A.summary(A.records.filter((r) => A.inScope(r, state.scope)));
       visible = matching();
       hover = null;
+      previewIndicator = null;
+      const isPairs = state.view === "pairs";
+      pca = state.view === "pca" ? App.pca2(space) : null;
+      pos = isPairs ? {} : Object.fromEntries(Object.keys(space.team).map((id) =>
+        [id, pca ? pca.project(space.team[id]) : [metric(id, state.x), metric(id, state.y)]]).filter(([, xy]) => xy.every(Number.isFinite)));
+      // Rank in PCA coordinates, independent of the plot's aspect ratio and filters.
+      mapRanks = new Map();
+      if (pca && pos[state.team]) {
+        Object.keys(pos).filter((id) => id !== state.team)
+          .map((id) => ({ id, d: App.dist(pos[state.team], pos[id]) }))
+          .sort((a, b) => a.d - b.d || a.id.localeCompare(b.id))
+          .forEach(({ id }, i) => mapRanks.set(id, i + 1));
+      }
+      for (const sel of ["#ws-map", "#ws-colour-control", "#ws-legend", "#ws-projection", "#ws-readout"]) q(sel).hidden = isPairs;
+      q("#ws-pairs").hidden = !isPairs;
+      q("#ws-pair-unit").hidden = !isPairs;
+      q("#ws-clear-pair-region").hidden = !isPairs || !state.pairRegion;
+      q("#ws-readout").classList.toggle("has-reference", !!space.team[state.team]);
+      q("#ws-color").value = state.color;
       q(".ws-details").classList.toggle("has-team", !!state.team);
       for (const id of ["D", "E", "F"]) q(`[data-panel="${id}"]`).hidden = !state.team;
-      drawContext(); drawCollection(); drawSimilarity(); heat.render({ state, full, visible, summaries, near }); drawMap(); drawProfile(); drawOutcomes(); drawMatches(); readout();
+      drawContext(); drawCollection(); drawSimilarity(); heat.render({ state, full, visible, summaries, near });
+      if (isPairs) {
+        heat.markIndicator(null);
+        pairView.render({ visible, nearByTeam, summaries, region: state.pairRegion, touchArmed: touchBrushArmed, scope: state.scope, dials: state.dials });
+      }
+      drawMap(!isPairs); drawProfile(); drawOutcomes(); drawMatches(); readout();
     }
 
     /* ---------- context bar ---------- */
@@ -291,7 +346,7 @@
       q("#ws-to-analysis").hidden = !state.team;
       const hasPair = !!(full.team[state.team] && full.team[state.compare]);
       q('#ws-order [data-v="gap"]').disabled = !hasPair;
-      [["#ws-scope", state.scope], ["#ws-view", state.view], ["#ws-color", state.color], ["#ws-order", hasPair ? state.order : "fixed"]].forEach(([s, v]) => q(s).querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v))));
+      [["#ws-scope", state.scope], ["#ws-view", state.view], ["#ws-order", hasPair ? state.order : "fixed"]].forEach(([s, v]) => q(s).querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v))));
       q("#ws-scope-size").textContent = `${Object.keys(space.team).length} teams · ${scopeAvg.n / 2} matches`;
       const missing = [state.team, state.compare].find((id) => id && !space.team[id]);
       const rank = rankOf(state.compare);
@@ -311,11 +366,11 @@
         r.lo.value = state[r.loKey] ?? min; r.hi.value = state[r.hiKey] ?? max; r.paint();
       });
       const chips = [];
-      if (state.cohort) chips.push(["cohort", `Map region · ${state.cohort.length} teams`]);
+      if (state.cohort) chips.push(["cohort", `Teams in map selection · ${state.cohort.length}`]);
       if (state.xlo !== null || state.xhi !== null) chips.push(["xgd", "xG diff. " + ranges.xgd.lo.value + " … " + ranges.xgd.hi.value]);
       if (state.glo !== null || state.ghi !== null) chips.push(["gd", "Goal diff. " + ranges.gd.lo.value + " … " + ranges.gd.hi.value]);
       q("#ws-chips").hidden = !chips.length;
-      q("#ws-chips").innerHTML = chips.map(([k, t]) => `<span class="ws-chip-x">${esc(t)}<button type="button" data-clear="${k}" aria-label="Clear ${esc(t)}">${ICON.x}</button></span>`).join("");
+      q("#ws-chips").innerHTML = chips.map(([k, t]) => `<span class="ws-chip-x">${esc(t)}<button type="button" data-clear="${k}" aria-label="${k === "cohort" ? "Clear map selection" : "Clear " + esc(t)}">${ICON.x}</button></span>`).join("");
       q("#ws-chips").querySelectorAll("[data-clear]").forEach((button) => {
         button.onclick = () => {
           const range = ranges[button.dataset.clear];
@@ -384,17 +439,20 @@
     }
 
     /* ---------- C · style map ---------- */
-    function drawMap() {
+    function drawMap(redrawPairs = true) {
       q("#ws-axes").hidden = state.view !== "custom";
       q("#ws-x").value = state.x; q("#ws-y").value = state.y;
-      q("#ws-brush").setAttribute("aria-pressed", String(brushing));
+      q("#ws-brush").hidden = !hasTouch();
+      q("#ws-brush").setAttribute("aria-pressed", String(touchBrushArmed));
+      if (state.view === "pairs") {
+        if (redrawPairs) pairView.draw(touchBrushArmed);
+        return;
+      }
       const host = q("#ws-map");
       const activeTeam = host.contains(document.activeElement) ? document.activeElement.dataset.team : null;
       const { svg, W, H } = svgFor(host, "Style Map");
       svg.attr("class", "ws-map").attr("role", "group").attr("aria-describedby", "ws-projection");
-      const m = { l: 40, r: 20, t: 30, b: 40 }, ids = Object.keys(space.team);
-      const pca = state.view === "pca" ? App.pca2(space) : null;
-      pos = Object.fromEntries(ids.map((id) => [id, pca ? pca.project(space.team[id]) : [metric(id, state.x), metric(id, state.y)]]).filter(([, v]) => v.every(Number.isFinite)));
+      const m = { l: 40, r: 20, t: 30, b: 40 };
       const f = focused();
       let fpos = f ? (pca ? pca.project(space.match[f.key]) : [recordMetric(f, state.x), recordMetric(f, state.y)]) : null;
       if (fpos && !fpos.every(Number.isFinite)) fpos = null;
@@ -427,18 +485,13 @@
       const order = { out: 0, in: 1, twin: 2, b: 3, a: 4 };
       const plotted = Object.keys(pos).sort((a, b) => order[role(a)] - order[role(b)]);
       const radius = { a: 7.5, b: 7.5, twin: 6, in: 4.6, out: 4 };
-      const fill = (id) => {
-        const r = role(id);
-        if (state.color === "group") return r === "out" ? C.off : App.arch[App.team[id].archetype].color;
-        return { a: C.a, b: C.b, twin: C.twin, in: C.dot, out: C.off }[r];
-      };
+      // Keep points above the drag surface so a click or tap can select a team.
+      const brushLayer = svg.append("g").attr("class", "brush");
       const marks = svg.append("g").selectAll("g").data(plotted).join("g").attr("class", "mark").attr("data-team", (id) => id)
         .attr("transform", (id) => `translate(${P(id)})`).attr("tabindex", 0).attr("role", "button")
         .attr("aria-label", (id) => App.team[id].name).attr("aria-pressed", (id) => [state.team, state.compare].includes(id));
       marks.append("circle").attr("class", "halo").attr("r", (id) => radius[role(id)] + 4.5);
-      marks.append("circle").attr("r", (id) => radius[role(id)]).attr("fill", fill)
-        .attr("stroke", (id) => (state.color === "group" && ["a", "b", "twin"].includes(role(id)) ? { a: C.a, b: C.b, twin: C.twin }[role(id)] : role(id) === "out" ? "#b5bcc5" : "#fff"))
-        .attr("stroke-width", (id) => (state.color === "group" && ["a", "b", "twin"].includes(role(id)) ? 2.5 : role(id) === "out" ? 0.75 : 1.2));
+      marks.append("circle").attr("class", "team-fill").attr("r", (id) => radius[role(id)]);
       marks.on("click", (e, id) => choose(id, e.shiftKey ? "A" : undefined))
         .on("keydown", (e, id) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(id, e.shiftKey ? "A" : undefined); } })
         .on("mouseenter focus", (e, id) => highlight(id, { reveal: true })).on("mouseleave blur", () => highlight(null));
@@ -479,37 +532,86 @@
         svg.append("text").attr("class", "code").attr("x", px + 10).attr("y", py + 16).attr("fill", C.ink).text(`${f.team_id} v ${f.opp_id}`);
       }
       if (!plotted.length) svg.append("text").attr("x", W / 2).attr("y", H / 2).attr("text-anchor", "middle").attr("fill", C.muted).text("No team has matches in this scope");
-      if (brushing) {
-        const brush = d3.brush().extent([[m.l, m.t], [W - m.r, H - m.b]]).on("end", (e) => {
-          if (!e.sourceEvent) return;
-          const s = e.selection;
-          const cohort = s ? plotted.filter((id) => { const [px, py] = P(id); return px >= s[0][0] && px <= s[1][0] && py >= s[0][1] && py <= s[1][1]; }) : null;
-          brushing = false;
-          const next = stateUrl({ ...state, cohort });
-          if (next === location.hash) { drawMap(); readout(); }
-          else change({ cohort });
-        });
-        svg.append("g").attr("class", "brush").call(brush);
-      }
-      // legend
-      const items = [];
-      const item = (symbol, label) => `<span><i class="${symbol}"></i>${esc(label)}</span>`;
-      if (state.color === "group") {
-        for (const group of App.data.archetypes) items.push(`<span><i style="background:${group.color}"></i>${esc(groupName(group.id))}</span>`);
-      } else {
-        items.push(item("lg-in", "Team"));
-      }
-      if (state.team) items.push(item("lg-a", "A"));
-      if (state.compare) items.push(item("lg-b", "B"));
-      if (twins.length) items.push(item("lg-twin", "5 closest to A"));
-      if (visible.length < ids.length) items.push(item("lg-out", "Filtered out"));
-      if (f) items.push(item("lg-match", "Selected match"));
-      q("#ws-legend").classList.toggle("group-colours", state.color === "group");
-      q("#ws-legend").innerHTML = items.join("");
+      setupBrush(brushLayer, [[m.l, m.t], [W - m.r, H - m.b]], ([[left, top], [right, bottom]]) => {
+        const cohort = pointPositions.filter(({ xy: [px, py] }) =>
+          px >= left && px <= right && py >= top && py <= bottom).map(({ id }) => id).sort();
+        commitBrush({ cohort });
+      }, touchBrushArmed);
+      paintMapColours();
       q("#ws-projection").textContent = pca
         ? `Two axes capture ${Math.round(d3.sum(pca.vars) * 100)}% of variation across ${state.dials.length} style indicators. Rankings use all selected indicators.`
         : "Axes show team means in the selected match scope.";
       if (activeTeam) host.querySelector(`[data-team="${activeTeam}"]`)?.focus({ preventScroll: true });
+    }
+
+    function setupBrush(brushLayer, extent, onBounds, touchArmed) {
+      if (touchArmed) brushLayer.raise();
+      const largeEnough = (s) => s && Math.hypot(s[1][0] - s[0][0], s[1][1] - s[0][1]) >= 5;
+      const brush = d3.brush().extent(extent)
+        .touchable(touchArmed).keyModifiers(false).handleSize(0)
+        .on("brush", ({ selection }) => brushLayer.classed("is-dragging", !!largeEnough(selection)))
+        .on("end", ({ sourceEvent, selection }) => {
+          if (!sourceEvent || !brushLayer.node().isConnected) return;
+          if (!largeEnough(selection) || sourceEvent.type === "touchcancel") {
+            if (selection) brushLayer.call(brush.move, null);
+            return;
+          }
+          onBounds(selection);
+        });
+      brushLayer.call(brush);
+    }
+    function commitBrush(patch) {
+      touchBrushArmed = false;
+      if (stateUrl({ ...state, ...patch }) === location.hash) { drawMap(); readout(); }
+      else change(patch);
+    }
+    function inspectIndicator(index) {
+      if (state.view === "pairs" || previewIndicator === index) return;
+      previewIndicator = index;
+      paintMapColours();
+    }
+    function paintMapColours() {
+      const index = previewIndicator ?? (state.color.startsWith("dial") ? +state.color.slice(4) : null);
+      const outlined = index !== null || state.color === "group";
+      const roleColours = { a: C.a, b: C.b, twin: C.twin, in: C.dot, out: C.off };
+      heat.markIndicator(index);
+      d3.select(q("#ws-map")).selectAll("circle.team-fill").each(function (id) {
+        const r = role(id), filtered = r === "out";
+        let fill = roleColours[r];
+        if (index !== null) fill = App.workspaceHeatmap.color(full.team[id][index]);
+        else if (state.color === "group" && !filtered) fill = App.arch[App.team[id].archetype].color;
+        const ring = outlined && ["a", "b", "twin"].includes(r);
+        d3.select(this).attr("fill", fill).attr("fill-opacity", index !== null && filtered ? 0.25 : 1)
+          .attr("stroke", ring ? roleColours[r] : filtered || index !== null ? C.faint : "#fff")
+          .attr("stroke-width", ring ? 2.5 : filtered ? 0.75 : 1.2);
+      });
+      const item = (symbol, label) => `<span><i class="${symbol}"></i>${esc(label)}</span>`;
+      const roles = [];
+      if (state.team) roles.push(item("lg-a", "A"));
+      if (state.compare) roles.push(item("lg-b", "B"));
+      if (twins.length) roles.push(item("lg-twin", "5 closest to A"));
+      if (visible.length < Object.keys(space.team).length) roles.push(item("lg-out", "Filtered out"));
+      if (focused()) roles.push(item("lg-match", "Selected match"));
+      const roleKey = roles.join("");
+      const legend = q("#ws-legend");
+      const grouped = state.color === "group";
+      legend.classList.toggle("base-group-colours", grouped);
+      legend.classList.toggle("group-colours", outlined);
+      let indicatorKey = "";
+      if (index !== null) {
+        const label = App.indicator(App.dials[index]).label;
+        indicatorKey = `<span class="ws-indicator-key"><b>${esc(label)}</b><span title="Standard deviations from the tournament mean">σ</span></span>${App.workspaceHeatmap.legend}`;
+      }
+      if (grouped) {
+        // Let the full group legend reserve its natural wrapped height during inspection.
+        const groups = App.data.archetypes.map((g) => `<span><i style="background:${g.color}"></i>${esc(groupName(g.id))}</span>`).join("");
+        legend.innerHTML = `<div class="ws-key-groups"${indicatorKey ? ' aria-hidden="true"' : ""}>${groups}${roleKey}</div>`
+          + (indicatorKey ? `<div class="ws-key-preview">${indicatorKey}${roleKey}</div>` : "");
+      } else {
+        legend.innerHTML = (indicatorKey || item("lg-in", "Team")) + roleKey;
+      }
+      if (legend.scrollWidth > legend.clientWidth || legend.scrollHeight > legend.clientHeight) legend.tabIndex = 0;
+      else legend.removeAttribute("tabindex");
     }
 
     /* ---------- D · style profile ---------- */
@@ -622,11 +724,33 @@
     /* ---------- linking ---------- */
     function readout() {
       const el = q("#ws-readout"), id = hover;
-      const show = id && summaries[id] ? id : state.team;
-      if (!summaries[show]) { el.textContent = brushing ? "Drag a rectangle to filter teams." : "Hover or focus a team to inspect it."; return; }
-      const t = App.team[show], s = summaries[show], r = show === state.team ? null : rankOf(show);
+      const show = id || (space.team[state.compare] ? state.compare : state.team);
+      const rank = show && show !== state.team ? rankOf(show) : null;
+      const gapDial = rank ? d3.maxIndex(space.team[state.team], (a, i) => Math.abs(a - space.team[show][i])) : -1;
+      const gapIndex = gapDial < 0 ? null : App.dials.indexOf(space.dialIds[gapDial]);
+      heat.compareHover(state.team, rank && state.view !== "pairs" ? show : null, gapIndex);
+      if (state.view === "pairs") return;
+      if (rank && !touchBrushArmed) {
+        const entry = (label, value, detail = "") => `<span class="ws-rank-readout"><span>${esc(label)}</span> <strong>${esc(value)}</strong>${detail ? ` <span aria-hidden="true">·</span> <span>${esc(detail)}</span>` : ""}</span>`;
+        const ranks = [];
+        if (mapRanks.has(show)) ranks.push(entry("PCA distance rank", "#" + mapRanks.get(show)));
+        ranks.push(entry("Style similarity rank", "#" + rank, `${state.dials.length} indicators`));
+        if (gapIndex !== null) {
+          const gap = Math.abs(space.team[state.team][gapDial] - space.team[show][gapDial]);
+          ranks.push(entry("Largest indicator gap", App.indicator(App.dials[gapIndex]).label, `${fmt(gap)} σ`));
+        }
+        el.innerHTML = `${App.flag(show, 14)}<b>${esc(App.team[show].name)}</b><span>Compared with</span><b>${esc(App.team[state.team].name)}</b> ${ranks.join(" ")}`;
+        return;
+      }
+      if (touchBrushArmed || !summaries[show]) {
+        el.textContent = touchBrushArmed ? "Drag to filter teams. Tap Brush again to cancel."
+          : hasTouch() ? "Tap a team to compare. Tap Brush to filter teams."
+          : "Click a team to compare. Drag on empty space to filter teams.";
+        return;
+      }
+      const t = App.team[show], s = summaries[show];
       el.innerHTML = `${App.flag(show, 14)}<b>${esc(t.name)}</b><span>${esc(groupName(t.archetype))}</span><span class="sep">|</span><span>${s.n} matches</span><span class="sep">|</span>
-        <span>xG diff. ${App.signed(s.xgd, 2)}</span><span class="sep">|</span><span>goal diff. ${App.signed(s.gd, 2)}</span>${r ? `<span class="sep">|</span><span>#${r} closest to ${esc(state.team)}</span>` : ""}`;
+        <span>xG diff. ${App.signed(s.xgd, 2)}</span><span class="sep">|</span><span>goal diff. ${App.signed(s.gd, 2)}</span>`;
     }
     function paintMapHover() {
       const svg = q("#ws-map svg");
@@ -665,11 +789,17 @@
         return box && target.clientHeight && (target.clientWidth !== box.width || target.clientHeight !== box.height);
       })) schedule();
     });
-    ["#ws-map", "#ws-profile", "#ws-outcomes"].forEach((selector) => observer.observe(q(selector)));
+    ["#ws-map", "#ws-pairs .wp-chart", "#ws-profile", "#ws-outcomes"].forEach((selector) => observer.observe(q(selector)));
     const onLang = () => render();
     window.addEventListener("languagechange", onLang);
-    App._stop = () => { observer.disconnect(); clearTimeout(searchTimer); cancelAnimationFrame(frame); window.removeEventListener("languagechange", onLang); };
-    return { update(p) { clearTimeout(searchTimer); brushing = false; state = stateFrom(p); render(); } };
+    const onPointerChange = () => { touchBrushArmed = false; drawMap(); readout(); };
+    coarsePointer.addEventListener("change", onPointerChange);
+    App._stop = () => {
+      observer.disconnect(); clearTimeout(searchTimer); cancelAnimationFrame(frame);
+      window.removeEventListener("languagechange", onLang);
+      coarsePointer.removeEventListener("change", onPointerChange);
+    };
+    return { update(p) { clearTimeout(searchTimer); touchBrushArmed = false; state = stateFrom(p); render(); } };
   }
 
   App.views.story = workspace;

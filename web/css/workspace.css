@@ -20,7 +20,6 @@ body.ws-route {
   --ws-diff: #6b7480;
   background: var(--ws-bg);
 }
-.ws-route .topbar .jump, .ws-route .topbar .github-link { display: none; }
 .ws-route #view { max-width: none; width: 100%; margin: 0; padding: 0; }
 
 /* The overview pair shares its filters and one resizable divider. */
@@ -64,6 +63,8 @@ body.ws-route { background: #f5f6f7; }
 .ws-details.has-team > :is([data-panel="A"],[data-panel="F"]) { grid-column: span 3; height: 320px; }
 .ws-sim-input, .ws-match-actions, .ws-readout, .ws-projection { flex: none; }
 .ws-map-controls, #ws-axes { padding: 7px 12px 2px; display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+.ws-map-controls label { display: inline-flex; align-items: center; gap: 7px; min-width: 0; max-width: 100%; }
+.ws-map-controls .sel-enhanced { width: 12rem; max-width: 100%; min-width: 0; }
 .ws-map-controls #ws-brush { margin-inline-start: auto; }
 #ws-axes label { display: flex; align-items: center; gap: 5px; min-width: 0; flex: 1; }
 #ws-axes .sel-enhanced, #ws-axes select { min-width: 0; width: 100%; }
@@ -76,6 +77,7 @@ body.ws-route { background: #f5f6f7; }
 .ws-seg button[aria-pressed="true"] { background: #fff; color: var(--ws-ink); box-shadow: 0 0 0 1px var(--ws-line-2); }
 
 /* Views */
+.ws-primary > [data-panel="C"] { container: style-map / inline-size; }
 .ws-panel { display: flex; flex-direction: column; min-height: 0; min-width: 0; background: var(--ws-panel); border: 1px solid var(--ws-line); border-radius: 4px; overflow: hidden; }
 .ws-ph { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 6px 12px; flex: none; border-bottom: 1px solid var(--ws-line); }
 .ws-ph h2 { flex: 1; min-width: 0; font: 600 16px/1.25 var(--sans); color: var(--ws-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -183,6 +185,19 @@ body.ws-route { background: #f5f6f7; }
 /* Style map */
 .ws-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; padding: 6px 12px; font-size: 12px; color: var(--ws-ink-2); flex: none; }
 .ws-legend span { display: inline-flex; align-items: center; gap: 6px; }
+/* Switching the legend while inspecting a heatmap column keeps the same plot area. */
+#ws-legend { flex-wrap: nowrap; height: 32px; overflow-x: auto; overflow-y: hidden; padding-block: 3px; scrollbar-width: thin; }
+#ws-legend > span { flex: none; white-space: nowrap; }
+#ws-legend.base-group-colours { position: relative; height: auto; min-height: 32px; overflow: auto; }
+#ws-legend .ws-key-groups, #ws-legend .ws-key-preview { display: flex; align-content: center; align-items: center; flex-wrap: wrap; gap: 3px 12px; }
+#ws-legend .ws-key-groups { width: 100%; }
+#ws-legend .ws-key-groups[aria-hidden="true"] { visibility: hidden; }
+#ws-legend .ws-key-preview { position: absolute; inset-inline: 12px; inset-block-start: 3px; min-height: calc(100% - 6px); }
+@container style-map (max-width: 540px) {
+  #ws-legend:not(.base-group-colours) { height: 48px; flex-wrap: wrap; align-content: safe center; gap: 2px 10px; overflow: auto; }
+  #ws-legend.base-group-colours { min-height: 48px; }
+}
+#ws-legend .hm-scale i { width: 32px; height: 8px; border-radius: 0; }
 .ws-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; }
 .ws-legend .lg-a { background: var(--ws-a); }
 .ws-legend .lg-b { background: var(--ws-b); }
@@ -196,16 +211,20 @@ body.ws-route { background: #f5f6f7; }
 .ws-legend .lg-tick-twin { width: 2px; height: 12px; border-radius: 0; background: var(--ws-twin); }
 .ws-legend .lg-tick-avg { width: 0; height: 12px; border-radius: 0; border-left: 2px dotted #8f99a5; }
 .ws-legend .lg-meta { margin-left: auto; color: var(--ws-muted); }
-.ws-readout { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-height: 36px; padding: 5px 12px; border-top: 1px solid var(--ws-line); font-size: 12px; color: var(--ws-ink-2); white-space: nowrap; overflow: hidden; }
+.ws-readout { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-height: 36px; padding: 5px 12px; border-top: 1px solid var(--ws-line); font-size: 12px; color: var(--ws-ink-2); overflow: hidden; }
+#ws-readout.has-reference { height: 4.5em; align-content: flex-start; align-items: baseline; overflow-y: auto; scrollbar-gutter: stable; }
+.ws-rank-readout { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; }
+.ws-rank-readout strong { color: var(--ws-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 .ws-readout b { color: var(--ws-ink); font-weight: 600; }
 .ws-readout .sep { color: var(--ws-line-2); }
 .ws-map .grid line { stroke: #eef0f2; }
-.ws-map .axis text { fill: var(--ws-muted); font-size: 11px; }
-.ws-map .axis .title { fill: var(--ws-ink-2); font-size: 12px; }
+.ws-map .axis text { fill: var(--ws-ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
+.ws-map .axis .title { font-size: 13px; font-weight: 500; }
 .ws-map .mark { cursor: pointer; }
 .ws-map .mark .halo { fill: none; stroke: var(--ws-ink); stroke-width: 2; opacity: 0; }
 .ws-map .mark.is-hover .halo { opacity: 1; }
-.ws-map .code { font-size: 11px; font-weight: 600; paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.ws-map .code { font-size: 12px; font-weight: 500; paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
+.ws-map .brush:not(.is-dragging) .selection { visibility: hidden; }
 .ws-map .brush .selection { fill: var(--ws-ink); fill-opacity: .04; stroke: var(--ws-ink-2); stroke-dasharray: 3 3; }
 
 /* Style profile */
@@ -234,11 +253,6 @@ body.ws-route { background: #f5f6f7; }
 
 .ws-empty { padding: 14px 12px; color: var(--ws-muted); font-size: 12px; }
 
-@media (min-width: 761px) {
-  body.ws-route .topbar .tabs { order: 1; flex: 1 1 auto; }
-  body.ws-route .topbar .language-control { order: 2; }
-}
-
 /* Local scrolling keeps the heatmap labels and both overview titles in view. */
 @media (max-width: 1100px) {
   .ws { padding-inline: 14px; }
@@ -247,10 +261,14 @@ body.ws-route { background: #f5f6f7; }
   .ws-details.has-team > [data-panel="A"] { grid-column: 1 / -1; }
 }
 @media (max-width: 800px) {
+  #ws-readout.has-reference { height: 6.5em; }
   .ws { padding: 12px 10px; }
   .ws-heading { flex-wrap: wrap; margin-bottom: 9px; }
   .ws-primary { height: auto; grid-template-columns: minmax(0,1fr); gap: 8px; }
   .ws-primary > section { height: 490px; }
+  /* The stacked map grows with wrapped controls, leaving room to inspect and brush points. */
+  .ws-primary > [data-panel="C"]:has(#ws-map:not([hidden])) { height: auto; }
+  #ws-map { flex: none; height: clamp(250px, 50vw, 340px); }
   .ws-gutter { display: none; }
   .ws-filters { gap: 6px 10px; }
 }

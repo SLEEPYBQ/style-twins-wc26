@@ -65,12 +65,12 @@ html[dir="rtl"] .pulse-event-list { padding-right:0; padding-inline-end:5px; }
 html[dir="rtl"] .pulse-footnote ul { padding-left:0; padding-inline-start:20px; }
 
 /* Script-appropriate system fallbacks do not require another font download. */
-html[lang="ar"] { --display:Tahoma,"Segoe UI",Arial,sans-serif; --sans:Tahoma,"Segoe UI",Arial,sans-serif; }
-html[lang="zh-Hans"] { --display:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif; --sans:"Microsoft YaHei","PingFang SC","Noto Sans CJK SC",system-ui,sans-serif; }
-html[lang="zh-Hant"] { --display:"Microsoft JhengHei","PingFang TC","Noto Sans CJK TC",system-ui,sans-serif; --sans:"Microsoft JhengHei","PingFang TC","Noto Sans CJK TC",system-ui,sans-serif; }
-html[lang="ja"] { --display:system-ui,"Yu Gothic",Meiryo,sans-serif; --sans:system-ui,"Yu Gothic",Meiryo,sans-serif; }
-html[lang="ko"] { --display:system-ui,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; --sans:system-ui,"Malgun Gothic","Apple SD Gothic Neo",sans-serif; }
-html[lang="hi"] { --display:"Kohinoor Devanagari","Nirmala UI","Noto Sans Devanagari",system-ui,sans-serif; --sans:"Kohinoor Devanagari","Nirmala UI","Noto Sans Devanagari",system-ui,sans-serif; }
+html[lang="ar"] { --script-fonts: Tahoma, "Segoe UI", Arial, sans-serif; }
+html[lang="zh-Hans"] { --script-fonts: "PingFang SC", "Inter", "Noto Sans SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif; }
+html[lang="zh-Hant"] { --script-fonts: "PingFang TC", "Inter", "Noto Sans TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif; }
+html[lang="ja"] { --script-fonts: system-ui, "Yu Gothic", Meiryo, sans-serif; }
+html[lang="ko"] { --script-fonts: system-ui, "Malgun Gothic", "Apple SD Gothic Neo", sans-serif; }
+html[lang="hi"] { --script-fonts: "Kohinoor Devanagari", "Nirmala UI", "Noto Sans Devanagari", system-ui, sans-serif; }
 html:is([lang="ar"],[lang="zh-Hans"],[lang="zh-Hant"],[lang="ja"],[lang="ko"],[lang="hi"]) :is(h1,h2,h3,h4,.kicker,.lab-eyebrow,.pulse-eyebrow,.lab-coverage) { letter-spacing:normal; }
 html:is([lang="zh-Hans"],[lang="zh-Hant"]) :is(button,select,label,.tabs a,.chip,.btn) { letter-spacing:normal; line-height:1.5; }
 html:is([lang="zh-Hans"],[lang="zh-Hant"]) #view :is(.lab-tabs button,.robust-tabs button,.seg button,.btn,.chip) { min-inline-size:0; max-inline-size:100%; white-space:normal; overflow-wrap:anywhere; }
@@ -85,33 +85,14 @@ html:not([lang="en"]) .lab-page .lab-tabs button { white-space:normal; text-alig
 html:not([lang="en"]) .lab-page .lab-coverage { white-space:normal; }
 html:not([lang="en"]) :is(.review-controls > *,.duel-controls > *,.robust-controls > *,.lab-kpis > *) { min-inline-size:0; }
 
-@media (max-width:1500px) {
-  .topbar { flex-wrap:wrap; gap:8px 12px; }
-  .topbar .brand { order:0; }
-  .topbar .jump { order:1; margin-left:0; margin-inline-start:auto; }
-  .topbar .language-control { order:2; }
-  .topbar .tabs { order:3; flex:1 1 100%; max-inline-size:100%; }
-}
-/* Expanded navigation labels keep a full row even on wider displays; the
-   controls remain grouped together instead of squeezing a translated tab. */
-@media (min-width:1501px) {
-  html:not([lang="en"]) .topbar { flex-wrap:wrap; gap:8px 12px; }
-  html:not([lang="en"]) .topbar .brand { order:0; }
-  html:not([lang="en"]) .topbar .jump { order:1; margin-left:0; margin-inline-start:auto; }
-  html:not([lang="en"]) .topbar .language-control { order:2; }
-  html:not([lang="en"]) .topbar .tabs { order:3; flex:1 1 100%; max-inline-size:100%; }
-}
 @media (max-width:850px) {
   html[dir="rtl"] .lab-page .lab-kpis > div:nth-child(2) { border-inline-end:0; }
 }
 @media (max-width:600px) {
-  .topbar { gap:8px; }
   .topbar .brand { font-size:18px; }
   .topbar .language-control { inline-size:126px; margin-inline-start:auto; }
   #language-select { font-size:12px; min-block-size:40px; padding-inline-start:33px; }
   .language-control .language-globe { inline-size:16px; block-size:16px; inset-inline-start:10px; }
-  .topbar .jump { order:3; flex:1 1 100%; inline-size:100%; max-inline-size:none; margin-inline-start:0; }
-  .topbar .tabs { order:4; }
   .topbar .tabs a { padding-block:7px; padding-inline:10px; }
   html:not([lang="en"]) .lab-page .lab-tabs { gap:6px 12px; }
   html:not([lang="en"]) .lab-page .lab-tabs button { flex:1 1 80px; font-size:11px; }
