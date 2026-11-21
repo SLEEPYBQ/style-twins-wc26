@@ -769,7 +769,7 @@
       if (!state.team) return;
       const match = focused();
       const id = hover !== state.team && hover !== state.compare ? hover : null;
-      if (match) lens.overlay(full.match[match.key], `${match.team_id} v ${match.opp_id}`, true);
+      if (match) lens.overlay(full.match[match.key], `${App.team[match.team_id].name} v ${App.team[match.opp_id].name}`, true);
       else lens.overlay(full.team[id], App.team[id]?.name, false);
     }
 
