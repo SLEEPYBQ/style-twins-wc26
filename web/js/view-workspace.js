@@ -53,7 +53,7 @@
     return {
       mode: ["compare", "explain"].includes(p.mode) ? p.mode : "explore",
       evidence: compare && p.evidence === "outcomes" ? "outcomes" : "matches",
-      goalView: team && p.goalView === "trend" ? "trend" : "distribution",
+      goalView: p.goalView === "distribution" ? "distribution" : "trend",
       team, compare, dials, scope, heatSort: heatSort === "near" && !team ? "group" : heatSort,
       arch: Object.hasOwn(App.arch, p.arch) ? p.arch : "", search: p.search || "",
       view: ["pairs", "custom"].includes(p.view) ? p.view : "pca",
@@ -69,7 +69,7 @@
     const defaultEncoding = s.color === "dial0" && s.heatSort === "dial0";
     return `#/styles${A.query(s.dials, {
       mode: s.mode === "explore" ? null : s.mode, evidence: s.evidence === "outcomes" && s.compare ? "outcomes" : null,
-      goalView: s.team && s.goalView === "trend" ? "trend" : null,
+      goalView: s.goalView === "distribution" ? "distribution" : null,
       team: s.team, compare: s.compare, heatSort: defaultEncoding ? null : s.heatSort, scope: s.scope === "all" ? null : s.scope, arch: s.arch, search: s.search,
       view: s.view === "pca" ? null : s.view, x: s.view === "custom" ? s.x : null, y: s.view === "custom" ? s.y : null,
       pairRegion: s.view === "pairs" && s.pairRegion ? s.pairRegion.join(",") : null,

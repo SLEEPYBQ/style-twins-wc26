@@ -1,19 +1,19 @@
-/* The distribution compares team means. The trend follows individual match records. */
+/* The distribution compares team means. The trend compares performances by game number. */
 (function () {
   "use strict";
   const App = window.App;
 
   App.exploreOutcomes = function (host, { choose, highlight: linkTeam, openEvidence, openMatch, setView }) {
     host.innerHTML = `<header class="xp-head">
-        <h2 id="ws-outcome-preview-title">Goal difference per match</h2>
+        <h2 id="ws-outcome-preview-title">Goal difference by match</h2>
         <div class="xp-goals-controls ws-seg" role="group" aria-label="Goal difference view">
-          <button type="button" data-goal-view="distribution" aria-pressed="true">Tournament distribution</button>
-          <button type="button" data-goal-view="trend" aria-pressed="false" disabled>Match trend</button>
+          <button type="button" data-goal-view="trend" aria-pressed="true">Match trend</button>
+          <button type="button" data-goal-view="distribution" aria-pressed="false">Tournament distribution</button>
         </div>
         <button class="xp-open" type="button" hidden>Match evidence</button>
       </header>
-      <svg class="xp-goals-plot" role="group" aria-labelledby="ws-outcome-preview-title"></svg>
-      <svg class="xp-goals-plot xp-trend-plot" role="group" aria-labelledby="ws-outcome-preview-title" hidden></svg>
+      <svg class="xp-goals-plot" role="group" aria-labelledby="ws-outcome-preview-title" hidden></svg>
+      <svg class="xp-goals-plot xp-trend-plot" role="group" aria-labelledby="ws-outcome-preview-title"></svg>
       <div class="xp-goals-readout" aria-live="polite"></div>`;
     const open = host.querySelector(".xp-open");
     open.onclick = () => openEvidence();
@@ -22,7 +22,7 @@
     const title = host.querySelector("h2");
     controls.onclick = event => {
       const button = event.target.closest("button[data-goal-view]");
-      if (button && !button.disabled && model.state.goalView !== button.dataset.goalView) setView(button.dataset.goalView);
+      if (button && model.state.goalView !== button.dataset.goalView) setView(button.dataset.goalView);
     };
 
     const svg = d3.select(host.querySelector("svg"));
@@ -187,7 +187,6 @@
           button.setAttribute("aria-pressed", String(button.dataset.goalView === state.goalView));
         }
       }
-      controls.querySelector('[data-goal-view="trend"]').disabled = !state.team;
       model = { state, summaries, visible: new Set(ids) };
       shown = rows.filter(row => model.visible.has(row.id) || side(row.id));
       open.hidden = !state.team;

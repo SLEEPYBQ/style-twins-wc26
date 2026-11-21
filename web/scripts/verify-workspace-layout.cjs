@@ -277,7 +277,7 @@ async function sharing(page) {
 
 async function linkedExplorePanels(page) {
   await page.setViewportSize({width:1440, height:900});
-  await page.goto(base + "/#/styles");
+  await page.goto(base + "/#/styles?goalView=distribution");
   await ready(page, "explore");
   const rows = page.locator("#ws-style-preview .xp-style-row");
   const marks = page.locator("#ws-outcome-preview .xp-goals-mark");
@@ -337,10 +337,10 @@ async function linkedExplorePanels(page) {
   await ready(page,"explore");
   await page.locator("#ws-swap").click();
   await verifyValues("GER","UZB");
-  await page.goto(base + "/#/styles?cohort=ECU,USA");
+  await page.goto(base + "/#/styles?cohort=ECU,USA&goalView=distribution");
   await ready(page,"explore");
   await verifyValues();
-  await page.goto(base + "/#/styles?search=zzzzzz");
+  await page.goto(base + "/#/styles?search=zzzzzz&goalView=distribution");
   await ready(page,"explore");
   assert.equal(await marks.count(), 0);
   assert.equal(await rows.count(), 0);
@@ -378,10 +378,46 @@ async function matchTrends(page) {
     .map(el => [Number(el.dataset.game), Number(el.dataset.gd)]).sort((a,b) => a[0] - b[0]), id);
   const ecuador = [[1,-1],[2,0],[3,1],[4,-2]];
   const usa = [[1,3],[2,2],[3,-1],[4,2],[5,-3]];
+  const round = panel.locator(".xp-cohort-mark:visible");
+  const roundStats = () => round.evaluateAll(nodes => nodes.map(({dataset: d}) =>
+    [d.game, d.count, d.q1, d.median, d.q3].map(Number)));
+  // Independently calculated from the 208 source team-match records in team schedule order.
+  const tournament = [[1,48,-1,0,1], [2,48,-1,0,1], [3,47,-1.5,0,1.5], [4,32,-1,0,1],
+    [5,17,-1,0,1], [6,8,-1.25,0,1.25], [7,4,-1.25,0,1.25], [8,4,-1.25,0,1.25]];
+  assert.equal(await trend.getAttribute("aria-pressed"), "true");
+  assert.deepEqual(await roundStats(), tournament);
+  const fullRanges = await round.evaluateAll(nodes => nodes.map(({dataset: d}) => [Number(d.min), Number(d.max)]));
+  assert.deepEqual(fullRanges, [[-6,6], [-6,6], [-5,5], [-3,3], [-3,3], [-2,2], [-2,2], [-2,2]]);
+  assert.equal(await panel.locator(".xp-cohort-range").evaluateAll(lines =>
+    lines.filter(line => line.getBoundingClientRect().height > 0 && getComputedStyle(line).display !== "none").length), 8);
+  assert.equal(await point.count(), 0, "overview has no preselected team");
+  await team(page, "ECU").focus();
+  await panel.locator('.xp-cohort-preview[data-team="ECU"]').waitFor();
+  await round.last().focus();
+  assert.match(await panel.locator(".xp-goals-readout").innerText(), /4 teams/i);
+  const overview = page.url();
+  await distribution.click();
   assert.equal(await panel.locator(".xp-goals-mark:visible").count(), 48);
-  assert.ok(await panel.locator(".xp-trend-plot").isHidden());
+  assert.equal(new URLSearchParams(page.url().split("?")[1]).get("goalView"), "distribution");
+  await page.reload();
+  await ready(page, "explore");
+  assert.equal(await distribution.getAttribute("aria-pressed"), "true");
+  await page.goBack();
+  await ready(page, "explore");
+  assert.equal(page.url(), overview);
+  assert.deepEqual(await roundStats(), tournament);
+
+  await page.locator("#ws-scope [data-v=knockout]").click();
+  assert.deepEqual(await roundStats(), [[4,31,-1,0,1], ...tournament.slice(4)]);
+  await page.goto(base + "/#/styles?cohort=ECU,USA");
+  await ready(page, "explore");
+  assert.deepEqual(await roundStats(), [[1,2,0,1,2], [2,2,.5,1,1.5], [3,2,-.5,0,.5], [4,2,-1,0,1], [5,1,-3,-3,-3]]);
+  await page.locator("#ws-search").fill("zzzzzz");
+  await page.waitForFunction(() => !document.querySelector(".xp-cohort-mark"));
+  assert.match(await panel.locator(".xp-goals-readout").innerText(), /no team|no match/i);
+  await page.locator("#ws-reset").click();
   await team(page, "ECU").press("Enter");
-  await trend.click();
+  assert.equal(await round.count(), 0);
   assert.deepEqual(await series("ECU"), ecuador);
   assert.equal(await point.count(), 4, "one team produces only its own matches");
   await panel.locator('[data-match="2026-M034-ECU-CUW_ECU"]').focus();
@@ -393,7 +429,7 @@ async function matchTrends(page) {
   assert.deepEqual(await series("USA"), usa);
   assert.deepEqual(await series("ECU"), ecuador);
   const share = page.url();
-  assert.equal(new URLSearchParams(new URL(share).hash.split("?")[1]).get("goalView"), "trend");
+  assert.equal(new URLSearchParams(new URL(share).hash.split("?")[1]).get("goalView"), null);
   await page.reload();
   await ready(page, "explore");
   assert.deepEqual(await series("USA"), usa);
@@ -439,8 +475,8 @@ async function matchTrends(page) {
     await ready(page, "explore");
   }
   await page.locator("#ws-reset").click();
-  assert.equal(await panel.locator(".xp-goals-mark:visible").count(), 48);
-  assert.ok(await panel.locator(".xp-trend-plot").isHidden());
+  assert.deepEqual(await roundStats(), tournament);
+  assert.equal(await point.count(), 0);
 }
 
 async function translatedLayout(page) {
@@ -471,6 +507,10 @@ async function phone(browser, errors) {
   await viewport(page, "phone overview", true);
   assert.ok(await page.evaluate(() => document.documentElement.scrollHeight > innerHeight), "phone scrolls naturally");
   await capture(page, "phone-390x844");
+  const overview = page.url();
+  await page.locator('.xp-cohort-mark[data-game="8"]').tap();
+  assert.match(await page.locator(".xp-goals-readout").innerText(), /4 teams/i);
+  assert.equal(page.url(), overview);
   await page.locator("#ws-pick-a .sel-btn").tap();
   await fullyVisible(page.locator("#ws-pick-a .sel-pop"), "phone team picker");
   await page.locator("#ws-pick-a input").fill("ECU");
@@ -478,7 +518,7 @@ async function phone(browser, errors) {
   await page.locator("#ws-pick-b .sel-btn").tap();
   await page.locator("#ws-pick-b input").fill("USA");
   await page.locator("#ws-pick-b .sel-opt").last().tap();
-  await page.locator("#ws-outcome-preview [data-goal-view=trend]").tap();
+  assert.equal(await page.locator("[data-goal-view=trend]").getAttribute("aria-pressed"), "true");
   await viewport(page, "phone match trends", true);
   const match = "2026-M034-ECU-CUW_ECU";
   await page.locator(`.xp-trend-mark[data-match="${match}"]`).tap();

@@ -105,11 +105,6 @@
   margin-inline-start: auto;
   max-width: 100%;
 }
-.xp-goals-controls button:disabled {
-  color: var(--ws-muted);
-  opacity: .7;
-  cursor: default;
-}
 .xp-goals-controls button { white-space: normal; }
 
 .xp-goals-plot {
@@ -147,6 +142,42 @@
 .xp-goals-pin.is-a { color: var(--ws-a-ink); }
 .xp-goals-pin.is-b { color: var(--ws-b-ink); }
 
+.xp-cohort-range { fill: none; stroke: var(--ws-dot); stroke-width: 1.25; }
+.xp-cohort-band { fill: var(--ws-dot); fill-opacity: .34; }
+.xp-cohort-median, .xp-cohort-preview path {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+.xp-cohort-median { stroke: var(--ws-ink-2); }
+.xp-cohort-whisker { stroke: var(--ws-dot); stroke-width: 5; stroke-opacity: .45; }
+.xp-cohort-dot { fill: var(--ws-ink-2); stroke: var(--ws-panel); stroke-width: 1.3; }
+.xp-cohort-mark { cursor: pointer; }
+.xp-cohort-mark:is(:hover, :focus) .xp-cohort-dot {
+  fill: var(--ws-panel);
+  stroke: var(--ws-ink);
+  stroke-width: 2;
+}
+.xp-cohort-preview { color: var(--ws-a-ink); pointer-events: none; }
+.xp-cohort-preview path { stroke: currentColor; }
+.xp-cohort-preview circle { fill: currentColor; stroke: var(--ws-panel); }
+.xp-cohort-key { display: inline-flex; align-items: center; gap: 5px; }
+.xp-cohort-key::before { content: ""; width: 16px; }
+.xp-cohort-key.is-median::before {
+  height: 6px;
+  background: radial-gradient(circle, var(--ws-ink-2) 2.5px, transparent 3px) center,
+    linear-gradient(var(--ws-ink-2), var(--ws-ink-2)) center / 100% 2px no-repeat;
+}
+.xp-cohort-key.is-team::before { border-block-start: 2px solid var(--ws-a-ink); }
+.xp-cohort-key.is-range::before {
+  width: 7px;
+  height: 11px;
+  margin-inline: 4px;
+  border-block: 1px solid var(--ws-dot);
+  background: linear-gradient(var(--ws-dot), var(--ws-dot)) center / 1px 100% no-repeat;
+}
+.xp-cohort-key.is-band::before { height: 8px; background: var(--ws-dot); opacity: .34; }
+
 .xp-trend-series.is-a { color: var(--ws-a); }
 .xp-trend-series.is-b { color: var(--ws-b); }
 .xp-trend-line {
@@ -167,14 +198,19 @@
 }
 .xp-trend-axis-title { fill: var(--ws-ink-2); font: 500 11px var(--sans); }
 .xp-trend-readout { align-content: start; }
+/* The longer match readout must not move a data point away from the pointer. */
+.xp-trend-plot[data-overview="true"] + .xp-trend-readout { min-height: calc(2.7em + 2px); }
 
 @media (min-width: 1000px) and (min-height: 560px) {
   .ws[data-mode="explore"] .ws-content {
     grid-template-rows: minmax(0, 1fr) clamp(128px, 17.8dvh, 200px);
     row-gap: 8px;
   }
-  .ws[data-mode="explore"] .ws-content:has(.xp-trend-plot:not([hidden])) {
+  .ws[data-mode="explore"] .ws-content:has(#ws-pairs[hidden]):has(.xp-trend-plot:not([hidden])) {
     grid-template-rows: minmax(0, 1fr) clamp(178px, 22dvh, 240px);
+  }
+  .ws[data-mode="explore"] .ws-content:has(#ws-pairs[hidden]):has(.xp-trend-plot:where([data-overview="true"]):not([hidden])) {
+    grid-template-rows: minmax(0, 1fr) clamp(168px, 21dvh, 225px);
   }
   /* Enhanced selects live inside the chart panel. Keep their scrollable lists
      inside its visible area after the additional row takes its share of space. */
@@ -218,7 +254,7 @@
 @media (min-width: 1000px) and (min-height: 560px) and (max-height: 699px) {
   body.ws-route:has(.ws[data-mode="explore"]) { min-height: 100dvh; height: auto; }
   .ws[data-mode="explore"] .ws-content { flex: none; grid-template-rows: minmax(470px, auto) minmax(138px, auto); }
-  .ws[data-mode="explore"] .ws-content:has(.xp-trend-plot:not([hidden])) {
+  .ws[data-mode="explore"] .ws-content:has(#ws-pairs[hidden]):has(.xp-trend-plot:not([hidden])) {
     grid-template-rows: minmax(470px, auto) minmax(180px, auto);
   }
 }

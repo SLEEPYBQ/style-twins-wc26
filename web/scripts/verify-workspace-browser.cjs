@@ -559,6 +559,15 @@ async function run() {
     assert.equal(await page.locator("#ws-brush").isVisible(), false, "Mouse selection requires no brush button");
     await page.locator("#ws-C-title").hover();
     assert.doesNotMatch(await mapTeam(page, "ECU").getAttribute("class"), /is-hover/);
+    const region = await topStrip(page);
+    await mouseDrag(page, region.start, region.end, async () => {
+      const cohort = await ids(page, heatRows + ":visible");
+      assert.ok(cohort.length > 0 && cohort.length < 48);
+      assert.equal(Number(await page.locator('.xp-cohort-mark[data-game="1"]').getAttribute("data-count")), cohort.length,
+        "uncommitted brush filters the trend's participating teams");
+      assert.equal(page.url(), initialUrl);
+    });
+    await page.locator("[data-clear='cohort']").click();
     await mapTeam(page, "ECU").focus();
     assert.match(await heatTeam(page, "ECU").getAttribute("class"), /is-hover/);
     await mapTeam(page, "ECU").press("Enter");
@@ -626,6 +635,7 @@ async function run() {
     assert.deepEqual(await ids(page, heatRows), order, "Column ordering should survive reload");
 
     // A brush changes the visible cohort in both tables while preserving pinned teams.
+    await page.locator("[data-goal-view=distribution]").click();
     const {start, end} = await topStrip(page);
     const beforeBrush = page.url();
     let preview;
