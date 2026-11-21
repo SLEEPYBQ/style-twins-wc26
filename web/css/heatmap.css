@@ -93,8 +93,9 @@
   .hm-table thead th button span { min-width: 0; hyphens: auto; overflow-wrap: anywhere; }
 }
 @container (min-width: 720px) and (max-width: 849px) {
-  .hm-name-col { width: clamp(95px, calc(100cqw - 650px), 134px); }
-  .hm-table thead th button { padding-inline: 0; font-size: 12px; letter-spacing: -.015em; }
+  .hm-name-col { width: clamp(105px, calc(100cqw - 645px), 138px); }
+  .hm-team { gap: 3px; padding-inline: 4px; }
+  .hm-table thead th button { padding-inline: 0; font-size: 12px; letter-spacing: -.025em; }
 }
 @container (min-width: 900px) {
   .hm-name-col { width: 176px; }
