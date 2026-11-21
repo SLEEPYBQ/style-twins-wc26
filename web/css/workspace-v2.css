@@ -129,6 +129,8 @@ body.ws-route .foot a { color: var(--ink-2); }
   white-space: nowrap;
 }
 .ws2-story-cap { flex: 1; min-width: 0; }
+.ws2-story-stage { margin-inline-start: 8px; color: var(--muted); }
+.ws2-story-stage b { color: var(--ink-2); font-weight: 650; }
 /* Story spotlight: the panels a beat talks about stay crisp, the rest recede. */
 .ws2.has-beat-focus .ws2-panel { transition: opacity 240ms ease, box-shadow 240ms ease; }
 .ws2.has-beat-focus .ws2-panel:not(.is-beat-focus) { opacity: 0.45; }

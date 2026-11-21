@@ -868,7 +868,8 @@
       gLabels.selectAll("*").remove();
       let priority = [];
       if (state.team) {
-        priority = [state.team, state.compare, ...twins.slice(0, 3)].filter((id) => id && pos[id]);
+        // B is often also one of A's top twins; label each team once.
+        priority = [...new Set([state.team, state.compare, ...twins.slice(0, 3)])].filter((id) => id && pos[id]);
       } else {
         const visList = Object.keys(pos).filter((id) => visibleSet.has(id));
         if (visList.length) {

@@ -142,37 +142,57 @@ async function assertDesktopBounds(page, label) {
   await settle(page);
   assert.equal(await page.locator('#sm-legend [data-act="clear-color"]').count(), 0);
 
-  // 5. Story Beat 1/2: captions are computed from the live model and spotlight the panels they describe.
+  // 5. Story beats: captions are computed from the live model and spotlight the panels they describe.
+  const banner = () => page.locator("#ws2-story-banner").innerText();
+  const focusPanels = () => page.locator(".ws2-panel.is-beat-focus").evaluateAll((els) => els.map((e) => e.dataset.panel));
+  assert.equal(await page.locator("#ws2-story-nav [data-beat]").count(), 5, "Story has five beats");
   await page.locator('#ws2-story-nav [data-beat="1"]').click();
   await settle(page, 300);
-  assert.deepEqual(
-    await page.locator(".ws2-panel.is-beat-focus").evaluateAll((els) => els.map((e) => e.dataset.panel)),
-    ["map", "dna"],
-    "Beat 1 spotlights the Style Map and Style DNA"
-  );
-  await page.locator('#ws2-story-nav [data-beat="2"]').click();
+  assert.deepEqual(await focusPanels(), ["map", "dna"], "Beat 1 spotlights the Style Map and Style DNA");
+  assert.match(await banner(), /rises from −1\.84 \(Deep & direct\) to \+0\.48 \(Final-third pressure\)/, "Beat 1 states the playstyle GD gradient");
+
+  // Beat 2: the champion (taken from the data) has no close twin.
+  await page.locator("[data-next-beat]").click();
   await settle(page, 300);
-  const beat2 = await page.locator("#ws2-story-banner").innerText();
-  assert.match(beat2, /1\.60 for teams that play differently/, "Beat 2 states the dissimilar median gap");
-  assert.match(beat2, /0\.92 for style twins/, "Beat 2 states the twin median gap");
-  assert.match(beat2, /53 twin pairs/, "Beat 2 counts the ★ pairs");
+  assert.equal(await page.locator(".dna-pin-row.is-a").getAttribute("data-team"), "ESP", "Beat 2 selects the champion");
+  assert.match(await banner(), /Spain won the tournament with a style nobody shared: its closest twin, Portugal, is only 79\.0% alike\. Only 3 of 48 teams/, "Beat 2 caption");
+  assert.match(await banner(), /typical team it is 97\.8%/, "Beat 2 states the typical closest-twin similarity");
   await page.screenshot({ path: path.join(OUT, "v3-beat2-1920.png") });
 
-  // 6. Story Beat 3 (USA vs ECU + Timeline + decreasing .tw2-sim widths)
-  await page.locator('#ws2-story-nav [data-beat="3"]').click();
+  // Beat 3: the runner-up against its closest twin; biggest factor preselected in the tug-of-war.
+  await page.locator("[data-next-beat]").click();
+  await settle(page, 300);
+  assert.equal(await page.locator(".dna-pin-row.is-a").getAttribute("data-team"), "ARG");
+  assert.equal(await page.locator(".dna-pin-row.is-b").getAttribute("data-team"), "POR");
+  assert.match(await banner(), /Argentina and Portugal are 97\.7% alike, yet Argentina averaged 0\.38 more goals per match\.\s+Biggest factor:\s+Chance creation\s+\(\+0\.83\)/, "Beat 3 caption");
+  assert.match(await banner(), /Argentina:\s*Runners-up\s*·\s*Portugal:\s*Round of 16/, "Beat 3 shows tournament stages");
+  assert.equal(await page.locator('.wf2-tug-row.is-active').getAttribute("data-comp"), "c_create", "Beat 3 highlights chance creation");
+  assert.equal(await page.locator('#sm-canvas .sm-labels text[data-label-for="POR"]').count(), 1, "B is labelled once on the map even when it is also a top twin");
+  await page.screenshot({ path: path.join(OUT, "v3-beat3-arg-por-1920.png") });
+
+  // Beat 4 (USA vs ECU + Timeline + decreasing .tw2-sim widths)
+  await page.locator("[data-next-beat]").click();
   await settle(page, 300);
   assert.equal(await page.locator(".dna-pin-row.is-a").getAttribute("data-team"), "USA");
   assert.equal(await page.locator(".dna-pin-row.is-b").getAttribute("data-team"), "ECU");
   assert.equal(await page.locator(".dna-diff-row").count(), 1);
   assert.match(
-    await page.locator("#ws2-story-banner").innerText(),
+    await banner(),
     /USA and Ecuador are 99\.7% alike, yet USA averaged 1\.10 more goals per match\.\s+Biggest factor:\s+Finishing vs xG\s+\(\+1\.90\)/,
-    "Beat 3 caption is computed from the selected pair"
+    "Beat 4 caption is computed from the selected pair"
   );
-  assert.ok((await page.locator("#wf2-timeline").count()) === 1, "Beat 3 defaults Panel 5 to G1..Gn Timeline");
+  assert.ok((await page.locator("#wf2-timeline").count()) === 1, "Beat 4 defaults Panel 5 to G1..Gn Timeline");
   const simWidths = await page.locator(".tw2-sim-track i").evaluateAll((els) => els.map((e) => parseFloat(getComputedStyle(e).width)));
   assert.ok(simWidths.length >= 6 && simWidths[0] > simWidths[5] + 4, `Twin similarity bars must reflect magnitude (${simWidths[0]} > ${simWidths[5]})`);
-  await page.screenshot({ path: path.join(OUT, "v3-beat3-ecu-usa-1920.png") });
+  await page.screenshot({ path: path.join(OUT, "v3-beat4-usa-ecu-1920.png") });
+
+  // Beat 5: aggregate across twins, last beat has no "Next".
+  await page.locator("[data-next-beat]").click();
+  await settle(page, 300);
+  assert.match(await banner(), /Across 53 twin pairs, style & opponents explain \+0\.15 of a 1\.69 goal gap per match; chances \+0\.71, finishing \+0\.83\. For teams that play differently, style explains \+0\.77 of 2\.36\./, "Beat 5 caption");
+  assert.equal(await page.locator("[data-next-beat]").count(), 0, "Last beat has no Next button");
+  await page.locator('#ws2-story-nav [data-beat="4"]').click();
+  await settle(page, 300);
 
   // Also test Beads view on ECU vs USA (9 fixed-r shapes) + DNA zero-scroll even with A/B/A-B pinned!
   const dnaPinBounds = await page.evaluate(() => {
@@ -332,30 +352,28 @@ async function assertDesktopBounds(page, label) {
   await page.locator('#ws2-map-ctrl [data-act="steer"]').click();
   await settle(page, 120);
 
-  // Check Story Beat 2 and Beat 3 in zh-Hans
-  await page.locator('#ws2-story-nav [data-beat="2"]').click();
-  await settle(page, 140);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 2 must have zero English prose leaks");
+  // Check every story beat in zh-Hans
+  for (const k of ["1", "2", "3", "5"]) {
+    await page.locator(`#ws2-story-nav [data-beat="${k}"]`).click();
+    await settle(page, 160);
+    assert.deepEqual(await collectEnglishLeaks(), [], `zh-Hans Beat ${k} must have zero English prose leaks`);
+  }
 
-  await page.locator('#ws2-story-nav [data-beat="3"]').click();
+  await page.locator('#ws2-story-nav [data-beat="4"]').click();
   await settle(page, 160);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 3 Timeline must have zero English prose leaks");
-  await assertDesktopBounds(page, "1920x1080 zh-Hans Beat 3");
+  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 4 Timeline must have zero English prose leaks");
+  await assertDesktopBounds(page, "1920x1080 zh-Hans Beat 4");
   const zhDna = await page.evaluate(() => {
     const el = document.getElementById("dna-scroll");
     return { sh: el.scrollHeight, ch: el.clientHeight };
   });
-  assert.ok(zhDna.sh <= zhDna.ch + 2, `zh-Hans Beat 3 DNA rows must fit after translation (${zhDna.sh} <= ${zhDna.ch})`);
+  assert.ok(zhDna.sh <= zhDna.ch + 2, `zh-Hans Beat 4 DNA rows must fit after translation (${zhDna.sh} <= ${zhDna.ch})`);
   assert.match(await page.locator("#fq-canvas .fq-pair-tag.is-ab").textContent(), /相似度/, "Quadrant pair tag is translated");
-  await page.screenshot({ path: path.join(OUT, "fixed-zh-beat3.png") });
+  await page.screenshot({ path: path.join(OUT, "fixed-zh-beat4.png") });
 
   await page.locator('#ws2-fate-ctrl [data-vmode="beads"]').click();
   await settle(page, 120);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 3 Beads must have zero English prose leaks");
-
-  await page.locator('#ws2-story-nav [data-beat="4"]').click();
-  await settle(page, 160);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 4 must have zero English prose leaks");
+  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 4 Beads must have zero English prose leaks");
 
   // Check Team A === Team B exclusion (阿根廷 cannot appear in Team B picker when A = 阿根廷)
   await page.goto(`${BASE}/#/styles?team=ARG`, { waitUntil: "domcontentloaded" });

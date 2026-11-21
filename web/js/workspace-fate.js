@@ -63,6 +63,9 @@
     return { n, meanGap, vals };
   }
 
+  // Shared with the story captions so narration and panel use one calculation.
+  App.fatePairBreakdown = pairBreakdown;
+
   App.workspaceFate = function (bodyHost, ctrlHost, { selectComp, selectMatch, choosePair, choose, highlight, setScope }) {
     let viewMode = "beads";          // "beads" | "timeline"
     let currentModel = null;

@@ -15,14 +15,26 @@
   const num = (v) => (v != null && v !== "" && Number.isFinite(+v) ? +v : null);
 
   // Presentation beats. Each caption is computed from the live model (see storyCaption), so
-  // the narration can never drift from what the panels show.
+  // the narration can never drift from what the panels show. The finalists come from the data;
+  // the runner-up is paired with its closest full-tournament style twin.
   const BEAT_BASE = { match: null, comp: null, arch: "", cohort: null, pairRegion: null, dials: App.dials.slice(), weights: null, scope: "all", colorDial: null, heatSort: "spectrum", search: "", mapSteer: false };
-  const STORY_BEATS = {
-    1: { title: "1 · Meet the 48 styles", focus: ["map", "dna"], patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "off", beat: 1 } },
-    2: { title: "2 · Same style, same result?", focus: ["quad", "twins"], patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "stars", beat: 2 } },
-    3: { title: "3 · Twins, opposite fates", focus: ["fate", "map"], patch: { ...BEAT_BASE, team: "USA", compare: "ECU", comp: "c_finish", mapLinks: "off", beat: 3 } },
-    4: { title: "4 · Why fates split", focus: ["fate"], patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "stars", beat: 4 } },
+  const CHAMPION = App.teams.find((t) => t.stage === "Champions")?.id || null;
+  const RUNNER_UP = App.teams.find((t) => t.stage === "Runners-up")?.id || null;
+  const FULL_NEAR = A.twinTable(A.space(App.dials, "all")).near;
+  const RUNNER_UP_TWIN = RUNNER_UP ? FULL_NEAR[RUNNER_UP]?.[0]?.id || null : null;
+  // Largest of the six result components for a pair in the full tournament; preselects the tug-of-war row.
+  const biggestComp = (a, b) => {
+    const gm = a && b ? A.outcomeGap(A.summary(A.rows(a, "all")), A.summary(A.rows(b, "all"))) : null;
+    return gm?.status === "ok" ? [...gm.steps.slice(0, 6)].sort((u, v) => Math.abs(v.value) - Math.abs(u.value))[0].id : null;
   };
+  const STORY_BEATS = {
+    1: { title: "1 · Meet the 48 styles", focus: ["map", "dna"], view: "beads", patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "off", beat: 1 } },
+    2: { title: "2 · Nobody plays like the champions", focus: ["map", "twins"], view: "beads", patch: { ...BEAT_BASE, team: CHAMPION, compare: null, mapLinks: "off", beat: 2 } },
+    3: { title: "3 · The runner-up beat its twin", focus: ["twins", "fate"], view: "beads", patch: { ...BEAT_BASE, team: RUNNER_UP, compare: RUNNER_UP_TWIN, comp: biggestComp(RUNNER_UP, RUNNER_UP_TWIN), mapLinks: "off", beat: 3 } },
+    4: { title: "4 · Same playbook, opposite fates", focus: ["fate", "map"], view: "timeline", patch: { ...BEAT_BASE, team: "USA", compare: "ECU", comp: biggestComp("USA", "ECU"), mapLinks: "off", beat: 4 } },
+    5: { title: "5 · Why fates split", focus: ["fate", "quad"], view: "beads", patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "stars", beat: 5 } },
+  };
+  const LAST_BEAT = Object.keys(STORY_BEATS).length;
 
   function median(values) {
     const v = values.filter(Number.isFinite).sort((x, y) => x - y);
@@ -45,37 +57,50 @@
     return out;
   }
 
-  // Returns escaped HTML.
+  // Returns escaped HTML. Sentences are split into spans so each piece is a stable translation key.
   function storyCaption(beat, model) {
     const s = model.state;
-    const pairs = scopePairs(model);
-    const twins = pairs.filter((p) => p.sim >= 90);
-    const stars = twins.filter((p) => p.gap >= 1);
-    const far = pairs.filter((p) => p.sim < 50);
     const f2 = (v) => App.fix(v, 2);
+    const name = (id) => App.team[id].name;
+    const span = (text) => `<span>${esc(text)}</span>`;
     if (beat === 1) {
-      const order = App.SPECTRUM_ORDER.map((id) => App.groupShort(id));
-      return esc(`Each flag is a team, placed by 10 style dials; the heatmap shows the same dials. Playstyles run from ${order[0]} to ${order.at(-1)}.`);
+      const groups = App.SPECTRUM_ORDER.filter((id) => App.arch[id]?.members.some((t) => model.summaries[t]?.n));
+      const meanGd = (id) => d3.mean(App.arch[id].members, (t) => model.summaries[t]?.gd);
+      const first = groups[0], last = groups.at(-1);
+      return span(`Each flag is a team, placed by 10 style dials; the heatmap shows the same dials. Average goal difference per match rises from ${App.signed(meanGd(first), 2)} (${App.groupShort(first)}) to ${App.signed(meanGd(last), 2)} (${App.groupShort(last)}).`);
     }
-    if (beat === 2) {
-      return esc(`Typical goal gap per match: ${f2(median(far.map((p) => p.gap)))} for teams that play differently (<50% similar), ${f2(median(twins.map((p) => p.gap)))} for style twins (≥90%). Yet ${stars.length} twin pairs (★) still differ by ≥1 goal per match.`);
+    if (beat === 2 && s.team && s.team === CHAMPION) {
+      const ids = Object.keys(model.space.team);
+      const best = (id) => model.nearByTeam[id]?.[0]?.sim;
+      const twin = model.nearByTeam[s.team]?.[0];
+      if (!twin) return "";
+      const fewer = ids.filter((id) => best(id) < twin.sim).length;
+      return span(`${name(s.team)} won the tournament with a style nobody shared: its closest twin, ${name(twin.id)}, is only ${App.fix(twin.sim * 100, 1)}% alike. Only ${fewer} of ${ids.length} teams have a less similar closest twin; for a typical team it is ${App.fix(median(ids.map(best)) * 100, 1)}%.`);
     }
-    if (beat === 3 && s.team && s.compare) {
+    if ((beat === 3 || beat === 4) && s.team && s.compare) {
       const sa = model.summaries[s.team], sb = model.summaries[s.compare];
       const sim = (model.nearByTeam[s.team] || []).find((n) => n.id === s.compare)?.sim;
       const gm = sa && sb ? A.outcomeGap(sa, sb) : null;
       if (!gm || gm.status !== "ok" || !Number.isFinite(sim)) return "";
-      const top = gm.steps.slice(0, 6).sort((u, v) => Math.abs(v.value) - Math.abs(u.value))[0];
-      const name = (id) => App.team[id].name;
-      // Split into spans so each piece is a stable translation key (the component label is translated on its own).
+      const top = [...gm.steps.slice(0, 6)].sort((u, v) => Math.abs(v.value) - Math.abs(u.value))[0];
       return [
-        `<span>${esc(`${name(s.team)} and ${name(s.compare)} are ${App.fix(sim * 100, 1)}% alike, yet ${name(s.team)} averaged ${f2(sa.gd - sb.gd)} more goals per match.`)}</span>`,
-        `<span>${esc("Biggest factor:")}</span>`,
+        span(`${name(s.team)} and ${name(s.compare)} are ${App.fix(sim * 100, 1)}% alike, yet ${name(s.team)} averaged ${f2(sa.gd - sb.gd)} more goals per match.`),
+        span("Biggest factor:"),
         `<b>${esc(top.label)}</b>`,
         `<span translate="no">(${esc(App.signed(top.value, 2))})</span>`,
+        `<span class="ws2-story-stage">${span(`${name(s.team)}:`)} <b>${esc(App.team[s.team].stage)}</b> · ${span(`${name(s.compare)}:`)} <b>${esc(App.team[s.compare].stage)}</b></span>`,
       ].join(" ");
     }
-    if (beat === 4) return esc("Across all twin pairs, compare the solid bars (twins) with the outlines (teams that play differently). Now pick your own team in the A / B boxes.");
+    if (beat === 5) {
+      const pairs = scopePairs(model);
+      const twins = App.fatePairBreakdown(pairs.filter((p) => p.sim >= 90 && p.gap >= 1), model.summaries);
+      const far = App.fatePairBreakdown(pairs.filter((p) => p.sim < 50 && p.gap >= 1), model.summaries);
+      if (!twins || !far) return "";
+      return [
+        span(`Across ${twins.n} twin pairs, style & opponents explain ${App.signed(twins.vals.structure, 2)} of a ${f2(twins.meanGap)} goal gap per match; chances ${App.signed(twins.vals.chances, 2)}, finishing ${App.signed(twins.vals.finishing, 2)}. For teams that play differently, style explains ${App.signed(far.vals.structure, 2)} of ${f2(far.meanGap)}.`),
+        span("Now pick your own team."),
+      ].join(" ");
+    }
     return "";
   }
 
@@ -97,7 +122,7 @@
       ? +p.colorDial : null;
     const heatSort = VALID_SORTS.has(p.heatSort) ? p.heatSort : (colorDial !== null ? `dial${colorDial}` : "spectrum");
     const match = RECORD_BY_KEY[p.match];
-    const beat = ["1", "2", "3", "4"].includes(p.beat) ? Number(p.beat) : null;
+    const beat = Object.hasOwn(STORY_BEATS, p.beat) ? Number(p.beat) : null;
     return {
       team,
       compare,
@@ -113,7 +138,7 @@
       pairRegion: pairRegionFrom(p.pairRegion),
       match: match && A.inScope(match, scope) ? match.key : null,
       comp: COMP_IDS.has(p.comp) ? p.comp : null,
-      mapLinks: ["off", "stars"].includes(p.mapLinks) ? p.mapLinks : (beat === 2 || beat === 4 ? "stars" : "off"),
+      mapLinks: ["off", "stars"].includes(p.mapLinks) ? p.mapLinks : (beat && STORY_BEATS[beat].patch.mapLinks === "stars" ? "stars" : "off"),
       mapSteer: p.mapSteer === "1",
       beat,
       tableSort: ["name", "group", "n", "xgd", "gd"].includes(p.tableSort) ? p.tableSort : "gd",
@@ -452,7 +477,7 @@
         change({ beat: null });
         return;
       }
-      if (bNum === 3) fateView.setViewMode("timeline");
+      fateView.setViewMode(b.view);
       change(b.patch);
     };
 
@@ -625,7 +650,7 @@
           <span class="ws2-story-badge">${esc(b.title)}</span>
           <span class="ws2-story-cap">${storyCaption(state.beat, model)}</span>
           <span class="ws2-story-acts">
-            ${state.beat < 4 ? `<button type="button" class="ws2-mini-btn" data-next-beat="${state.beat + 1}">Next beat →</button>` : ""}
+            ${state.beat < LAST_BEAT ? `<button type="button" class="ws2-mini-btn" data-next-beat="${state.beat + 1}">Next beat →</button>` : ""}
             <button type="button" class="ws2-mini-btn" data-close-beat="1" aria-label="Close story banner">×</button>
           </span>`;
         const nxt = bannerEl.querySelector("[data-next-beat]");
@@ -860,7 +885,7 @@
       App.tip.hide();
       if (state.beat !== lastEnteredBeat) {
         lastEnteredBeat = state.beat;
-        if (state.beat === 3) fateView.setViewMode("timeline");
+        if (state.beat) fateView.setViewMode(STORY_BEATS[state.beat].view);
       }
       const space = A.space(state.dials, state.scope, state.weights);
       const full = A.space(App.dials, state.scope);

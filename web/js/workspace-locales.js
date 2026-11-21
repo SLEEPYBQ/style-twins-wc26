@@ -934,26 +934,12 @@
     "Matrix seriation order": ["矩阵排序方式", "矩陣排序方式"],
     // 1920×1080 presentation pass: story beats, comparative overview, list headers.
     "{0} · Meet the {1} styles": ["{0} · 认识 {1} 支球队的打法", "{0} · 認識 {1} 支球隊的打法"],
-    "{0} · Same style, same result?": ["{0} · 打法相似，结果也相似吗？", "{0} · 打法相似，結果也相似嗎？"],
-    "{0} · Twins, opposite fates": ["{0} · 风格双胞胎，命运相反", "{0} · 風格雙胞胎，命運相反"],
     "{0} · Why fates split": ["{0} · 差距从何而来", "{0} · 差距從何而來"],
-    "Each flag is a team, placed by {0} style dials; the heatmap shows the same dials. Playstyles run from Deep & direct to Final-third pressure.": [
-      "每面国旗是一支球队，位置由 {0} 个风格指标决定；热力图展示的是同一组指标。打法从“深守直攻”一直排到“前场施压”。",
-      "每面國旗是一支球隊，位置由 {0} 個風格指標決定；熱力圖展示的是同一組指標。打法從「深守直攻」一直排到「前場施壓」。"
-    ],
-    "Typical goal gap per match: {0} for teams that play differently (<{1} similar), {2} for style twins (≥{3}). Yet {4} twin pairs (★) still differ by ≥{5} goal per match.": [
-      "场均净胜球差的中位数：打法不同（相似度 <{1}）的组合为 {0}，风格双胞胎（≥{3}）为 {2}。但仍有 {4} 对双胞胎（★）每场相差 ≥{5} 球。",
-      "場均淨勝球差的中位數：打法不同（相似度 <{1}）的組合為 {0}，風格雙胞胎（≥{3}）為 {2}。但仍有 {4} 對雙胞胎（★）每場相差 ≥{5} 球。"
-    ],
     "{0} and {1} are {2} alike, yet {3} averaged {4} more goals per match.": [
       "{0} 与 {1} 的打法相似度达 {2}，但 {3} 场均净胜球多出 {4} 球。",
       "{0} 與 {1} 的打法相似度達 {2}，但 {3} 場均淨勝球多出 {4} 球。"
     ],
     "Biggest factor:": ["最大原因：", "最大原因："],
-    "Across all twin pairs, compare the solid bars (twins) with the outlines (teams that play differently). Now pick your own team in the A / B boxes.": [
-      "看所有双胞胎组合：实心条是风格双胞胎，空心框是打法不同的组合。现在请在 A / B 框里选你自己的球队。",
-      "看所有雙胞胎組合：實心條是風格雙胞胎，空心框是打法不同的組合。現在請在 A / B 框裡選你自己的球隊。"
-    ],
     "Style twins with different fates": ["风格相似、结果迥异", "風格相似、結果迥異"],
     "Better team first": ["结果更好的球队在前", "結果更好的球隊在前"],
     "Goal gap / match": ["场均净胜球差", "場均淨勝球差"],
@@ -978,6 +964,23 @@
     "Main driver": ["主因", "主因"],
     "By match": ["逐场", "逐場"],
     "{0} alike · {1} goals/m apart": ["相似度 {0} · 场均相差 {1} 球", "相似度 {0} · 場均相差 {1} 球"],
+    "{0} · Nobody plays like the champions": ["{0} · 没人踢得像冠军", "{0} · 沒人踢得像冠軍"],
+    "{0} · The runner-up beat its twin": ["{0} · 亚军赢了自己的双胞胎", "{0} · 亞軍贏了自己的雙胞胎"],
+    "{0} · Same playbook, opposite fates": ["{0} · 同样的打法，相反的命运", "{0} · 同樣的打法，相反的命運"],
+    "Each flag is a team, placed by {0} style dials; the heatmap shows the same dials. Average goal difference per match rises from {1} (Deep & direct) to {2} (Final-third pressure).": [
+      "每面国旗是一支球队，位置由 {0} 个风格指标决定；热力图展示的是同一组指标。场均净胜球的组平均值从 {1}（深守直攻）升到 {2}（前场施压）。",
+      "每面國旗是一支球隊，位置由 {0} 個風格指標決定；熱力圖展示的是同一組指標。場均淨勝球的組平均值從 {1}（深守直攻）升到 {2}（前場施壓）。"
+    ],
+    "{0} won the tournament with a style nobody shared: its closest twin, {1}, is only {2} alike. Only {3} of {4} teams have a less similar closest twin; for a typical team it is {5}.": [
+      "{0} 夺冠时的打法无人相似：与它最像的 {1} 相似度也只有 {2}。{4} 支球队中只有 {3} 支的最像对手比这更不像；一般球队的最像对手相似度为 {5}。",
+      "{0} 奪冠時的打法無人相似：與它最像的 {1} 相似度也只有 {2}。{4} 支球隊中只有 {3} 支的最像對手比這更不像；一般球隊的最像對手相似度為 {5}。"
+    ],
+    "Across {0} twin pairs, style & opponents explain {1} of a {2} goal gap per match; chances {3}, finishing {4}. For teams that play differently, style explains {5} of {6}.": [
+      "在 {0} 对风格双胞胎中，打法与对手只解释了场均 {2} 球差距中的 {1}；机会质量 {3}，临门一脚 {4}。打法不同的组合中，打法能解释 {6} 中的 {5}。",
+      "在 {0} 對風格雙胞胎中，打法與對手只解釋了場均 {2} 球差距中的 {1}；機會品質 {3}，臨門一腳 {4}。打法不同的組合中，打法能解釋 {6} 中的 {5}。"
+    ],
+    "Now pick your own team.": ["现在请选你自己的球队。", "現在請選你自己的球隊。"],
+    "Chance creation across individual matches": ["各场比赛的创造机会", "各場比賽的創造機會"],
     "Selected teams": ["已选球队", "已選球隊"],
     "Playstyle spectrum": ["打法谱系", "打法譜系"],
     "Twin links overlay": ["双胞胎连线", "雙胞胎連線"],
