@@ -82,7 +82,12 @@ async function checkLens(page, base, output) {
   await absolute.click();
   await page.goBack();
   assert.equal(await difference.getAttribute("aria-pressed"),"true");
-  await page.locator("#ws-matches tbody [data-match]").first().click();
+  const matchRow = page.locator("#ws-matches tbody [data-match]").first();
+  await matchRow.press("Enter");
+  assert.equal(await page.locator(":focus").getAttribute("data-match"), await matchRow.getAttribute("data-match"));
+  await matchRow.press("Space");
+  assert.equal(await matchRow.getAttribute("aria-selected"), "false");
+  await matchRow.press("Enter");
   assert.equal(await absolute.getAttribute("aria-pressed"),"true");
   assert.equal(await page.locator(".lens-overlay.is-match:visible").count(),10);
 }

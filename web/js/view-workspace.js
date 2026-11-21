@@ -830,7 +830,13 @@
       }).join("") || `<tr><td colspan="5" class="ws-empty">No matches in this scope.</td></tr>`;
       q("#ws-matches tbody").querySelectorAll("tr[data-match]").forEach((row) => {
         const pick = () => change(row.dataset.match === state.match ? { match: null } : { match: row.dataset.match, lens: "absolute" });
-        row.onclick = pick; row.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
+        row.onclick = pick;
+        row.onkeydown = (event) => {
+          if (event.key !== "Enter" && event.key !== " ") return;
+          event.preventDefault();
+          pick();
+          q(`#ws-matches tr[data-match="${row.dataset.match}"]`)?.focus({ preventScroll: true });
+        };
         row.onpointerenter = () => highlight(row.dataset.team); row.onpointerleave = () => highlight(null);
       });
       const ret = A.query(state.dials, { return: stateUrl(state) });
@@ -838,7 +844,7 @@
         ? `<a class="ws-link" href="#/twins/${state.team}/${state.compare}${esc(A.query(state.dials, { scope: state.scope, return: stateUrl(state) }))}">Full pair report</a>`
         : `<a class="ws-link" href="#/team/${state.team}${esc(ret)}">Team report</a>`;
       q("#ws-match-actions").innerHTML = f
-        ? `<span class="ws-match-sel" title="Selected performance on the map and profile">◇ <b>${f.team_id} ${f.goals}–${f.goals_opp} ${f.opp_id}</b> · ${esc(App.stageShort(f.stage))}</span><span class="ws-spacer"></span>
+        ? `<span class="ws-match-sel" title="Selected match">◇ <b>${f.team_id} ${f.goals}–${f.goals_opp} ${f.opp_id}</b> · ${esc(App.stageShort(f.stage))}</span><span class="ws-spacer"></span>
            <a class="ws-link" href="#/match/${f.match_id}${esc(ret)}">Replay</a><a class="ws-link" href="#/lab/${f.match_id}${esc(A.query(state.dials, { team: f.team_id, return: stateUrl(state) }))}">Match Lab</a><button type="button" class="ws-link" id="ws-clear-match">Clear</button>`
         : reports;
       q("#ws-clear-match")?.addEventListener("click", () => change({ match: null }));
