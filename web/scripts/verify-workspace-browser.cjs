@@ -130,11 +130,25 @@ async function checkTeamRanks(page) {
   await checkIndicatorPreview(page);
   const readout = page.locator("#ws-readout");
   const url = page.url();
+  const expectedTwins = (await ids(page, "#ws-twins .ws-twin")).slice(0, 5).sort();
+  assert.deepEqual(await page.locator("#ws-map .relationship.is-near").evaluateAll(links => links.map(l => l.dataset.to).sort()), expectedTwins);
+  assert.deepEqual((await ids(page, heatRows + ":has(.hm-near-rank)")).sort(), expectedTwins);
+  assert.equal(await page.locator("#ws-map .relationship[data-to='URU'].is-pair").count(), 1);
+  await heatTeam(page, "GER").locator("button").evaluate(el => el.focus());
+  await page.locator(".hm-pins button[data-locate='URU']").click();
+  assert.ok(await heatTeam(page, "URU").locator("button").evaluate(el => el === document.activeElement));
+  const profileBeforeHover = await page.locator("#ws-profile svg").elementHandle();
   await mapTeam(page, "FRA").locator("circle").last().hover();
   const france = await readout.innerText();
   assert.match(france, /PCA distance rank\s*#1\b/i);
   assert.match(france, /Style similarity rank\s*#8\b/i);
   assert.match(france, /crosses/i);
+  const gdGap = await page.evaluate(() => {
+    const A = App.analysis;
+    return App.signed(A.summary(A.rows("GER", "all")).gd - A.summary(A.rows("FRA", "all")).gd, 2);
+  });
+  assert.ok(france.includes(gdGap) && france.includes("GER − FRA"), "Preview gives the signed A-minus-focus goal gap per match");
+  assert.ok(await profileBeforeHover.evaluate(node => node.isConnected), "Moving across teams should only update the profile overlay");
   const gap = page.locator("#ws-heat tr.is-compared td.is-gap");
   assert.deepEqual(await gap.evaluateAll(cells => cells.map(c => [c.parentElement.dataset.team, c.dataset.i]).sort()),
     [["FRA","5"],["GER","5"]], "Crosses has the largest standardized gap for this pair");
@@ -152,6 +166,34 @@ async function checkTeamRanks(page) {
   assert.match(await readout.innerText(), /Style similarity rank\s*#6\b/i);
   assert.deepEqual(await gap.evaluateAll(cells => cells.map(c => c.dataset.i)), ["8","8"],
     "With crosses omitted the largest selected difference is press after loss");
+}
+
+async function checkMapRefit(page) {
+  await page.goto(base + "/#/styles?team=GER", {waitUntil:"domcontentloaded"});
+  await mapTeam(page, "GER").waitFor();
+  for (const preference of ["reduce", "no-preference"]) {
+    await page.emulateMedia({reducedMotion:preference});
+    const result = await page.evaluate(() => {
+      const svg = () => document.querySelector("#ws-map svg");
+      const position = () => svg().querySelector('.mark[data-team="GER"]').getAttribute("transform");
+      const changeIndicators = () => document.querySelector('#ws-dials input[data-i="5"]').click();
+      const before = position(), old = svg();
+      changeIndicators();
+      const refit = svg(), after = position(), animation = getComputedStyle(refit).animationName;
+      const frames = refit.getAnimations().flatMap(a => a.effect.getKeyframes());
+      changeIndicators();
+      return { before, after, restored:position(), oldDetached:!old.isConnected && !refit.isConnected,
+        animation, properties:frames.flatMap(frame => Object.keys(frame)) };
+    });
+    assert.notEqual(result.before, result.after, "The selected indicators should refit PCA");
+    assert.equal(result.before, result.restored, "Rapid refits restore the original positions");
+    assert.ok(result.oldDetached, "Older projections should never animate over the current one");
+    assert.equal(result.animation, preference === "reduce" ? "none" : "ws-reveal");
+    if (preference === "no-preference") {
+      assert.ok(result.properties.includes("opacity"));
+      assert.ok(!result.properties.includes("transform"), "A refit must not imply movement in a fixed plane");
+    }
+  }
 }
 
 async function checkTouchIndicator(page) {
@@ -451,6 +493,7 @@ async function run() {
     await checkLinkedOrdering(page);
     await checkPairExplorer(page);
     await checkTeamRanks(page);
+    await checkMapRefit(page);
     await overview(page);
     assert.match(await page.locator("#ws-projection").innerText(), /variation.*10.*indicators/i);
     const maxError = await page.evaluate(() => {
@@ -549,6 +592,8 @@ async function run() {
       await page.waitForFunction(() => [...document.querySelectorAll("#ws-heat tbody tr[data-team]")].filter(row => row.getClientRects().length).length < 48);
       preview = await ids(page, heatRows + ":visible");
       assert.ok(preview.includes("CAN") && preview.length < 48, "Heatmap should show the subset while dragging");
+      assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out):visible")).sort(), [...preview].sort());
+      assert.ok(await page.locator("#ws-teams tr[data-team='ECU'].is-out .ws-pinned-note").isVisible(), "A remains identifiable outside the preview region");
       assert.match(await page.locator("#ws-heat .hm-count").innerText(), new RegExp("^" + preview.length + "\\s*/\\s*48\\b"));
       assert.equal(page.url(), beforeBrush, "Drag previews should not add history entries");
       await page.screenshot({path:path.join(output,"workspace-live-brush.png")});

@@ -93,6 +93,8 @@
     let nearByTeam, pca, mapRanks = new Map(), previewIndicator = null;
     let brushPreview = null;
     let activeBrush = null;
+    let updateProfilePreview = () => {};
+    let lastProjection, lastPins;
     const coarsePointer = window.matchMedia("(any-pointer: coarse)");
     const hasTouch = () => coarsePointer.matches || navigator.maxTouchPoints > 0;
     const q = (s) => root.querySelector(s);
@@ -351,12 +353,22 @@
       q(".ws-details").classList.toggle("has-team", !!state.team);
       for (const id of ["D", "F"]) q(`[data-panel="${id}"]`).hidden = !state.team;
       q('[data-panel="E"]').hidden = !state.compare;
-      drawContext(); drawCollection(); drawSimilarity(); heat.render({ state, full, visible, summaries, near });
+      drawContext(); drawCollection(); drawSimilarity(); heat.render({ state, full, visible, summaries, near, twins });
       if (isPairs) {
         heat.markIndicator(null);
         pairView.render({ visible, nearByTeam, summaries, region: state.pairRegion, touchArmed: touchBrushArmed, scope: state.scope, dials: state.dials });
       }
       drawMap(!isPairs); drawProfile(); drawOutcomes(); drawMatches(); readout();
+      const projection = pca ? state.scope + "|" + state.dials.join(",") : "";
+      const pins = [state.team, state.compare].join("|");
+      if (projection && lastProjection && projection !== lastProjection) {
+        // A refit changes the coordinate system. Reveal the new projection as a whole.
+        q("#ws-map svg").classList.add("ws-reveal");
+      } else if (state.team && lastPins !== undefined && pins !== lastPins) {
+        qa("#ws-map .relationship, .hm-side, #ws-twins .is-b .ws-twin-rank").forEach((node) => node.classList.add("ws-reveal"));
+      }
+      lastProjection = projection;
+      lastPins = pins;
     }
 
     /* ---------- context bar ---------- */
@@ -403,14 +415,18 @@
       });
       q("#ws-count").textContent = `${visible.length} / ${Object.keys(space.team).length} teams`;
 
-      visible.sort((a, b) => {
+      drawTeamRows(visible);
+    }
+
+    function drawTeamRows(ids) {
+      ids.sort((a, b) => {
         let c;
         if (state.sort === "name") c = App.team[a].name.localeCompare(App.team[b].name);
         else if (state.sort === "group") c = groupName(App.team[a].archetype).localeCompare(groupName(App.team[b].archetype));
         else { const x = summaries[a][state.sort], y = summaries[b][state.sort]; c = x == null ? (y == null ? 0 : 1) : y == null ? -1 : x - y; }
         return (state.desc ? -c : c) || App.team[a].name.localeCompare(App.team[b].name);
       });
-      const pins = [state.team, state.compare].filter((id) => !visible.includes(id) && space.team[id]);
+      const pins = [state.team, state.compare].filter((id) => !ids.includes(id) && space.team[id]);
       qa("[data-sort]").forEach((b) => { const on = b.dataset.sort === state.sort; b.parentElement.setAttribute("aria-sort", on ? (state.desc ? "descending" : "ascending") : "none"); b.querySelector("span").textContent = on ? (state.desc ? "↓" : "↑") : ""; });
       const ext = { xgd: d3.max(Object.values(summaries), (s) => Math.abs(s.xgd ?? 0)) || 1, gd: d3.max(Object.values(summaries), (s) => Math.abs(s.gd ?? 0)) || 1 };
       const bar = (v, key) => {
@@ -418,14 +434,14 @@
         const w = Math.min(50, (Math.abs(v) / ext[key]) * 50);
         return `<span class="ws-bar"><i><b style="${v >= 0 ? `left:50%;width:${w}%` : `right:50%;width:${w}%`}"></b></i><span>${App.signed(v, 2)}</span></span>`;
       };
-      q("#ws-teams tbody").innerHTML = [...pins, ...visible].map((id) => {
-        const t = App.team[id], s = summaries[id], r = id === state.team ? "is-a" : id === state.compare ? "is-b" : "", out = !visible.includes(id);
+      q("#ws-teams tbody").innerHTML = [...pins, ...ids].map((id) => {
+        const t = App.team[id], s = summaries[id], r = id === state.team ? "is-a" : id === state.compare ? "is-b" : "", out = !ids.includes(id);
         return `<tr data-team="${id}" class="${r}${out ? " is-out" : ""}" tabindex="0" aria-label="${esc(t.name)}">
           <td><span class="ws-ab" translate="no"><button type="button" data-pick="A" aria-pressed="${id === state.team}" aria-label="Set ${esc(t.name)} as A">A</button><button type="button" data-pick="B" ${state.team ? "" : "disabled"} aria-pressed="${id === state.compare}" aria-label="Set ${esc(t.name)} as B">B</button></span></td>
-          <th scope="row"><span class="ws-teamcell">${App.flag(id, 16)}<span>${esc(t.name)}</span>${out ? '<span class="ws-pinned-note" title="Pinned as A or B; outside the current filters">(pinned)</span>' : ""}</span></th>
+          <th scope="row"><span class="ws-teamcell">${App.flag(id, 16)}<span>${esc(t.name)}</span>${r ? `<span class="ws-pinned-note" ${out ? "" : "hidden"} title="Pinned as A or B; outside the current filters">(pinned)</span>` : ""}</span></th>
           <td class="ws-groupcell" title="${esc(groupName(t.archetype))}">${esc(groupName(t.archetype))}</td>
           <td class="num">${s.n}</td><td class="num">${bar(s.xgd, "xgd")}</td><td class="num">${App.signed(s.gd, 2)}</td></tr>`;
-      }).join("") || `<tr><td colspan="6" class="ws-empty">No team matches these filters.</td></tr>`;
+      }).join("") + `<tr class="ws-team-empty" ${pins.length || ids.length ? "hidden" : ""}><td colspan="6" class="ws-empty">No team matches these filters.</td></tr>`;
       q("#ws-teams tbody").querySelectorAll("tr[data-team]").forEach((row) => {
         const id = row.dataset.team;
         row.onclick = (e) => choose(id, e.target.closest("[data-pick]")?.dataset.pick || (e.shiftKey ? "A" : undefined));
@@ -450,7 +466,7 @@
       reference.hidden = !pairs;
       reference.textContent = `Percentile: share of the ${pairs} team pairs in scope at least this far apart.`;
       const list = near.slice(0, 8), bRank = rankOf(state.compare);
-      const row = (n, rank) => `<li class="ws-twin${n.id === state.compare ? " is-b" : ""}" data-team="${n.id}" tabindex="0" title="Style distance ${fmt(n.d)}">
+      const row = (n, rank) => `<li class="ws-twin${rank <= K ? " is-near" : ""}${n.id === state.compare ? " is-b" : ""}" data-team="${n.id}" tabindex="0" title="Style distance ${fmt(n.d)}">
         <span class="ws-twin-rank">${rank}</span><span class="ws-teamcell">${App.flag(n.id, 16)}<span>${esc(App.team[n.id].name)}</span></span>
         <span class="ws-twin-bar"><b style="width:${n.sim * 100}%"></b></span><span class="ws-twin-val">${fmt(n.sim * 100, 1)}%</span></li>`;
       q("#ws-twins").innerHTML = !list.length ? `<li class="ws-empty">${state.team ? "No matches in this scope." : "Choose Team A to see its nearest teams."}</li>`
@@ -503,13 +519,23 @@
         svg.append("line").attr("x1", x(lo)).attr("x2", x(hi)).attr("y1", y(lo)).attr("y2", y(hi)).attr("stroke", C.faint || "#b8c0c9").attr("stroke-dasharray", "4 4");
       }
       const P = (id) => [x(pos[id][0]), y(pos[id][1])];
+      svg.classed("has-anchor", !!pos[state.team]);
       const links = svg.append("g").attr("pointer-events", "none");
-      if (pos[state.team]) twins.filter((id) => pos[id] && role(id) === "twin").forEach((id) => links.append("line").attr("x1", P(state.team)[0]).attr("y1", P(state.team)[1]).attr("x2", P(id)[0]).attr("y2", P(id)[1]).attr("stroke", C.twin).attr("stroke-opacity", 0.35).attr("stroke-width", 1.2));
-      if (pos[state.team] && pos[state.compare]) links.append("line").attr("x1", P(state.team)[0]).attr("y1", P(state.team)[1]).attr("x2", P(state.compare)[0]).attr("y2", P(state.compare)[1]).attr("stroke", C.ink).attr("stroke-opacity", 0.5).attr("stroke-dasharray", "3 3").attr("stroke-width", 1.2);
+      if (pos[state.team]) {
+        const [ax, ay] = P(state.team);
+        for (const id of new Set([...twins, state.compare])) {
+          if (!pos[id]) continue;
+          const [bx, by] = P(id);
+          links.append("line").attr("class", "relationship").attr("data-to", id)
+            .classed("is-near", twins.includes(id)).classed("is-pair", id === state.compare)
+            .classed("is-out", role(id) === "out")
+            .attr("x1", ax).attr("y1", ay).attr("x2", bx).attr("y2", by);
+        }
+      }
 
       const order = { out: 0, in: 1, twin: 2, b: 3, a: 4 };
       const plotted = Object.keys(pos).sort((a, b) => order[role(a)] - order[role(b)]);
-      const radius = { a: 7.5, b: 7.5, twin: 6, in: 5.3, out: 4 };
+      const radius = { a: 8, b: 8, twin: 6, in: pos[state.team] ? 4 : 5.3, out: 4 };
       // Keep points above the drag surface so a click or tap can select a team.
       const brushLayer = svg.append("g").attr("class", "brush");
       const marks = svg.append("g").selectAll("g").data(plotted).join("g").attr("class", "mark").attr("data-team", (id) => id)
@@ -527,6 +553,7 @@
       const codeLayer = svg.append("g").attr("class", "point-labels");
       const pointPositions = plotted.map((id) => ({ id, xy: P(id) }));
       let priority = plotted.filter((id) => role(id) !== "out").reverse();
+      if (pos[state.team] && priority.length > 12) priority = priority.filter((id) => role(id) !== "in");
       // In the overview label the visible extremes of each axis; hover/focus names any other point.
       if (!state.team && priority.length > 12) {
         priority = [...new Set([0, 1].flatMap((axis) =>
@@ -574,15 +601,26 @@
           // A second drag replaces the old region. Keep search, group and outcome filters.
           if (brushPreview === null && state.cohort) {
             const candidates = matching(null);
-            heat.render({ state, full, visible: candidates, summaries, near });
+            heat.render({ state, full, visible: candidates, summaries, near, twins });
+            drawTeamRows(candidates);
             paintMapColours(candidates);
           }
           brushPreview = key;
           const ids = new Set(matching(cohort));
           heat.previewRegion(ids);
+          let shown = 0;
+          for (const row of qa("#ws-teams tbody tr[data-team]")) {
+            const pinned = row.querySelector(".ws-pinned-note"), inside = ids.has(row.dataset.team);
+            row.hidden = !inside && !pinned;
+            row.classList.toggle("is-out", !inside);
+            if (pinned) pinned.hidden = inside;
+            if (!row.hidden) shown++;
+          }
+          q("#ws-teams .ws-team-empty").hidden = shown > 0;
           q("#ws-count").textContent = `${ids.size} / ${Object.keys(space.team).length} teams`;
-          marks.classed("outside-brush", (id) => !ids.has(id));
-          codeLayer.selectAll("text").classed("outside-brush", function () { return !ids.has(this.dataset.labelFor); });
+          const dimmed = (id) => id !== state.team && id !== state.compare && !ids.has(id);
+          marks.classed("outside-brush", dimmed);
+          codeLayer.selectAll("text").classed("outside-brush", function () { return dimmed(this.dataset.labelFor); });
         });
       paintMapColours();
       q("#ws-projection").textContent = pca
@@ -594,7 +632,8 @@
     function clearBrushPreview() {
       if (brushPreview === null) return;
       brushPreview = null;
-      heat.render({ state, full, visible, summaries, near });
+      heat.render({ state, full, visible, summaries, near, twins });
+      drawTeamRows(visible);
       paintMapColours();
       q("#ws-count").textContent = `${visible.length} / ${Object.keys(space.team).length} teams`;
       qa("#ws-map .outside-brush").forEach((el) => el.classList.remove("outside-brush"));
@@ -641,6 +680,7 @@
       heat.markIndicator(index);
       d3.select(q("#ws-map")).selectAll("circle.team-fill").each(function (id) {
         const r = role(id, population), filtered = r === "out";
+        this.parentNode.dataset.role = r;
         let fill = roleColours[r];
         if (index !== null) fill = App.workspaceHeatmap.color(full.team[id][index]);
         else if (state.color === "group" && !filtered) fill = App.arch[App.team[id].archetype].color;
@@ -689,16 +729,16 @@
         `<span><i class="lg-${side}"></i>${esc(App.team[id].name)}</span>`).join("");
     }
     function drawProfile() {
-      if (!state.team) return;
+      if (!state.team) { updateProfilePreview = () => {}; return; }
       q("#ws-profile-key").innerHTML = teamLegend();
       const host = q("#ws-profile"), { svg, W, H } = svgFor(host, "Style profiles of A and B");
       svg.attr("class", "ws-profile");
       const a = full.team[state.team], b = full.team[state.compare], f = focused();
-      const extra = f ? { v: full.match[f.key], match: true } : hover && ![state.team, state.compare].includes(hover) && full.team[hover] ? { v: full.team[hover], id: hover } : null;
       const gap = (i) => (a && b ? Math.abs(a[i] - b[i]) : 0);
       let rows = App.dials.map((d, i) => ({ d, i, on: state.dials.includes(d) }));
       if (a && b && state.order === "gap") rows.sort((p, r) => (r.on - p.on) || gap(r.i) - gap(p.i));
-      const vals = [a, b, extra?.v].filter(Boolean).flat().filter(Number.isFinite);
+      // Keep the scale fixed as different teams are inspected in the same scope.
+      const vals = [...Object.values(full.team), f && full.match[f.key]].filter(Boolean).flat().filter(Number.isFinite);
       const ext = Math.max(2, Math.ceil((d3.max(vals, Math.abs) || 2) * 2) / 2);
       const m = { l: Math.min(150, Math.round(W * 0.39)), r: b ? 42 : 16, t: 6, b: 26 };
       const x = d3.scaleLinear().domain([-ext, ext]).range([m.l, W - m.r]);
@@ -716,12 +756,21 @@
           svg.append("circle").attr("data-team", id).attr("cx", x(v)).attr("cy", yy).attr("r", 5.5).attr("fill", col).attr("stroke", "#fff").attr("stroke-width", 1.5).attr("opacity", op)
             .append("title").text(`${App.team[id].name} · ${App.indicator(r.d).label}: ${App.signed(v, 2)} σ`);
         });
-        if (extra?.v && Number.isFinite(extra.v[r.i])) svg.append("path").attr("d", d3.symbol(extra.match ? d3.symbolDiamond : d3.symbolCircle, extra.match ? 60 : 50)()).attr("transform", `translate(${x(extra.v[r.i])},${yy})`).attr("fill", "#fff").attr("stroke", C.ink).attr("stroke-width", 1.6).attr("opacity", op);
         if (a && b) svg.append("text").attr("class", "gap-label").attr("x", W - m.r + 8).attr("y", yy + 4).attr("opacity", op).text(`Δ ${App.fix(Math.abs(va - vb), 1)}`);
       });
       [-ext, 0, ext].forEach((v) => svg.append("text").attr("class", "axis-label").attr("x", x(v)).attr("y", H - 8).attr("text-anchor", v === -ext ? "start" : v === ext ? "end" : "middle").text(v === 0 ? "tournament average" : `${App.signed(v, 1)} σ`));
       if (a && b) svg.append("text").attr("class", "axis-label").attr("x", W - m.r + 8).attr("y", H - 8).text("gap");
-      if (extra) svg.append("text").attr("class", "axis-label").attr("x", m.l - 12).attr("y", H - 8).attr("text-anchor", "end").text(extra.match ? `◇ ${f.team_id} v ${f.opp_id}` : `○ ${App.team[extra.id].name}`);
+      const overlay = svg.append("g").attr("pointer-events", "none");
+      const note = overlay.append("text").attr("class", "axis-label").attr("x", m.l - 12).attr("y", H - 8).attr("text-anchor", "end");
+      updateProfilePreview = () => {
+        const vector = f ? full.match[f.key] : hover && hover !== state.team && hover !== state.compare ? full.team[hover] : null;
+        overlay.selectAll("path").data(vector ? rows : [], r => r.i).join("path")
+          .attr("d", d3.symbol(f ? d3.symbolDiamond : d3.symbolCircle, f ? 60 : 50)())
+          .attr("transform", r => `translate(${x(vector[r.i])},${cy(r.d)})`)
+          .attr("fill", "#fff").attr("stroke", C.ink).attr("stroke-width", 1.6).attr("opacity", r => r.on ? 1 : .32);
+        note.text(f ? `◇ ${f.team_id} v ${f.opp_id}` : vector ? `○ ${App.team[hover].name}` : "");
+      };
+      updateProfilePreview();
     }
 
     /* ---------- E · outcomes ---------- */
@@ -805,15 +854,16 @@
       heat.compareHover(state.team, rank && state.view !== "pairs" ? show : null, gapIndex);
       if (state.view === "pairs") return;
       if (rank && !touchBrushArmed) {
-        const entry = (label, value, detail = "") => `<span class="ws-rank-readout"><span>${esc(label)}</span> <strong>${esc(value)}</strong>${detail ? ` <span aria-hidden="true">·</span> <span>${esc(detail)}</span>` : ""}</span>`;
+        const entry = (label, value, detail = "") => `<span class="ws-rank-readout"><span>${esc(label)}</span> <strong>${esc(value)}</strong>${detail ? ` <small>${esc(detail)}</small>` : ""}</span>`;
         const ranks = [];
-        if (mapRanks.has(show)) ranks.push(entry("PCA distance rank", "#" + mapRanks.get(show)));
         ranks.push(entry("Style similarity rank", "#" + rank, `${state.dials.length} indicators`));
+        if (mapRanks.has(show)) ranks.push(entry("PCA distance rank", "#" + mapRanks.get(show)));
+        ranks.push(entry("Goal difference per match", App.signed(summaries[state.team].gd - summaries[show].gd, 2), `${state.team} − ${show}`));
         if (gapIndex !== null) {
           const gap = Math.abs(space.team[state.team][gapDial] - space.team[show][gapDial]);
           ranks.push(entry("Largest indicator gap", App.indicator(App.dials[gapIndex]).label, `${fmt(gap)} σ`));
         }
-        el.innerHTML = `${App.flag(show, 14)}<b>${esc(App.team[show].name)}</b><span>Compared with</span><b>${esc(App.team[state.team].name)}</b> ${ranks.join(" ")}`;
+        el.innerHTML = `<div class="ws-relation-head">${App.flag(state.team, 14)}<b>${esc(App.team[state.team].name)}</b><span>Compared with</span>${App.flag(show, 14)}<b>${esc(App.team[show].name)}</b></div><div class="ws-relation-metrics">${ranks.join(" ")}</div>`;
         return;
       }
       if (touchBrushArmed || !summaries[show]) {
@@ -843,20 +893,28 @@
       mark.classList.add("is-hover");
       if (!svg.querySelector(`[data-label-for="${hover}"]`)) {
         const point = mark.transform.baseVal.getItem(0).matrix;
-        layer.append("text").attr("class", "code").attr("x", point.e).attr("y", point.f - 10)
+        const labels = [...svg.querySelectorAll(".point-labels text")];
+        const box = svg.viewBox.baseVal;
+        const offsets = [[0, -12], [0, 19], [20, 4], [-20, 4], [20, -12], [-20, -12]];
+        const [x, y] = offsets.map(([dx, dy]) => [point.e + dx, point.f + dy]).find(([x, y]) =>
+          x > 46 && x < box.width - 18 && y > 23 && y < box.height - 33 &&
+          !labels.some(label => Math.abs(Number(label.getAttribute("x")) - x) < 28 && Math.abs(Number(label.getAttribute("y")) - y) < 14)
+        ) || [point.e, point.f - 12];
+        layer.append("text").attr("class", "code").attr("x", x).attr("y", y)
           .attr("text-anchor", "middle").attr("fill", C.ink).text(hover);
       }
     }
     function highlight(id, { reveal = false } = {}) {
       if (hover === id) return;
+      if (hover) qa(`[data-team="${hover}"], .relationship[data-to="${hover}"]`).forEach((el) => el.classList.remove("is-hover"));
       hover = id;
-      qa("[data-team]").forEach((el) => el.classList.toggle("is-hover", el.dataset.team === id));
+      if (id) qa(`[data-team="${id}"], .relationship[data-to="${id}"]`).forEach((el) => el.classList.add("is-hover"));
       paintMapHover();
       if (reveal && id) {
         const row = q(`#ws-teams tr[data-team="${id}"]`), box = q("#ws-team-scroll");
         if (row && box) { const r = row.getBoundingClientRect(), s = box.getBoundingClientRect(); if (r.top < s.top + 30) box.scrollTop -= s.top + 30 - r.top; else if (r.bottom > s.bottom) box.scrollTop += r.bottom - s.bottom; }
       }
-      heat.highlight(id); readout(); drawProfile();
+      heat.highlight(id); readout(); updateProfilePreview();
     }
 
     const redraw = () => { if (!root.isConnected) return; drawMap(); drawProfile(); drawOutcomes(); };

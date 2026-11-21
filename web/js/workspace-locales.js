@@ -4,6 +4,7 @@
   const M = window.STYLE_TWINS_MESSAGES;
   if (!M) return;
   const hans = {
+    "Locate team in heatmap": "在热图中定位球队",
     "Team Table": "球队表",
     "{0} / {1} teams": "{0} / {1} 支球队",
     "Export CSV": "导出 CSV",
@@ -130,6 +131,7 @@
     "Match Lab ↗": "比赛分析室 ↗",
   };
   const hant = {
+    "Locate team in heatmap": "在熱圖中定位球隊",
     "Team Table": "球隊表",
     "{0} / {1} teams": "{0} / {1} 支球隊",
     "Export CSV": "匯出 CSV",

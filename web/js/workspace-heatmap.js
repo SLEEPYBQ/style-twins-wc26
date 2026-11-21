@@ -33,6 +33,7 @@
     host.innerHTML = `<div class="hm-tools">
         <label for="ws-heat-sort">Row order</label><span id="ws-heat-sort-host"></span>
         <span class="hm-sort-direction" hidden>Highest first</span>
+        <span class="hm-pins" hidden></span>
         <span class="hm-excluded" hidden><i aria-hidden="true">○</i> <span>Outside similarity</span></span>
         <span class="hm-count"></span>
       </div>
@@ -49,6 +50,21 @@
       <div class="hm-readout" id="ws-heat-value" aria-live="polite"></div>`;
     const get = (selector) => host.querySelector(selector);
     const viewport = get(".hm-scroll"), table = get(".hm-table"), body = table.tBodies[0];
+    const pins = get(".hm-pins");
+    pins.onclick = (event) => {
+      const id = event.target.closest("[data-locate]")?.dataset.locate;
+      const row = id && body.querySelector(`tr[data-team="${id}"]`);
+      if (row && !row.hidden) {
+        revealRow(row);
+        row.querySelector(".hm-team").focus({ preventScroll: true });
+      }
+    };
+    function updatePins(ids) {
+      for (const pin of pins.querySelectorAll("button")) {
+        pin.disabled = !ids.has(pin.dataset.locate);
+        pin.title = pin.disabled ? "Pinned as A or B; outside the current filters" : "Locate team in heatmap";
+      }
+    }
     const info = App.dials.map((dial) => App.indicator(dial));
     let model, pickSort, canRank, previousLayout, focusTeam, currentCell, raw = {};
     let pointerColumn = null, markedColumn = null;
@@ -94,10 +110,12 @@
     }
     function teamRow(id, state, z) {
       const t = App.team[id], side = id === state.team ? "A" : id === state.compare ? "B" : "";
+      const rank = model.twins.indexOf(id) + 1;
+      const near = rank ? `<span class="hm-near-rank" title="Style similarity rank"><span class="sr-only">Style similarity rank</span>#${rank}</span>` : "";
       const tag = side ? `<b class="hm-side" translate="no">${side}</b>` : "";
       return `<tr data-team="${id}" class="${side ? `is-${side.toLowerCase()}` : ""}"><th scope="row">
         <button type="button" class="hm-team" tabindex="${id === focusTeam ? "0" : "-1"}" title="${esc(t.name)}">
-          ${App.flag(id, 15)}<span class="hm-name">${esc(t.name)}</span>${tag}</button>
+          ${App.flag(id, 15)}<span class="hm-name">${esc(t.name)}</span>${near}${tag}</button>
         </th>${cells(z, raw[id])}</tr>`;
     }
 
@@ -114,6 +132,12 @@
       get(".hm-excluded").hidden = state.dials.length === App.dials.length;
       get(".hm-legend").hidden = state.view !== "pairs" && state.color.startsWith("dial");
       const ids = ordered(visible, order, model);
+      pins.hidden = !state.team;
+      pins.innerHTML = [state.team, state.compare].filter(Boolean).map((id, i) => {
+        const side = i ? "B" : "A";
+        return `<button type="button" data-locate="${id}"><b translate="no">${side}</b> <span translate="no">${id}</span><span class="sr-only">${esc(App.team[id].name)}</span></button>`;
+      }).join("");
+      updatePins(new Set(ids));
       const previousFocus = document.activeElement;
       const priorRow = previousFocus?.closest("tr[data-team]")?.dataset.team;
       const priorColumn = previousFocus?.closest("td[data-i]")?.dataset.i;
@@ -262,6 +286,7 @@
     });
     // While dragging, keep the sorted DOM and scroll position instead of rebuilding up to 480 cells per move.
     function previewRegion(ids) {
+      updatePins(ids);
       for (const row of body.querySelectorAll("tr[data-team]")) row.hidden = !ids.has(row.dataset.team);
       for (const group of body.querySelectorAll(".hm-group-heading")) {
         let shown = 0;

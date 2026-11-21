@@ -21,6 +21,10 @@
 .hm-tools .sel-enhanced { width: max-content; min-width: 135px; max-width: 210px; }
 .hm-sort-direction, .hm-count { color: var(--ws-muted); }
 .hm-count { margin-inline-start: auto; }
+.hm-pins { display: inline-flex; gap: 4px; }
+.hm-pins button { border: 0; border-bottom: 1px solid currentColor; background: transparent; color: var(--ws-a-ink); padding: 2px 3px; font: inherit; }
+.hm-pins button:nth-child(2) { color: var(--ws-b-ink); }
+.hm-pins button:disabled { border-bottom-style: dashed; color: var(--ws-muted); }
 .hm-legend { padding-block: 5px 8px; }
 .hm-scale { display: inline-flex; gap: 5px; align-items: center; direction: ltr; font-variant-numeric: tabular-nums; }
 .hm-scale i { display: inline-block; width: 32px; height: 8px; }
@@ -55,6 +59,8 @@
 .hm-team .flag { flex: none; }
 .hm-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hm-side { margin-inline-start: auto; font-size: 11px; }
+.hm-near-rank { margin-inline-start: auto; color: #147266; font-size: 11px; font-variant-numeric: tabular-nums; }
+.hm-near-rank + .hm-side { margin-inline-start: 0; }
 .is-a .hm-team { color: var(--ws-a-ink); background: var(--ws-a-soft); }
 .is-b .hm-team { color: var(--ws-b-ink); background: var(--ws-b-soft); }
 .hm-table .is-hover > *, .hm-table .is-compared > *, .hm-table tr:focus-within > * { box-shadow: inset 0 1px var(--ws-ink), inset 0 -1px var(--ws-ink); }
@@ -85,6 +91,10 @@
   .hm-table thead th { height: 52px; }
   .hm-table thead th button, [dir="rtl"] .hm-table thead th button { position: static; transform: none; width: 100%; max-width: none; padding: 4px 1px; text-align: start; }
   .hm-table thead th button span { min-width: 0; hyphens: auto; overflow-wrap: anywhere; }
+}
+@container (min-width: 720px) and (max-width: 849px) {
+  .hm-name-col { width: clamp(95px, calc(100cqw - 650px), 134px); }
+  .hm-table thead th button { padding-inline: 0; font-size: 12px; letter-spacing: -.015em; }
 }
 @container (min-width: 900px) {
   .hm-name-col { width: 176px; }

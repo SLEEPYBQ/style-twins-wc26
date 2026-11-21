@@ -185,6 +185,9 @@ body.ws-route { background: #f5f6f7; }
 .ws-twin:hover, .ws-twin.is-hover { background: #f4f6f8; }
 .ws-twin.is-b { background: var(--ws-b-soft); }
 .ws-twin-rank { color: var(--ws-muted); text-align: right; }
+.ws-twin.is-near .ws-twin-rank { font-weight: 700; color: #147266; }
+.ws-twin.is-b .ws-twin-rank { color: var(--ws-b-ink); }
+.ws-twin:not(.is-near,.is-b) .ws-twin-bar b { background: var(--ws-dot); }
 .ws-twin-bar { position: relative; height: 8px; background: var(--ws-sunken); }
 .ws-twin-bar b { position: absolute; left: 0; top: 0; bottom: 0; background: var(--ws-twin); }
 .ws-twin.is-b .ws-twin-bar b { background: var(--ws-b); }
@@ -220,8 +223,12 @@ body.ws-route { background: #f5f6f7; }
 .ws-legend .lg-tick-avg { width: 0; height: 12px; border-radius: 0; border-left: 2px dotted #8f99a5; }
 .ws-legend .lg-meta { margin-left: auto; color: var(--ws-muted); }
 .ws-readout { flex: none; display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; min-height: 36px; padding: 5px 12px; border-top: 1px solid var(--ws-line); font-size: 12px; color: var(--ws-ink-2); overflow: hidden; }
-#ws-readout.has-reference { height: 4.5em; align-content: flex-start; align-items: baseline; overflow-y: auto; scrollbar-gutter: stable; }
-.ws-rank-readout { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 4px; }
+#ws-readout.has-reference { height: 7em; align-content: center; align-items: baseline; overflow-y: auto; scrollbar-gutter: stable; }
+.ws-relation-head { width: 100%; display: flex; align-items: center; flex-wrap: wrap; gap: 3px 6px; }
+.ws-relation-metrics { width: 100%; display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 2px 8px; align-self: start; }
+.ws-rank-readout { display: flex; flex-wrap: wrap; align-content: start; align-items: baseline; gap: 0 4px; }
+.ws-rank-readout > span:first-child { width: 100%; color: var(--ws-ink-2); }
+.ws-rank-readout small { font-size: 11px; color: var(--ws-muted); }
 .ws-rank-readout strong { color: var(--ws-ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 .ws-readout b { color: var(--ws-ink); font-weight: 600; }
 .ws-readout .sep { color: var(--ws-line-2); }
@@ -231,6 +238,18 @@ body.ws-route { background: #f5f6f7; }
 .ws-map .mark { cursor: pointer; }
 .ws-map .mark .halo { fill: none; stroke: var(--ws-ink); stroke-width: 2; opacity: 0; }
 .ws-map .mark.is-hover .halo { opacity: 1; }
+.ws-map .mark[data-role="b"] .team-fill { stroke-dasharray: 4 1.5; }
+.ws-map.has-anchor .mark[data-role="in"]:not(.is-hover,.outside-brush) { opacity: .68; }
+.ws-map .relationship { stroke: var(--ws-twin); stroke-width: 1.4; stroke-opacity: .56; }
+.ws-map .relationship.is-out { stroke: var(--ws-dot); stroke-opacity: .22; }
+.ws-map .relationship.is-pair { stroke: var(--ws-ink); stroke-dasharray: 4 3; stroke-width: 1.8; stroke-opacity: .7; }
+.ws-map .relationship.is-hover { stroke-width: 2.4; stroke-opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes ws-reveal { from { opacity: .3; } to { opacity: 1; } }
+  .ws .ws-reveal { animation: ws-reveal 220ms ease-out; }
+  .ws-map .halo, .ws-map .mark { transition: opacity 140ms ease-out; }
+  .ws-map .relationship { transition: stroke-opacity 140ms ease-out, stroke-width 140ms ease-out; }
+}
 .ws-map .code { font-size: 12px; font-weight: 500; paint-order: stroke; stroke: #fff; stroke-width: 3px; stroke-linejoin: round; pointer-events: none; }
 .ws-map .brush:not(.is-dragging) .selection { visibility: hidden; }
 .ws-map .brush .selection { fill: var(--ws-ink); fill-opacity: .04; stroke: var(--ws-ink-2); stroke-dasharray: 3 3; }
@@ -274,7 +293,8 @@ body.ws-route { background: #f5f6f7; }
   .ws-details.has-team > [data-panel="A"] { grid-column: 1 / -1; }
 }
 @media (max-width: 800px) {
-  #ws-readout.has-reference { height: 6.5em; }
+  #ws-readout.has-reference { height: 10.5em; }
+  .ws-relation-metrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
   .ws { padding: 12px 10px; }
   .ws-heading { flex-wrap: wrap; margin-bottom: 9px; }
   .ws-primary, .ws-primary:has(.ws-overview-tools[hidden]) { height: auto; grid-template-columns: minmax(0,1fr); grid-template-rows: none; }
