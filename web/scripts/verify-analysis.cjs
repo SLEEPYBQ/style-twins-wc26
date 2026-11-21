@@ -44,6 +44,41 @@ assert.equal(A.metric({ goals: 0, goals_opp: 0 }, "gd"), 0);
 assert.equal(A.metric({ xg: null, xga: 0 }, "xgd"), null);
 assert.equal(A.summary([{ xg: 1, shots: 1 }, { xg: 1, shots: 9 }]).quality, 0.2);
 
+// Independent reference: the delivered match values, including their three-decimal rounding.
+let pairScopes = 0, maxResidual = 0;
+for (const scope of ["all", "group", "knockout"]) {
+  const teams = App.teams.map(t => {
+    const rows = A.rows(t.id, scope);
+    const avg = fn => rows.reduce((sum, r) => sum + fn(r), 0) / rows.length;
+    return { sum: A.summary(rows), gd: avg(r => r.goals - r.goals_opp), terms: App.components.map((_, i) => avg(r => r.decomp[i])) };
+  }).filter(t => t.sum.n);
+  for (const [i, a] of teams.entries()) {
+    for (const b of teams.slice(i + 1)) {
+      const model = A.outcomeGap(a.sum, b.sum);
+      assert.equal(model.status, "ok");
+      let cumulative = 0;
+      model.steps.slice(0, -1).forEach((s, k) => {
+        close(s.start, cumulative);
+        close(s.value, a.terms[k] - b.terms[k]);
+        cumulative += s.value;
+        close(s.end, cumulative);
+      });
+      const total = model.steps.at(-1);
+      close(total.start, 0);
+      close(total.value, a.gd - b.gd);
+      close(total.end, a.gd - b.gd);
+      close(model.residual, total.end - cumulative);
+      maxResidual = Math.max(maxResidual, Math.abs(model.residual));
+      pairScopes++;
+    }
+  }
+}
+assert.equal(pairScopes, 2752);
+assert.ok(maxResidual <= 0.006 + 1e-10);
+assert.equal(A.outcomeGap(ned, A.summary([])).status, "missing");
+assert.equal(A.outcomeGap({ ...ned, gd: ned.gd + 1 }, ned).status, "mismatch");
+console.log(`Waterfall: ${pairScopes} scoped pairs, maximum absolute residual ${maxResidual.toFixed(6)} goals per match`);
+
 const knockout = A.space(App.dials, "knockout");
 assert.equal(Object.keys(knockout.team).length, 32);
 assert.equal(knockout.team.IRQ, undefined);

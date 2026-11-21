@@ -65,3 +65,67 @@ All 104 match files contain both teams’ passing edges, players, line-break mar
 - The existing fixed six-part model remains an optional interpretation. Its source is available in `pipeline/build_data.py`; the full-tournament fit and retrospective group/knockout calculation described above do not provide causal or out-of-sample validation.
 
 No external platform’s graphical assets, proprietary model outputs or unavailable spatial data were copied into these workspaces.
+
+## 16 November 2026: persistent multi-panel workbench
+
+The revised interface follows the user's VITALITY and Lumos examples: persistent controls, an overview, a selectable record collection, comparison views and details in the same screen. It replaces the intervening homepage and four-card arrangement. No data or model was regenerated.
+
+Sources reviewed for this revision:
+
+- [VITALITY (Narechania et al., 2022), Figure 1 and Section 4.2](https://arxiv.org/pdf/2108.03366): the paper collection, similarity search, visualization canvas and metadata views coordinate selections and filters. Adaptation: a sortable team collection and map share selection and hover; filters define a subset; pair profiles and match rows provide context. The publication embedding model and recommendation claims are not reproduced.
+- [Lumos (Narechania et al., 2021)](https://lumos-vis.github.io/): persistent attribute, encoding, filter, visualization, detail and distribution panels. Adaptation: controls and free X/Y choice stay beside the main visualization; a filtered outcome distribution gives subset context. Interaction-attention modelling and bias feedback are not implemented.
+- COMP6411D, Fall 2026, Lecture 2, “Introduction to Data Visualization”, final tools/systems examples: reviewed the distinction between static presentation and direct interactive exploration. The actual desktop layout is grounded in the two papers above, rather than copying the lecture's immersive examples.
+- [D3 brushing](https://d3js.org/d3-brush): rectangular selection filters candidate teams across map, table and distribution. The explicit A/B pair remains pinned outside a filtered subset.
+- [Statsbomb, Modelling Team Playing Style](https://blogarchive.statsbomb.com/articles/soccer/modelling-team-playing-style/): feature choices and the distinction between style and strength inform the separation of style indicators from observed outcomes. Existing definitions and limitations above still apply.
+
+The workspace uses grey structural elements. Blue/orange identify A/B consistently; a hollow diamond identifies an individual selected performance. The former cluster-colour decoration, card side stripes, marketing headings, repeated captions and footer statistics were removed. Units, standardization reference and direct interaction cues remain where needed to interpret a chart. The desktop uses resizable divisions with local scrolling, and small screens stack panels. This is a design adaptation, not an evaluated claim of improved usability.
+
+## 18 November 2026: six single-purpose panels
+
+The 16 November workbench was rebuilt from scratch (`web/js/view-workspace.js`, `web/css/workspace.css`). The previous version gathered task, team choice, filters, map encoding and similarity indicators in one scrolling sidebar. Its Task menu only switched the map projection, and the similarity inputs sat far from the distances they produced. The revision gives each view one question. Letters A–F are for the report figure only; they are not shown in the interface (see the design-standard pass below):
+
+| Panel | Question | Interactions |
+| --- | --- | --- |
+| A Team collection | Which teams are in play? | Name search, style group, xG-difference and goal-difference range sliders, sort, A/B pins, CSV export |
+| B Similarity search | Who plays most like A, under which indicators? | Indicator chips (minimum two) as input; ranked closest teams with similarity percentiles as output; click to set B |
+| C Style map | Where does every team sit? | PCA or chosen X/Y; colour by selection state or style group; brush to filter; click sets B, Shift-click sets A |
+| D Style profile | How do A and B play differently? | All ten indicators in fixed or largest-gap order; unused indicators dimmed; hovered team or selected match overlaid |
+| E Outcomes | Do similar styles bring similar results? | A and B per-match xG and goals, with ticks for the average of A's five closest teams and the tournament average |
+| F Match evidence | Which matches back it up? | A and B match rows; selecting one places that performance in C and D, with links to the replay and Match Lab |
+
+The current pair and match scope sit in a context bar above all panels because they affect every view.
+
+Sources reviewed for this revision:
+
+- [VITALITY (Narechania et al., 2022), Figure 1 and Sections 2.3 and 4](https://arxiv.org/pdf/2108.03366). The paper has four design goals: serendipity, familiarity, novelty and overview. Its paper collection, similarity search, visualization canvas, meta view and saved-papers views each serve one task. Adaptations made here: the team collection takes attribute filters inside the panel, as VITALITY's collection view does. Similarity input and output share one panel, and map points are coloured by analytic state (A, B, similarity output, in filter, filtered out), following VITALITY's state palette. A fixed readout below the map replaces floating tooltips. The transformer embeddings and recommendation evaluation are not reproduced.
+- [Lumos (Narechania et al., 2021), Figure 1](https://lumos-vis.github.io/). Encoding choices stay in the visualization panel header, and distribution context sits beside the canvas.
+- DataPilot (CHI 2023), Figure 1. Lettered panels, each with a one-line purpose, keep a dense multi-view layout readable.
+
+Visual changes: neutral surfaces with colour reserved for A (blue), B (orange) and A's closest teams (teal); the Inter typeface with tabular figures; and diverging mini-bars for signed per-match differences. Below 1180 px the map spans the top and the other panels pair up; phones stack all panels. Resizable dividers were dropped in favour of fixed proportions. The superseded `view-explore.js` and `explore.css` are no longer loaded. No data, standardization or model was changed, and this is a design revision rather than an evaluated usability claim.
+
+### Design-standard pass (18 November 2026, later the same day)
+
+Five literature and practice reviews informed a second pass over the whole site, not only the workspace. The reviews were run by assistants with web access and checked here before use. Several claims they could not verify from primary text are omitted.
+
+- **View layout and labels.** In VITALITY, Lumos, DataPilot and Voyager 2, the panel letters appear in figure captions, and the papers do not describe them as interface elements. Views are named by function, controls sit in the view they affect, and global state is shown through encodings and legends rather than prose. Lumos added resizable panels after pilot feedback. Sources: https://arxiv.org/html/2108.03366, https://arxiv.org/html/2108.02909, https://arxiv.org/html/2303.01575, https://idl.uw.edu/papers/voyager2.
+- **Interface text.** Data-bearing text is kept: axis titles with units, legends, scale references and counts. Letter badges, question subtitles and gesture hints were removed; gestures belong in the method page or the report. This follows the data-ink argument of Tufte and Few. The observation that card-heavy, rounded, shadowed layouts read as generic templates comes from practitioner commentary, not measured evidence.
+- **Typography.** The site now uses one sans family, Inter, with tabular figures and Noto Sans SC/TC or PingFang as CJK fallbacks. Text that must be read is at least 12px, chart ticks at least 11px. Weights are 400–600, with no uppercase labels. These are style-guide conventions (ONS data-visualisation typography; Datawrapper on fonts), not experimental thresholds.
+- **Colour.** Blue and vermilion identify the first and second team. Violet marks the closest teams, and outlines preserve the quantitative fill on the map. The heatmap diverges from ochre through an off-white tournament mean to teal. The boxplots and match trend share a pale blue-grey band for the middle half of the teams, with a dark median. Labels, marker shapes and signed values reinforce these encodings. The restrained background and repeated accents follow the [Nature Reviews guide to designing figures](https://www.nature.com/documents/natrev-artworkguide.pdf).
+- **Sports VA systems.** PassVizor, Team-Builder, Team-Scouter and VisCommentator keep team colours consistent across views and use little decoration. Evaluation is by domain-expert interview, which the report should plan for.
+
+Implementation:
+- `web/css/theme.css`, loaded last, defines the shared tokens: neutral surfaces, 3–4px radii, hairline borders, no drop shadows, one type scale, and the colour roles above.
+- Legacy stylesheets had their display sizes, heavy weights and pill radii normalised.
+- Decorative generated illustrations are hidden.
+- Workspace views can be resized by dragging the gutters; the layout is stored per browser, and double-clicking a gutter resets it.
+- Page copy outside the workspace now uses plain view titles instead of question headlines and taglines. Examples: “Where do their styles align?” → “Style indicators”, “Match intelligence.” → “Match Lab”, “Audit the resemblance.” → “Similarity robustness”, “Find the matches behind the pattern” → “Matches”. Numbered step kickers such as “01 / Establish the comparison” were removed. Simplified and Traditional Chinese labels are in `web/js/copy-locales.js`; the other ten languages show these new titles in English until their catalogs are updated. `scripts/verify-lab.cjs` now checks for the new Match Lab heading.
+
+## 19 November 2026 — Exploratory team selection and the Style DNA Heatmap
+
+The opening view displays all teams on the map and in the matrix. A chosen team supplies the reference for similarity search, and selecting a second team opens a comparison. The following decisions adapt the interaction roles visible in the three papers.
+
+- VITALITY distinguishes collection filters, similarity results, projected positions and details on demand. Here a hover identifies a team across views, a brush defines a subset, and A/B selections persist through filtering. Distances are computed across the selected indicators independently of the map projection. [VITALITY, Figure 1 and system description](https://arxiv.org/html/2108.03366v3)
+- Lumos places encoding choices next to the plot and supplies distribution context. The workspace keeps raw X/Y controls by the map, the standardized scale above the heatmap and the current scope’s reference mean beside the outcomes. [Lumos project and interface](https://lumos-vis.github.io/)
+- DataPilot separates attribute selection from record filtering. Style Twins makes the corresponding distinction visible through similarity checkboxes, matrix header markers and a separate original-group filter. A group filter exposes the group’s mean for each indicator. [DataPilot, Figure 1](https://jhoffswell.github.io/website/resources/papers/2023-DataPilot-CHI.pdf#page=7)
+
+The presentation labels follow the transformations in `pipeline/features.py`. For example, attacking transitions are shown as “Attacks after regains”, and “Defending high” includes both high press and high block. Custom map axes and cell readouts use raw indicator units, while heatmap colours use the fixed full-tournament standardization. Team outcomes use the selected scope’s matches. The all-ten-indicator PCA shows approximately 68% of team-match variation on its first two axes.

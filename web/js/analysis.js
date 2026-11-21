@@ -29,6 +29,39 @@
     return normalizeDials(App.dials.filter((_, index) => indices.includes(index)));
   }
 
+  function readWeights(params = {}) {
+    const raw = params instanceof URLSearchParams ? params.get("w") : params.w;
+    if (typeof raw !== "string" || !raw.trim()) return null;
+    const out = {};
+    let has = false;
+    for (const part of raw.split(",")) {
+      const [iStr, vStr] = part.split(":");
+      if (!/^\d+$/.test(iStr || "")) continue;
+      const idx = Number(iStr), val = Number(vStr);
+      const dial = App.dials[idx];
+      if (!dial || !Number.isFinite(val)) continue;
+      const clamped = Math.round(Math.max(0.2, Math.min(2.5, val)) * 100) / 100;
+      if (Math.abs(clamped - 1) >= 0.04) {
+        out[dial] = clamped;
+        has = true;
+      }
+    }
+    return has ? out : null;
+  }
+
+  function encodeWeights(weights) {
+    if (!weights) return "";
+    const parts = [];
+    App.dials.forEach((dial, idx) => {
+      const v = weights[dial];
+      if (Number.isFinite(v) && Math.abs(v - 1) >= 0.04) {
+        const clamped = Math.round(Math.max(0.2, Math.min(2.5, v)) * 100) / 100;
+        parts.push(`${idx}:${Number(clamped.toFixed(2))}`);
+      }
+    });
+    return parts.join(",");
+  }
+
   function query(dials, extra = {}) {
     const params = new URLSearchParams();
     params.set("dials", normalizeDials(dials).map((dial) => App.dials.indexOf(dial)).join(","));
@@ -42,8 +75,8 @@
     return records.filter((row) => row.team_id === teamId && inScope(row, scope));
   }
 
-  function space(dials, scope = "all") {
-    const result = App.styleSpace(normalizeDials(dials));
+  function space(dials, scope = "all", weights = null) {
+    const result = App.styleSpace(normalizeDials(dials), weights);
     result.team = {};
     for (const team of App.teams) {
       const selected = rows(team.id, scope);
@@ -110,6 +143,25 @@
     return result;
   }
 
+  // Each stored team-match term was rounded to 0.001 goals. Subtracting two
+  // averages can accumulate at most 2 × 6 × 0.0005 goals of rounding error.
+  function outcomeGap(a, b) {
+    if (!a?.n || !b?.n || !finite(a.gd) || !finite(b.gd)) return { status: "missing" };
+    let level = 0;
+    const steps = [];
+    for (const { id, label } of App.components) {
+      const left = a.model[id], right = b.model[id];
+      if (!finite(left) || !finite(right)) return { status: "missing" };
+      const value = left - right, start = level;
+      level += value;
+      steps.push({ id, label, left, right, start, end: level, value });
+    }
+    const observed = a.gd - b.gd, residual = observed - level;
+    if (Math.abs(residual) > App.components.length * 0.001 + 1e-10) return { status: "mismatch", residual };
+    steps.push({ id: "gd", label: "Observed goal-difference gap", left: a.gd, right: b.gd, start: 0, end: observed, value: observed });
+    return { status: "ok", steps, residual };
+  }
+
   function vectorDistance(left, right) {
     if (!left || !right || !left.length || left.length !== right.length) return null;
     if (!left.every(finite) || !right.every(finite)) return null;
@@ -142,5 +194,5 @@
     };
   }
 
-  App.analysis = { records, readDials, query, rows, space, twinTable, summary, metric, distance, nearest, opponent };
+  App.analysis = { records, inScope, readDials, readWeights, encodeWeights, query, rows, space, twinTable, summary, metric, outcomeGap, distance, nearest, opponent };
 })();

@@ -7,20 +7,10 @@
     const carry = App.data.story.carry;
     const interval = (values) => `${values[0].toFixed(2)} to ${values[1].toFixed(2)}`;
     const count = Object.keys(App.tm).length;
-    const dialDescription = {
-      "Patient build-up": "Combined build-up measures as a share of normalized attacking-phase measures.",
-      "Direct play": "Long-ball and counter-attack measures as a share of normalized attacking-phase measures.",
-      "Transition attacks": "Attacking-transition measure within the normalized attacking-phase profile.",
-      "Final-third camp": "Final-third measure within the normalized attacking-phase profile.",
-      "High press": "High-press and high-block measures within the normalized defensive-phase profile.",
-      "Deep block": "Low-block and low-press measures within the normalized defensive-phase profile.",
-      "Counter-press": "Counter-press measure within the normalized defensive-phase profile.",
-    };
     root.innerHTML = `
       <article class="review-method">
         <header class="review-method-header">
-          <div class="review-eyebrow">A guide to reading the evidence</div>
-          <h1>What the numbers can tell you</h1>
+          <h1>Method</h1>
           <p>Style Twins helps football fans compare similar approaches and investigate different opportunities and scorelines. Each view has a specific unit, calculation and interpretation.</p>
           <div class="review-sources"><a href="https://github.com/Alamyy/Worldcup26" target="_blank" rel="noopener">Explore the source dataset ↗</a><a href="#/styles">Start with the style map →</a></div>
         </header>
@@ -45,13 +35,17 @@
           <p>Choose at least two style dimensions. Each selected value is standardized using the mean and population standard deviation across all ${count} team-match records. The selected dimensions receive equal weight. Goals, shots and xG are reserved for outcome comparison.</p>
           <div class="formula">Standardized value = (reported or transformed value − tournament mean) / tournament standard deviation</div>
           <p>A team's profile is the average of its match profiles within the selected scope. Distances use all selected dimensions. The map projects those profiles onto two principal components, so the visible spacing is an approximation of the full comparison.</p>
-          <div class="review-method-table-wrap"><table class="review-method-table"><caption>The ten available dimensions</caption><thead><tr><th scope="col">Dimension</th><th scope="col">Measure</th><th scope="col">Reading it</th></tr></thead><tbody>
-            ${App.data.dials.map((dial) => `<tr><td>${App.esc(dial.id)}</td><td>${App.esc(dial.label.replace("attacking time", "normalized attacking profile"))}</td><td>${App.esc(dialDescription[dial.id] || dial.help)}</td></tr>`).join("")}
+          <div class="review-method-table-wrap"><table class="review-method-table"><caption>The ten available dimensions</caption><thead><tr><th scope="col">Dimension</th><th scope="col">Unit</th><th scope="col">Reading it</th></tr></thead><tbody>
+            ${App.dials.map(App.indicator).map((dial) => `<tr><td>${App.esc(dial.label)}</td><td>${App.esc(dial.unit)}</td><td>${App.esc(dial.help)}</td></tr>`).join("")}
           </tbody></table></div>
           <p class="review-method-note">Several source phase measures overlap. Rescaling them to sum to 100% creates a relative phase profile. The normalized values describe the balance among recorded phase measures, rather than mutually exclusive fractions of playing time.</p>
-          <p>Team similarity is a percentile among the available team pairings. A value of 92 means the pair is closer than about 92% of pairings under the selected dimensions and scope. It expresses a relative ranking. Inspect the individual dimensions to understand the actual resemblance.</p>
+          <p>The similarity percentile counts the share of team pairs with an equal or greater style distance. The reference includes all teams with matches in the selected scope, even when the view is filtered.</p>
           <p>Single-match comparisons show the root mean square distance across selected standardized dimensions. A lower distance means a closer profile. Candidate matches from the same team or the same fixture are excluded from the new match-comparison search.</p>
-          <details><summary>How the five style groups relate to your selection</summary><p>The original groups use k-means with five clusters fitted to all ten dimensions and each team's full-tournament average. Their names summarize prominent features. Group colours stay fixed as you change dimensions, while the map and similarity calculations update. This lets you inspect how the original groups appear under a different definition of style.</p></details>
+          <details><summary>How the five style groups relate to your selection</summary><p>The original groups use k-means with five clusters fitted to all ten dimensions and each team's full-tournament average. Their names summarize prominent features. Group colours stay fixed as you change dimensions, while the map and similarity calculations update. This lets you inspect how the original groups appear under a different definition of style.</p>
+            <table class="review-method-table"><thead><tr><th scope="col">Style group</th><th scope="col" translate="no">CSV</th></tr></thead><tbody>
+              ${App.data.archetypes.map((group) => `<tr><th scope="row"><a href="#/styles?arch=${group.id}">${App.esc(App.groupLabel(group.id))}</a></th><td translate="no">${App.esc(group.name.replace(/^The /, ""))}</td></tr>`).join("")}
+            </tbody></table>
+          </details>
         </section>
 
         <section id="method-results">

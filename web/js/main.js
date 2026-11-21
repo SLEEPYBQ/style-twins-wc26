@@ -32,17 +32,18 @@
     lastHash = location.hash;
     const r = parse();
     if (!r) return;
-    const key = `${r.name}/${r.args.join("/")}`;
+    const key = ["story", "styles"].includes(r.name) ? "workspace" : `${r.name}/${r.args.join("/")}`;
     if (key === currentKey && instance && typeof instance.update === "function") {
       instance.update(r.params);
       return;
     }
     currentKey = key;
     App.cleanup();
+    document.body.classList.toggle("ws-route", ["story", "styles"].includes(r.name));
     const fn = App.views[r.name] || App.views.story;
     document.querySelectorAll(".tabs a").forEach((a) => {
       const tab = a.dataset.tab;
-      a.classList.toggle("on", tab === r.name || (tab === "matches" && ["match", "duel"].includes(r.name)) || (tab === "styles" && r.name === "team") || (tab === "twins" && r.name === "robustness"));
+      a.classList.toggle("on", tab === r.name || (tab === "matches" && ["match", "duel"].includes(r.name)) || (tab === "styles" && ["story", "team"].includes(r.name)) || (tab === "twins" && r.name === "robustness"));
     });
     view.innerHTML = "";
     view.classList.toggle("wide", r.name === "match");

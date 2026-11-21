@@ -1,6 +1,6 @@
 (function () {
   const App = window.App, A = App.analysis, R = App.robustness;
-  const colors = App.isDesktop() ? ["#0a9396", "#e8743b"] : ["#087f81", "#b85d34"];
+  const colors = ["var(--team-a)", "var(--team-b)"]; // A blue, B orange, as in the workspace
   const scopes = { all: "Whole tournament", group: "Group stage", knockout: "Knockout stage" };
   const source = "https://blogarchive.statsbomb.com/articles/soccer/modelling-team-playing-style/";
 
@@ -28,20 +28,19 @@
 
     root.innerHTML = `<div class="robust-page">
       <div class="review-breadcrumb"><a href="${App.esc(back)}">← Return to your comparison</a><span>Style lab · Sensitivity</span></div>
-      <section class="robust-hero"><div><div class="kicker">One pairing. Many checks.</div><h1>Audit the<br><em>resemblance.</em></h1><p>Does a close style pairing survive a different metric choice or the loss of a single match? Inspect every scenario and see the alternatives that move ahead.</p></div>
-        <img class="robust-hero-art" src="img/gen/audit_hero.webp" alt="" width="720" height="720" loading="lazy" onerror="this.remove()"><div class="robust-hero-mark" aria-hidden="true"><span></span><span></span><span></span><span></span><b>01<span>→</span>?</b></div></section>
+      <section class="robust-hero"><div><h1>Similarity robustness</h1><p>Recomputes this pair&#8217;s similarity rank after omitting one indicator or one team&#8217;s match. Each scenario lists the teams that move ahead.</p></div></section>
       <div class="robust-presets" aria-label="Example comparisons"><span>Explore a case</span>${[["NED", "CRO", "Netherlands & Croatia"], ["ESP", "GER", "Spain & Germany"], ["MEX", "SWE", "Mexico & Sweden"]].map(([left, right, label]) => `<a class="${a === left && b === right ? "active" : ""}" href="#/robustness/${left}/${right}${A.query(dials, { scope })}">${label} ↗</a>`).join("")}</div>
       <form class="robust-controls card"><label>Reference team<select name="first">${teamOptions(a)}</select></label><label>Comparison team<select name="second">${teamOptions(b)}</select></label><label>Match scope<select name="scope">${Object.entries(scopes).map(([key, label]) => `<option value="${key}" ${key === scope ? "selected" : ""}>${label}</option>`).join("")}</select></label><button class="btn" type="submit">Run comparison →</button><p class="note" data-form-error></p></form>
-      <details class="robust-metrics"><summary>${dials.length} selected style indicators</summary><p class="note">Your selected indicators define the starting comparison. Each test removes one input while holding the remaining reference scale fixed.</p><div class="review-chips">${App.dials.map((dial, index) => `<button type="button" class="chip ${dials.includes(dial) ? "on" : ""}" aria-pressed="${dials.includes(dial)}" data-dial="${index}">${dial}</button>`).join("")}</div></details>
+      <details class="robust-metrics"><summary>${dials.length} selected style indicators</summary><p class="note">Your selected indicators define the starting comparison. Each test removes one input while holding the remaining reference scale fixed.</p><div class="review-chips">${App.dials.map((dial, index) => `<button type="button" class="chip ${dials.includes(dial) ? "on" : ""}" aria-pressed="${dials.includes(dial)}" data-dial="${index}" title="${App.esc(App.indicator(dial).help)}">${App.esc(App.indicator(dial).label)}</button>`).join("")}</div></details>
       ${result.valid ? `<div class="robust-pairline">${[a, b].map((id, index) => `<span>${App.flag(id, 32)}<b>${App.esc(App.team[id].name)}</b><small>${result.counts[index]} matches</small></span>`).join('<i>↔</i>')}<span class="robust-percentile">${Math.round(result.base.percentile * 100)} / 100 <small>baseline similarity percentile</small></span></div>
       <div class="robust-direction" aria-label="Rank direction"><span>Whose nearest teams?</span><button type="button" data-direction="a">${App.esc(App.team[a].name)}</button><button type="button" data-direction="b">${App.esc(App.team[b].name)}</button></div>
       <section class="robust-stats" data-stats></section>
-      <div class="robust-workspace"><section class="card robust-scenarios"><div class="robust-panel-head"><div class="kicker">01 / Perturb the comparison</div><h2>How far does the rank move?</h2></div>
+      <div class="robust-workspace"><section class="card robust-scenarios"><div class="robust-panel-head"><h2>Rank under each scenario</h2></div>
         <div class="robust-tabs" role="tablist" aria-label="Sensitivity test"><button type="button" role="tab" data-test="indicators">Remove an indicator <span>${result.indicators.length}</span></button><button type="button" role="tab" data-test="matches">Remove a match <span>${result.matches.length}</span></button></div>
         <p class="note" data-chart-caption></p><div data-rank-chart></div><div class="robust-chart-key"><i></i><span>Top-five zone</span><span>Smaller rank = closer style</span></div>
       </section><aside class="card robust-detail" data-detail aria-live="polite"></aside></div>
-      <section class="card robust-feature-panel"><div class="robust-panel-head"><div><div class="kicker">03 / Read the selected scenario</div><h2>Which dimensions separate them?</h2></div><span class="robust-scenario-tag" data-feature-tag></span></div><p class="note">Dots use the same full-tournament standardized scale. The connector shows the gap. The share column allocates the pair’s squared distance across the retained indicators.</p><div class="robust-feature-legend"><span><i style="background:${colors[0]}"></i>${App.esc(App.team[a].name)}</span><span><i style="background:${colors[1]}"></i>${App.esc(App.team[b].name)}</span><span>Team values are in standard deviations</span></div><div data-feature-chart></div></section>
-      <section class="robust-method card"><div><div class="kicker">What this audit measures</div><h2>Sensitivity to the inputs.</h2><p>These are enumerated alternative comparisons. Counts and rank ranges describe this audit, with no sampling probabilities or confidence intervals attached.</p></div><div><p>Indicator tests remove one metric from every team profile. Match tests remove one team–match observation from either selected team, update that team’s mean, and keep other team means fixed. Both rank directions are recalculated.</p><p>All z-scores retain the original 208-record reference. Neighbors come from teams with matches in the selected scope. Tied distances share a rank. The percentile benchmark is recalculated for each scenario.</p>${result.notes.map((note) => `<p class="robust-method-note">${App.esc(note)}</p>`).join("")}<p>Inspired by the emphasis on interpretability and stability in <a href="${source}" target="_blank" rel="noopener">StatsBomb’s playing-style research ↗</a>. The deterministic deletion audit here is a project-specific method.</p><button class="btn small" data-export>Download full audit CSV ↓</button></div></section>` : `<section class="card robust-empty"><h2>Choose an available comparison</h2><p>${App.esc(result.reason)}</p></section>`}
+      <section class="card robust-feature-panel"><div class="robust-panel-head"><div><h2>Indicator gaps in this scenario</h2></div><span class="robust-scenario-tag" data-feature-tag></span></div><p class="note">Dots use the same full-tournament standardized scale. The connector shows the gap. The share column allocates the pair’s squared distance across the retained indicators.</p><div class="robust-feature-legend"><span><i style="background:${colors[0]}"></i>${App.esc(App.team[a].name)}</span><span><i style="background:${colors[1]}"></i>${App.esc(App.team[b].name)}</span><span>Team values are in standard deviations</span></div><div data-feature-chart></div></section>
+      <section class="robust-method card"><div><h2>Method</h2><p>These are enumerated alternative comparisons. Counts and rank ranges describe this audit, with no sampling probabilities or confidence intervals attached.</p></div><div><p>Indicator tests remove one metric from every team profile. Match tests remove one team–match observation from either selected team, update that team’s mean, and keep other team means fixed. Both rank directions are recalculated.</p><p>All z-scores retain the original 208-record reference. Neighbors come from teams with matches in the selected scope. Tied distances share a rank. The percentile benchmark is recalculated for each scenario.</p>${result.notes.map((note) => `<p class="robust-method-note">${App.esc(note)}</p>`).join("")}<p>Inspired by the emphasis on interpretability and stability in <a href="${source}" target="_blank" rel="noopener">StatsBomb’s playing-style research ↗</a>. The deterministic deletion audit here is a project-specific method.</p><button class="btn small" data-export>Download full audit CSV ↓</button></div></section>` : `<section class="card robust-empty"><h2>Choose an available comparison</h2><p>${App.esc(result.reason)}</p></section>`}
     </div>`;
 
     root.querySelector("form").onsubmit = (event) => {
@@ -90,6 +89,10 @@
       }).join("")}`;
     }
 
+    function scenarioName(scenario) {
+      return scenario.kind === "indicator" ? `Excluded · ${App.indicator(scenario.omittedDial).label}` : scenario.label;
+    }
+
     function drawRankChart() {
       const scenarios = [result.base, ...result[family]];
       const node = root.querySelector("[data-rank-chart]");
@@ -102,14 +105,14 @@
       rankSvg.append("g").attr("class", "robust-axis").attr("transform", "translate(0,27)").call(d3.axisTop(x).tickValues((narrow ? [1, 10, 20, 30, 40] : [1, 5, 10, 20, 30, 40]).filter((rank) => rank <= result.base.nearA.length)).tickSize(0));
       const groups = rankSvg.selectAll("g.robust-rank-row").data(scenarios).join("g").attr("class", "robust-rank-row")
         .attr("transform", (_, index) => `translate(0,${45 + index * rowHeight})`).attr("tabindex", 0).attr("role", "button")
-        .attr("aria-label", (scenario) => `${scenario.label}, partner rank ${scenario[rankKey()]}`)
+        .attr("aria-label", (scenario) => `${scenarioName(scenario)} · Partner rank #${scenario[rankKey()]}`)
         .on("click", (_, scenario) => selectScenario(scenario))
         .on("keydown", (event, scenario) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); selectScenario(scenario); } });
       groups.append("rect").attr("class", "robust-row-highlight").attr("x", 0).attr("y", -10).attr("width", width).attr("height", 36).attr("rx", 7);
       groups.append("text").attr("x", 0).attr("y", 12).attr("class", "robust-svg-label").text((scenario) => {
-        const text = scenario.kind === "indicator" ? `− ${scenario.omittedDial}` : scenario.kind === "baseline" ? "Original" : scenario.label;
-        return narrow && text.length > 19 ? `${text.slice(0, 17)}…` : text;
-      }).append("title").text((scenario) => scenario.label);
+        if (scenario.kind === "indicator") return App.indicator(scenario.omittedDial).label;
+        return scenario.kind === "baseline" ? "Original" : scenarioName(scenario);
+      }).append("title").text(scenarioName);
       groups.append("line").attr("x1", x(result.base[rankKey()])).attr("x2", (scenario) => x(scenario[rankKey()])).attr("y1", 8).attr("y2", 8).attr("stroke", "#c9d3cd").attr("stroke-width", 2);
       groups.append("circle").attr("cx", x(result.base[rankKey()])).attr("cy", 8).attr("r", 3).attr("fill", "white").attr("stroke", "#9fac9f");
       groups.append("circle").attr("class", "robust-rank-dot").attr("cx", x(result.base[rankKey()])).attr("cy", 8).attr("r", 5.5).attr("fill", activeColor())
@@ -129,14 +132,14 @@
       if (!displayed.some((neighbor) => neighbor.id === partner)) displayed.push(neighbors.find((neighbor) => neighbor.id === partner));
       const maximum = Math.max(...displayed.map((neighbor) => neighbor.distance), 0.01);
       let explanation = "All selected indicators and all selected-scope matches are included.";
-      if (selected.kind === "indicator") explanation = `${selected.omittedDial} is excluded from every team profile. ${selected.dials.length} indicators remain.`;
+      if (selected.kind === "indicator") explanation = `Excluded · ${App.indicator(selected.omittedDial).label} · ${selected.dials.length} indicators remain.`;
       if (selected.kind === "match") {
         const row = App.tm[selected.omittedKey];
         explanation = `${App.team[selected.omittedTeam].name}’s M${row.number} against ${App.team[row.opp_id].name} is removed from its average. All other team profiles are held fixed.`;
       }
-      root.querySelector("[data-detail]").innerHTML = `<div class="kicker">02 / Inspect this scenario</div><h2>${App.esc(selected.label)}</h2><p class="note">${App.esc(explanation)}</p>
+      root.querySelector("[data-detail]").innerHTML = `<div class="kicker">Selected scenario</div><h2>${App.esc(scenarioName(selected))}</h2><p class="note">${App.esc(explanation)}</p>
         <div class="robust-detail-score"><b>#${selected[rankKey()]}</b><span>${App.esc(App.team[partner].name)} in ${App.esc(App.team[reference].name)}’s neighbors<small>Original rank #${result.base[rankKey()]} · RMS distance ${App.fix(selected.distance, 3)}</small></span></div>
-        <h3>Who is closest now?</h3><ol class="robust-neighbors">${displayed.map((neighbor) => {
+        <h3>Closest teams in this scenario</h3><ol class="robust-neighbors">${displayed.map((neighbor) => {
           const rank = 1 + neighbors.filter((other) => other.d < neighbor.d - 1e-12).length;
           const baseline = baselineNeighbors.find((other) => other.id === neighbor.id);
           const originalRank = 1 + baselineNeighbors.filter((other) => other.d < baseline.d - 1e-12).length;
@@ -162,7 +165,7 @@
         const baseline = result.base.gaps.find((gap) => gap.dial === dial);
         const gap = selected.gaps.find((entry) => entry.dial === dial);
         const row = svg.append("g").attr("transform", `translate(0,${index * rowHeight + 33})`);
-        row.append("text").attr("x", 0).attr("y", 10).attr("class", "robust-svg-label").text(narrow && dial.length > 17 ? `${dial.slice(0, 15)}…` : dial).append("title").text(dial);
+        row.append("text").attr("x", 0).attr("y", 10).attr("class", "robust-svg-label").text(App.indicator(dial).label).append("title").text(App.indicator(dial).help);
         if (!gap) {
           row.attr("opacity", 0.45);
           row.append("text").attr("x", x(0)).attr("y", 10).attr("class", "robust-svg-label").text("Excluded");
@@ -174,10 +177,10 @@
           .transition().duration(reducedMotion ? 0 : 420).attr("cx", x(value)));
         row.append("text").attr("x", width).attr("y", 10).attr("text-anchor", "end").attr("class", "robust-svg-value")
           .text(`${App.signed(gap.a, 2)} / ${App.signed(gap.b, 2)} · ${Math.round(gap.share * 100)}%`);
-        row.append("title").text(`${dial}. ${App.team[a].name} ${gap.a.toFixed(4)} sd. ${App.team[b].name} ${gap.b.toFixed(4)} sd. Difference ${gap.difference.toFixed(4)} sd. Squared-distance share ${(gap.share * 100).toFixed(2)}%.`);
+        row.append("title").text(`${App.indicator(dial).label} · ${App.team[a].name}: ${gap.a.toFixed(4)} σ · ${App.team[b].name}: ${gap.b.toFixed(4)} σ · Difference: ${gap.difference.toFixed(4)} σ · Squared-distance share: ${(gap.share * 100).toFixed(2)}%`);
       });
       svg.append("g").attr("transform", `translate(0,${height - 28})`).call(d3.axisBottom(x).ticks(narrow ? 3 : 7));
-      root.querySelector("[data-feature-tag]").textContent = selected.label;
+      root.querySelector("[data-feature-tag]").textContent = scenarioName(selected);
     }
 
     function refresh() {

@@ -1,0 +1,448 @@
+{
+  "browser": "141.0.7390.37",
+  "tolerance": 2,
+  "measurements": [
+    {
+      "stage": "all teams",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "empty compare",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "empty explain",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "one team",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "one team's match evidence",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "two teams",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "difference lens",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "outcome evidence",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "expanded contribution records",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "credits open",
+      "width": 1920,
+      "height": 1080,
+      "docWidth": 1905,
+      "docHeight": 1080,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "all teams",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "empty compare",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "empty explain",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "one team",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "one team's match evidence",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "two teams",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "difference lens",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "outcome evidence",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "expanded contribution records",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "credits open",
+      "width": 1440,
+      "height": 900,
+      "docWidth": 1425,
+      "docHeight": 900,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "all teams",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "empty compare",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "empty explain",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "one team",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "one team's match evidence",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "two teams",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "difference lens",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "outcome evidence",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "expanded contribution records",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "credits open",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "all teams",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "empty compare",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "empty explain",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "one team",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "one team's match evidence",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "two teams",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "difference lens",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "outcome evidence",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "expanded contribution records",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "credits open",
+      "width": 1280,
+      "height": 800,
+      "docWidth": 1265,
+      "docHeight": 800,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "zh-Hans compare",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "zh-Hans explain",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "zh-Hant compare",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "zh-Hant explain",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "ar compare",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "ar explain",
+      "width": 1366,
+      "height": 768,
+      "docWidth": 1351,
+      "docHeight": 768,
+      "pageY": 0,
+      "mode": "explain"
+    },
+    {
+      "stage": "phone overview",
+      "width": 390,
+      "height": 844,
+      "docWidth": 390,
+      "docHeight": 1468,
+      "pageY": 0,
+      "mode": "explore"
+    },
+    {
+      "stage": "phone compare",
+      "width": 390,
+      "height": 844,
+      "docWidth": 390,
+      "docHeight": 1617,
+      "pageY": 0,
+      "mode": "compare"
+    },
+    {
+      "stage": "phone explain",
+      "width": 390,
+      "height": 844,
+      "docWidth": 390,
+      "docHeight": 1905,
+      "pageY": 1061,
+      "mode": "explain"
+    }
+  ],
+  "pageErrors": []
+}

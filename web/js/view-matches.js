@@ -10,12 +10,12 @@
     const pairFilter = archA && archB;
     const metric = params.metric === "gd" ? "gd" : "xgd";
     const returnTo = /^#\/(twins|styles|story|team|duel)(\/|\?|$)/.test(params.return || "") ? params.return : "";
-    const context = pairFilter ? `${App.arch[archA].name} × ${App.arch[archB].name}` : "";
+    const context = pairFilter ? `${App.groupLabel(archA)} × ${App.groupLabel(archB)}` : "";
     root.innerHTML = `
       ${returnTo ? `<a class="btn small ghost" href="${App.esc(returnTo)}">← Back to analysis</a>` : ""}
       <div class="section-head" style="margin-top:0">
-        <div><div class="kicker">Match evidence · 104 matches</div><h2 style="font-size:40px">Find the matches behind the pattern</h2>
-          <p>Inspect a scoreline alongside expected goals, then explore events, passing connections and similar performances.</p></div>
+        <div><h2>Matches</h2>
+          <p>Scorelines with expected goals (xG). Select a match for its events, passing network and similar performances.</p></div>
         <div class="filters"><div id="f-team"></div><div id="f-sort"></div></div>
       </div>
       ${pairFilter ? `<div class="duel-filter-context"><div><b>${App.esc(context)}</b><div class="note">Teams are classified by their whole-tournament style. Both home and away orientations are included.</div></div><a href="#/matches${App.analysis.query(dials)}">Clear matchup</a></div>` : ""}
@@ -56,7 +56,7 @@
         const direction = App.team[match.home].archetype === archA ? 1 : -1;
         return direction * (values[0] - values[1]);
       });
-      element.innerHTML = `<div class="kicker">${App.esc(App.arch[archA].name)} perspective · current selection</div><h3>${App.signed(average, 2)} ${label.toLowerCase()} per match</h3><p class="note">${matches.length} distinct fixture${matches.length === 1 ? "" : "s"}. ${sameGroup ? "Both teams belong to the same style group. Including both perspectives gives a mean of zero by construction." : `Each fixture is oriented toward ${App.esc(App.arch[archA].name)}, regardless of home or away side.`}</p>`;
+      element.innerHTML = `<div class="kicker">${App.esc(App.groupLabel(archA))} perspective · current selection</div><h3>${App.signed(average, 2)} ${label.toLowerCase()} per match</h3><p class="note">${matches.length} distinct fixture${matches.length === 1 ? "" : "s"}. ${sameGroup ? "Both teams belong to the same style group. Including both perspectives gives a mean of zero by construction." : `Each fixture is oriented toward ${App.esc(App.groupLabel(archA))}, regardless of home or away side.`}</p>`;
     }
 
     function draw() {
