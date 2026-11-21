@@ -1,0 +1,60 @@
+/* Positions share one centred, left-to-right quantitative scale in every locale. */
+.ws-details.has-team > [data-panel="D"] { height: auto; min-height: 360px; }
+[data-panel="D"] .ws-ph { flex-wrap: wrap; }
+[data-panel="D"] .ws-pc { flex: none; }
+.lens-tools { display: flex; align-items: center; gap: 6px; padding: 6px 12px 0; }
+#ws-profile { padding: 6px 12px 8px; font-size: 12px; container-type: inline-size; }
+.lens-guide, .lens-keys, .lens-key, .lens-reference, .lens-readout, .lens-detail-team { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.lens-guide { justify-content: space-between; min-height: 22px; align-items: center; }
+.lens-direction:empty { display: none; }
+.lens-direction { font-size: 11px; color: var(--ws-ink-2); direction: ltr; }
+.lens-key { align-items: center; gap: 5px; }
+.lens-key .lens-dot { position: static; transform: none; }
+.lens-key .lens-dot.b { transform: rotate(45deg); }
+.lens-extra-key { font-weight: 500; }
+.lens-rows { border-top: 1px solid var(--ws-line); }
+.lens-scale, .ws .lens-row {
+  display: grid; grid-template-columns: minmax(98px, 37%) minmax(0,1fr) 50px; align-items: center; column-gap: 8px;
+}
+#ws-profile.is-paired:not(.is-difference) :is(.lens-scale,.lens-row) { grid-template-columns: minmax(96px,35%) minmax(0,1fr) 79px; }
+.lens-scale { color: var(--ws-muted); font-size: 11px; min-height: 20px; }
+.lens-axis { grid-column: 2; display: flex; justify-content: space-between; direction: ltr; }
+.lens-values-head { text-align: end; direction: ltr; }
+.ws .lens-row {
+  width: 100%; text-align: start; padding: 3px 0; margin: 0; min-height: 26px; background: transparent;
+  border: 0; border-bottom: 1px solid var(--ws-line); font: inherit; color: var(--ws-ink);
+}
+.ws .lens-row:is(.is-inspected,:focus-visible) { background: var(--ws-sunken); }
+.lens-name { display: flex; align-items: baseline; gap: 3px; line-height: 1.2; }
+.lens-name small { font: 600 10px var(--sans); color: var(--ws-ink-2); }
+.lens-name i { font-style: normal; }
+.lens-row[data-rank="1"] .lens-name, .lens-row[data-rank="2"] .lens-name, .lens-row[data-rank="3"] .lens-name { font-weight: 650; }
+.lens-track { position: relative; display: block; height: 18px; direction: ltr; }
+.lens-track::before { content: ""; position: absolute; left: 50%; top: -5px; bottom: -5px; width: 1px; background: var(--ws-line-2); }
+.lens-track::after { content: ""; position: absolute; inset-inline: 0; top: 50%; height: 1px; background: var(--ws-line); z-index: 0; }
+.lens-dot, .lens-overlay { position: absolute; width: 8px; height: 8px; top: 50%; transform: translate(-50%,-50%); z-index: 2; border-radius: 50%; }
+.lens-dot.a, .lens-bar.a { background: var(--ws-a); }
+.lens-dot.b, .lens-bar.b { background: var(--ws-b); }
+.lens-dot.b { width: 7px; height: 7px; border-radius: 0; transform: translate(-50%,-50%) rotate(45deg); }
+.lens-overlay { z-index: 3; background: var(--ws-panel); border: 1.5px solid var(--ws-ink); width: 7px; height: 7px; }
+.lens-overlay.is-match { transform: translate(-50%,-50%) rotate(45deg); border-radius: 0; }
+.lens-bar, .lens-connector { position: absolute; top: 50%; z-index: 1; transform: translateY(-50%); }
+.lens-bar { height: 8px; }
+.lens-connector { height: 3px; background: var(--ws-line-2); }
+.lens-numbers { display: flex; justify-content: flex-end; gap: 5px; font: 500 11px var(--sans); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.lens-number { flex: 1; text-align: right; }
+.lens-number.a { color: var(--ws-a-ink); }
+.lens-number.b { color: var(--ws-b-ink); }
+.lens-row.is-excluded .lens-name, .lens-row.is-excluded .lens-numbers { color: var(--ws-muted); }
+.lens-row.is-excluded .lens-track i { opacity: .55; }
+.lens-reference { font-size: 11px; color: var(--ws-muted); justify-content: space-between; margin-block: 6px; }
+.lens-readout { min-height: 36px; padding-top: 5px; border-top: 1px solid var(--ws-line); }
+.lens-detail-team { gap: 2px 4px; }
+.lens-readout > b { flex-basis: 100%; }
+.ws-summary.metrics { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; font-variant-numeric: tabular-nums; }
+.ws-summary.metrics > span { display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 4px; }
+.ws-summary.metrics b { color: var(--ws-ink); }
+@media (pointer: coarse) {
+  .ws .lens-row { min-height: 44px; }
+}
+.hm-table thead th.lens-linked button { outline: 1px dashed var(--ws-ink); outline-offset: -1px; }

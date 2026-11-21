@@ -211,7 +211,7 @@
     function inspectTarget(target, column) {
       const row = target?.closest("tr[data-team], .hm-group-mean");
       highlight(row?.dataset.team || null);
-      inspectIndicator(model.state.view === "pairs" ? null : column);
+      inspectIndicator(column);
       inspect(row, target?.closest("td[data-i]"));
     }
     table.addEventListener("pointerover", (e) => {
@@ -310,6 +310,10 @@
     }
     return {
       render, previewRegion, markIndicator, compareHover,
+      markLensColumn(index) {
+        table.tHead.querySelector(".lens-linked")?.classList.remove("lens-linked");
+        if (index != null) table.tHead.querySelector(`th[data-i="${index}"]`)?.classList.add("lens-linked");
+      },
       highlight(id) {
         const row = id && body.querySelector(`tr[data-team="${id}"]`);
         if (row && !row.matches(":hover, :focus-within")) revealRow(row);

@@ -137,7 +137,7 @@ async function checkTeamRanks(page) {
   await heatTeam(page, "GER").locator("button").evaluate(el => el.focus());
   await page.locator(".hm-pins button[data-locate='URU']").click();
   assert.ok(await heatTeam(page, "URU").locator("button").evaluate(el => el === document.activeElement));
-  const profileBeforeHover = await page.locator("#ws-profile svg").elementHandle();
+  const profileBeforeHover = await page.locator("#ws-profile .lens-row").first().elementHandle();
   await mapTeam(page, "FRA").locator("circle").last().hover();
   const france = await readout.innerText();
   assert.match(france, /PCA distance rank\s*#1\b/i);
@@ -494,6 +494,7 @@ async function run() {
     await checkPairExplorer(page);
     await checkTeamRanks(page);
     await checkMapRefit(page);
+    await require("./verify-lens-browser.cjs")(page, base, output);
     await overview(page);
     assert.match(await page.locator("#ws-projection").innerText(), /variation.*10.*indicators/i);
     const maxError = await page.evaluate(() => {

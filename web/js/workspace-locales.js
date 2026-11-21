@@ -5,6 +5,12 @@
   if (!M) return;
   const hans = {
     "Locate team in heatmap": "在热图中定位球队",
+    "Absolute profiles": "绝对画像",
+    "Difference view": "差值视图",
+    "Style comparison mode": "风格对比模式",
+    "← Higher for B · Higher for A →": "← B 较高 · A 较高 →",
+    "Largest absolute differences": "绝对差值最大",
+    "GD gap per match (A − B)": "场均净胜球差（A − B）",
     "Team Table": "球队表",
     "{0} / {1} teams": "{0} / {1} 支球队",
     "Export CSV": "导出 CSV",
@@ -132,6 +138,12 @@
   };
   const hant = {
     "Locate team in heatmap": "在熱圖中定位球隊",
+    "Absolute profiles": "絕對剖面",
+    "Difference view": "差值檢視",
+    "Style comparison mode": "風格比較模式",
+    "← Higher for B · Higher for A →": "← B 較高 · A 較高 →",
+    "Largest absolute differences": "絕對差值最大",
+    "GD gap per match (A − B)": "場均淨勝球差（A − B）",
     "Team Table": "球隊表",
     "{0} / {1} teams": "{0} / {1} 支球隊",
     "Export CSV": "匯出 CSV",

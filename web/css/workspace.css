@@ -255,12 +255,6 @@ body.ws-route { background: #f5f6f7; }
 .ws-map .brush .selection { fill: var(--ws-ink); fill-opacity: .04; stroke: var(--ws-ink-2); stroke-dasharray: 3 3; }
 .ws-map .outside-brush { opacity: .18; }
 
-/* Style profile */
-.ws-profile .row-label { font-size: 12px; fill: var(--ws-ink); }
-.ws-profile .row-label.off { fill: var(--ws-faint); }
-.ws-profile .gap-label { font-size: 11px; fill: var(--ws-muted); }
-.ws-profile .axis-label { font-size: 11px; fill: var(--ws-muted); }
-
 /* Outcomes */
 .ws-outcomes text { font-size: 12px; }
 .ws-gd-comparison { display: flex; align-items: baseline; flex-wrap: wrap; gap: 3px 12px; width: 100%; }

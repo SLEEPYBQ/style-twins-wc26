@@ -55,7 +55,7 @@
       arch: Object.hasOwn(App.arch, p.arch) ? p.arch : "", search: p.search || "",
       view: ["pairs", "custom"].includes(p.view) ? p.view : "pca",
       pairRegion: p.view === "pairs" ? pairRegionFrom(p.pairRegion) : null, x: axis(p.x, "xgd"), y: axis(p.y, "gd"),
-      color, order: p.order === "gap" ? "gap" : "fixed",
+      color, order: p.order === "gap" ? "gap" : "fixed", lens: compare && p.lens === "difference" ? "difference" : "absolute",
       cohort: p.cohort ? [...new Set(p.cohort.split(",").filter(validTeam))] : null,
       xlo: num(p.xlo), xhi: num(p.xhi), glo: num(p.glo), ghi: num(p.ghi),
       sort: ["name", "group", "n", "xgd", "gd"].includes(p.sort) ? p.sort : "xgd", desc: p.desc !== "0",
@@ -69,6 +69,7 @@
       view: s.view === "pca" ? null : s.view, x: s.view === "custom" ? s.x : null, y: s.view === "custom" ? s.y : null,
       pairRegion: s.view === "pairs" && s.pairRegion ? s.pairRegion.join(",") : null,
       color: defaultEncoding ? null : s.color, order: s.order === "fixed" ? null : s.order,
+      lens: s.compare && s.lens === "difference" ? s.lens : null,
       cohort: s.cohort ? s.cohort.join(",") || "none" : null, xlo: s.xlo, xhi: s.xhi, glo: s.glo, ghi: s.ghi,
       sort: s.sort === "xgd" ? null : s.sort, desc: s.desc ? null : "0", match: s.match,
     })}`;
@@ -93,7 +94,6 @@
     let nearByTeam, pca, mapRanks = new Map(), previewIndicator = null;
     let brushPreview = null;
     let activeBrush = null;
-    let updateProfilePreview = () => {};
     let lastProjection, lastPins;
     const coarsePointer = window.matchMedia("(any-pointer: coarse)");
     const hasTouch = () => coarsePointer.matches || navigator.maxTouchPoints > 0;
@@ -153,8 +153,9 @@
            <div class="ws-scroll"><ol class="ws-twins" id="ws-twins"></ol></div>
            <p class="ws-reference" id="ws-sim-reference"></p>`)}
         ${panel("D", "Style Profile <span class=\"ws-count\" title=\"Team mean, standard deviations from the tournament average\">z-score</span>",
-          `<span class="ws-pc-label">Order</span>${seg("ws-order", [["fixed", "Fixed"], ["gap", "By gap"]], "Indicator order")}`,
-          `<div class="ws-legend" id="ws-profile-key"></div><div class="ws-chart ws-profile" id="ws-profile"></div>`)}
+          seg("ws-lens", [["absolute", "Absolute profiles"], ["difference", "Difference view"]], "Style comparison mode"),
+          `<div class="lens-tools"><span class="ws-pc-label">Order</span>${seg("ws-order", [["fixed", "Fixed"], ["gap", "By gap"]], "Indicator order")}</div>
+           <div id="ws-profile"></div>`)}
         ${panel("E", "Outcomes <span class=\"ws-count\">per match</span>", "",
           `<div class="ws-legend" id="ws-outcome-key"></div>
            <div class="ws-chart ws-outcomes" id="ws-outcomes"></div>`)}
@@ -232,6 +233,7 @@
         else change({ heatSort: value });
       },
     });
+    const lens = App.workspaceLens(q("#ws-profile"), heat.markLensColumn);
     const pairView = App.workspacePairs(q("#ws-pairs"), {
       choosePair(first, second) {
         const keepA = state.team === second;
@@ -256,6 +258,7 @@
     };
     q("#ws-color").onchange = (e) => selectEncoding(e.target.value);
     segBind("ws-order", "order");
+    segBind("ws-lens", "lens");
     q("#ws-reset").onclick = () => {
       clearTimeout(searchTimer);
       touchBrushArmed = false;
@@ -378,14 +381,26 @@
       q("#ws-swap").disabled = !state.compare;
       q("#ws-to-analysis").hidden = !state.team;
       const hasPair = !!(full.team[state.team] && full.team[state.compare]);
+      q("#ws-lens").hidden = !hasPair;
+      q(".lens-tools").hidden = !hasPair;
       q('#ws-order [data-v="gap"]').disabled = !hasPair;
-      [["#ws-scope", state.scope], ["#ws-view", state.view], ["#ws-order", hasPair ? state.order : "fixed"]].forEach(([s, v]) => q(s).querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v))));
+      [["#ws-scope", state.scope], ["#ws-view", state.view], ["#ws-order", hasPair ? state.order : "fixed"], ["#ws-lens", hasPair ? state.lens : "absolute"]].forEach(([s, v]) => q(s).querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === v))));
       q("#ws-scope-size").textContent = `${Object.keys(space.team).length} teams · ${scopeAvg.n / 2} matches`;
       const missing = [state.team, state.compare].find((id) => id && !space.team[id]);
       const rank = rankOf(state.compare);
-      q("#ws-summary").textContent = missing ? `${App.team[missing].name} has no matches in this scope.`
-        : rank ? `${App.team[state.compare].name} ranks #${rank} of ${near.length} for similarity to ${App.team[state.team].name}.`
-        : state.team ? "Select another team to compare." : "Choose a team from the map or heatmap.";
+      const summary = q("#ws-summary");
+      summary.classList.toggle("metrics", !!rank);
+      if (rank) {
+        const percentile = near[rank - 1].sim * 100, pairs = near.length * (near.length + 1) / 2;
+        const gap = summaries[state.team].gd - summaries[state.compare].gd;
+        const scope = { all: "Full tournament", group: "Group stage", knockout: "Knockout" }[state.scope];
+        summary.innerHTML = `<span aria-describedby="ws-sim-reference" title="Percentile: share of the ${pairs} team pairs in scope at least this far apart."><span>Similarity percentile</span> <b>${fmt(percentile,1)}%</b> <small title="Style similarity rank">#${rank}/${near.length}</small></span>
+          <span><span>GD gap per match (A − B)</span> <b>${App.signed(gap,2)}</b></span>
+          <span>${state.dials.length} indicators</span><span>${scope}</span>`;
+      } else {
+        summary.textContent = missing ? `${App.team[missing].name} has no matches in this scope.`
+          : state.team ? "Select another team to compare." : "Choose a team from the map or heatmap.";
+      }
     }
 
     /* ---------- A · team collection ---------- */
@@ -669,6 +684,7 @@
       else change(patch);
     }
     function inspectIndicator(index) {
+      lens.inspect(index);
       if (state.view === "pairs" || previewIndicator === index) return;
       previewIndicator = index;
       paintMapColours();
@@ -724,53 +740,20 @@
     }
 
     /* ---------- D · style profile ---------- */
-    function teamLegend() {
-      return [[state.team, "a"], [state.compare, "b"]].filter(([id]) => id).map(([id, side]) =>
-        `<span><i class="lg-${side}"></i>${esc(App.team[id].name)}</span>`).join("");
-    }
     function drawProfile() {
-      if (!state.team) { updateProfilePreview = () => {}; return; }
-      q("#ws-profile-key").innerHTML = teamLegend();
-      const host = q("#ws-profile"), { svg, W, H } = svgFor(host, "Style profiles of A and B");
-      svg.attr("class", "ws-profile");
-      const a = full.team[state.team], b = full.team[state.compare], f = focused();
-      const gap = (i) => (a && b ? Math.abs(a[i] - b[i]) : 0);
-      let rows = App.dials.map((d, i) => ({ d, i, on: state.dials.includes(d) }));
-      if (a && b && state.order === "gap") rows.sort((p, r) => (r.on - p.on) || gap(r.i) - gap(p.i));
-      // Keep the scale fixed as different teams are inspected in the same scope.
-      const vals = [...Object.values(full.team), f && full.match[f.key]].filter(Boolean).flat().filter(Number.isFinite);
-      const ext = Math.max(2, Math.ceil((d3.max(vals, Math.abs) || 2) * 2) / 2);
-      const m = { l: Math.min(150, Math.round(W * 0.39)), r: b ? 42 : 16, t: 6, b: 26 };
-      const x = d3.scaleLinear().domain([-ext, ext]).range([m.l, W - m.r]);
-      const y = d3.scaleBand().domain(rows.map((r) => r.d)).range([m.t, H - m.b]).paddingInner(0.1);
-      const cy = (d) => y(d) + y.bandwidth() / 2;
-      rows.forEach((r, k) => { if (k % 2 === 0) svg.append("rect").attr("x", 0).attr("width", W).attr("y", y(r.d) - 1).attr("height", y.bandwidth() + 2).attr("fill", "#f9fafb"); });
-      [-ext, -ext / 2, ext / 2, ext].forEach((v) => svg.append("line").attr("x1", x(v)).attr("x2", x(v)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", C.grid));
-      svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", m.t).attr("y2", H - m.b).attr("stroke", "#b9c0c8");
-      rows.forEach((r) => {
-        const yy = cy(r.d), op = r.on ? 1 : 0.32;
-        svg.append("text").attr("class", `row-label${r.on ? "" : " off"}`).attr("x", m.l - 12).attr("y", yy + 4).attr("text-anchor", "end").text(App.indicator(r.d).label).append("title").text(App.indicator(r.d).help + (r.on ? "" : " (not used for similarity)"));
-        const va = a?.[r.i], vb = b?.[r.i];
-        if (a && b) svg.append("line").attr("x1", x(va)).attr("x2", x(vb)).attr("y1", yy).attr("y2", yy).attr("stroke", "#cfd5dc").attr("stroke-width", 4).attr("stroke-linecap", "round").attr("opacity", op);
-        [[state.team, va, C.a], [state.compare, vb, C.b]].filter(([, v]) => Number.isFinite(v)).forEach(([id, v, col]) => {
-          svg.append("circle").attr("data-team", id).attr("cx", x(v)).attr("cy", yy).attr("r", 5.5).attr("fill", col).attr("stroke", "#fff").attr("stroke-width", 1.5).attr("opacity", op)
-            .append("title").text(`${App.team[id].name} · ${App.indicator(r.d).label}: ${App.signed(v, 2)} σ`);
-        });
-        if (a && b) svg.append("text").attr("class", "gap-label").attr("x", W - m.r + 8).attr("y", yy + 4).attr("opacity", op).text(`Δ ${App.fix(Math.abs(va - vb), 1)}`);
-      });
-      [-ext, 0, ext].forEach((v) => svg.append("text").attr("class", "axis-label").attr("x", x(v)).attr("y", H - 8).attr("text-anchor", v === -ext ? "start" : v === ext ? "end" : "middle").text(v === 0 ? "tournament average" : `${App.signed(v, 1)} σ`));
-      if (a && b) svg.append("text").attr("class", "axis-label").attr("x", W - m.r + 8).attr("y", H - 8).text("gap");
-      const overlay = svg.append("g").attr("pointer-events", "none");
-      const note = overlay.append("text").attr("class", "axis-label").attr("x", m.l - 12).attr("y", H - 8).attr("text-anchor", "end");
-      updateProfilePreview = () => {
-        const vector = f ? full.match[f.key] : hover && hover !== state.team && hover !== state.compare ? full.team[hover] : null;
-        overlay.selectAll("path").data(vector ? rows : [], r => r.i).join("path")
-          .attr("d", d3.symbol(f ? d3.symbolDiamond : d3.symbolCircle, f ? 60 : 50)())
-          .attr("transform", r => `translate(${x(vector[r.i])},${cy(r.d)})`)
-          .attr("fill", "#fff").attr("stroke", C.ink).attr("stroke-width", 1.6).attr("opacity", r => r.on ? 1 : .32);
-        note.text(f ? `◇ ${f.team_id} v ${f.opp_id}` : vector ? `○ ${App.team[hover].name}` : "");
-      };
+      if (!state.team) return;
+      const ids = [state.team, state.compare], match = focused();
+      const raw = ids.map(id => id ? App.dials.map((_, i) => metric(id, `dial${i}`)) : null);
+      lens.render({ ids, full, raw, dials: state.dials, order: state.order, mode: state.lens,
+        match: match ? full.match[match.key] : null });
       updateProfilePreview();
+    }
+    function updateProfilePreview() {
+      if (!state.team) return;
+      const match = focused();
+      const id = hover !== state.team && hover !== state.compare ? hover : null;
+      if (match) lens.overlay(full.match[match.key], `${match.team_id} v ${match.opp_id}`, true);
+      else lens.overlay(full.team[id], App.team[id]?.name, false);
     }
 
     /* ---------- E · outcomes ---------- */
@@ -829,7 +812,7 @@
           <td class="num"><span class="ws-bar"><i><b style="${(v ?? 0) >= 0 ? `left:50%;width:${w}%` : `right:50%;width:${w}%`}"></b></i><span>${App.signed(v, 2)}</span></span></td></tr>`;
       }).join("") || `<tr><td colspan="5" class="ws-empty">No matches in this scope.</td></tr>`;
       q("#ws-matches tbody").querySelectorAll("tr[data-match]").forEach((row) => {
-        const pick = () => change({ match: row.dataset.match === state.match ? null : row.dataset.match });
+        const pick = () => change(row.dataset.match === state.match ? { match: null } : { match: row.dataset.match, lens: "absolute" });
         row.onclick = pick; row.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
         row.onpointerenter = () => highlight(row.dataset.team); row.onpointerleave = () => highlight(null);
       });
@@ -917,7 +900,7 @@
       heat.highlight(id); readout(); updateProfilePreview();
     }
 
-    const redraw = () => { if (!root.isConnected) return; drawMap(); drawProfile(); drawOutcomes(); };
+    const redraw = () => { if (!root.isConnected) return; drawMap(); drawOutcomes(); };
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(redraw); };
     render();
     // Wrapping legends, translated labels and changes in match scope can change
@@ -928,7 +911,7 @@
         return box && target.clientHeight && (target.clientWidth !== box.width || target.clientHeight !== box.height);
       })) schedule();
     });
-    ["#ws-map", "#ws-pairs .wp-chart", "#ws-profile", "#ws-outcomes"].forEach((selector) => observer.observe(q(selector)));
+    ["#ws-map", "#ws-pairs .wp-chart", "#ws-outcomes"].forEach((selector) => observer.observe(q(selector)));
     const onLang = () => render();
     window.addEventListener("languagechange", onLang);
     const onPointerChange = () => { touchBrushArmed = false; drawMap(); readout(); };
