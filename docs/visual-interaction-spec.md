@@ -15,7 +15,7 @@ The workspace opens on the tournament, with no team pinned. The investigation st
 ## Data, focus and motion
 
 - The unit of observation is a team in one match. Scope selects team-match records. Style profiles use the shipped tournament standardization; changing scope changes the records being averaged.
-- Similarity uses distances in the selected indicator space. Its percentile is the share of eligible, unordered team pairs whose distance is at least as large. All ten indicator means remain available for inspection.
+- Similarity uses distances in the selected indicator space. Its percentile is the share of eligible, unordered team pairs whose distance is at least as large. The candidate preview reports the largest difference among those selected indicators. The Difference Lens ranks all ten measured indicators and marks the ones excluded from similarity.
 - Blue identifies A, orange B and teal the nearest neighbors. Use labels, outlines, signed numbers and a zero line so interpretation is possible without identifying the colors. Preserve the heatmap’s quantitative fill when marking a selection.
 - Hover, keyboard focus and an unfinished brush are temporary. Pinning, swapping and committing a filter use browser history. On coarse pointers, arming Brush distinguishes region selection from scrolling.
 - Changing the PCA inputs can change its basis. Replace the projected geometry without tweening from the old coordinates. Keep position fixed for a change in observed color. Prefer short, interruptible emphasis changes and disable discretionary motion under reduced motion.

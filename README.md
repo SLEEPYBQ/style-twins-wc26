@@ -34,6 +34,10 @@ Selections are retained in shareable analysis URLs and return links. Comparison 
 
 ### Linked analysis workbench
 
+Pinning A reveals its five closest teams across the map, heatmap and ranking. Pinning B opens the signed Style DNA comparison and a six-step waterfall of the observed goal-difference gap. From any waterfall step, inspect the match records used in each team's mean. The Team pairs map includes a selectable, labeled example region for finding other comparisons.
+
+[Classroom walkthrough](docs/visual-interaction-demo.md) · [Interaction design](docs/visual-interaction-spec.md) · [Browser screenshots and verification](review/visual-interactions/README.md)
+
 The site opens with all 48 teams. Map points and heatmap cells share a colour scale. The map initially shows possession in colour, and the heatmap lists teams from highest to lowest possession. Hover or focus a point or row to locate the same team in the other view. Click a team to set A, then another to set B. The searchable pickers also accept a team name or code. Shift-click sets A. Use **Clear comparison** in the B picker to return to one team, or **Reset view** to return to the full tournament.
 
 - **Style Map** projects team means onto two principal components fitted to tournament team-match records using the selected indicators. Switch to X / Y for raw indicator means or per-match outcomes. Drag the divider to resize the two views. With a mouse or trackpad, drag from empty space in the plot. The heatmap and team count update as the rectangle changes. Release to keep the selection. On a touchscreen, tap **Brush** and drag, or tap **Brush** again to cancel. A normal swipe scrolls the page. Press **Esc** or click **×** on the map filter to clear the selection and keep A, B and the other filters. During a drag, **Esc** cancels the gesture. With no region selected, **Esc** clears the pinned teams.
