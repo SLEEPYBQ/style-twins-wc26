@@ -248,6 +248,7 @@
     function focusPanel(id) {
       const heading = q(`#ws-${id}-title`);
       heading.tabIndex = -1;
+      heading.style.scrollMarginTop = `${document.querySelector(".topbar").getBoundingClientRect().bottom + 8}px`;
       heading.focus({ preventScroll: true });
       heading.scrollIntoView({ block: "start" });
     }
