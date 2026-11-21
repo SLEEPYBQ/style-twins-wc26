@@ -137,6 +137,8 @@ body.ws-route { background: #f5f6f7; }
 .ws-chip-x { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 3px 0 8px; border-radius: 3px; background: var(--ws-sunken); border: 1px solid var(--ws-line); font-size: 12px; color: var(--ws-ink-2); }
 .ws-chip-x button { border: 0; background: none; width: 16px; height: 16px; border-radius: 2px; display: inline-flex; align-items: center; justify-content: center; color: var(--ws-muted); padding: 0; }
 .ws-chip-x button:hover { background: var(--ws-line); color: var(--ws-ink); }
+.ws-chip-x button[aria-keyshortcuts] { width: auto; gap: 4px; padding-inline: 2px; }
+.ws kbd { font: 500 11px var(--sans); color: var(--ws-ink-2); }
 
 .ws-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
 #ws-teams { table-layout: fixed; }

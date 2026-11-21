@@ -18,6 +18,7 @@
   const fmt = (v, n = 2) => (Number.isFinite(v) ? App.fix(v, n) : "–");
   const num = (v) => (v != null && v !== "" && Number.isFinite(+v) ? +v : null);
   const esc = App.esc;
+  const escapeHint = '<kbd translate="no" aria-hidden="true">Esc</kbd>';
   const ICON = {
     swap: '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 5h9m0 0-2.5-2.5M13 5l-2.5 2.5M12 11H3m0 0 2.5-2.5M3 11l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     search: '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="6" cy="6" r="4.3" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M9.3 9.3 12.5 12.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
@@ -91,6 +92,7 @@
     let space, full, twins, near, summaries, scopeAvg, visible = [], pos = {}, hover = null, touchBrushArmed = false, frame = null;
     let nearByTeam, pca, mapRanks = new Map(), previewIndicator = null;
     let brushPreview = null;
+    let activeBrush = null;
     const coarsePointer = window.matchMedia("(any-pointer: coarse)");
     const hasTouch = () => coarsePointer.matches || navigator.maxTouchPoints > 0;
     const q = (s) => root.querySelector(s);
@@ -128,7 +130,7 @@
         ${panel("C", "Style Map", seg("ws-view", [["pca", "PCA"], ["custom", "X / Y"], ["pairs", "Team pairs"]], "Map view"),
           `<div class="ws-map-controls">
              <span class="ws-pc-label" id="ws-pair-unit" hidden>One dot per team pair.</span>
-             <button type="button" class="ws-link" id="ws-clear-pair-region" hidden>Clear pair selection</button>
+             <button type="button" class="ws-link" id="ws-clear-pair-region" aria-keyshortcuts="Escape" hidden><span>Clear pair selection</span> ${escapeHint}</button>
              <button type="button" class="ws-btn" id="ws-brush" hidden aria-pressed="false" title="Drag a rectangle to filter teams">${ICON.brush}Brush</button></div>
              <div id="ws-axes" hidden><label>X <select id="ws-x" aria-label="X axis">${selectOptions(measures.map((m) => [m.id, m.label]))}</select></label>
              <label>Y <select id="ws-y" aria-label="Y axis">${selectOptions(measures.map((m) => [m.id, m.label]))}</select></label></div>
@@ -389,7 +391,10 @@
       if (state.xlo !== null || state.xhi !== null) chips.push(["xgd", "xG diff. " + ranges.xgd.lo.value + " … " + ranges.xgd.hi.value]);
       if (state.glo !== null || state.ghi !== null) chips.push(["gd", "Goal diff. " + ranges.gd.lo.value + " … " + ranges.gd.hi.value]);
       q("#ws-chips").hidden = !chips.length;
-      q("#ws-chips").innerHTML = chips.map(([k, t]) => `<span class="ws-chip-x">${esc(t)}<button type="button" data-clear="${k}" aria-label="${k === "cohort" ? "Clear map selection" : "Clear " + esc(t)}">${ICON.x}</button></span>`).join("");
+      q("#ws-chips").innerHTML = chips.map(([k, t]) => {
+        const shortcut = k === "cohort" && !state.pairRegion;
+        return `<span class="ws-chip-x">${esc(t)}<button type="button" data-clear="${k}" aria-label="${k === "cohort" ? "Clear map selection" : "Clear " + esc(t)}"${shortcut ? ' aria-keyshortcuts="Escape"' : ""}>${shortcut ? escapeHint : ""}${ICON.x}</button></span>`;
+      }).join("");
       q("#ws-chips").querySelectorAll("[data-clear]").forEach((button) => {
         button.onclick = () => {
           const range = ranges[button.dataset.clear];
@@ -599,12 +604,16 @@
       const largeEnough = (s) => s && Math.hypot(s[1][0] - s[0][0], s[1][1] - s[0][1]) >= 5;
       const brush = d3.brush().extent(extent)
         .touchable(touchArmed).keyModifiers(false).handleSize(0)
+        .on("start", ({ sourceEvent }) => {
+          if (sourceEvent) activeBrush = brushLayer.node();
+        })
         .on("brush", ({ selection, sourceEvent }) => {
           const active = largeEnough(selection);
           brushLayer.classed("is-dragging", !!active);
           if (sourceEvent && brushLayer.node().isConnected) preview?.(active ? selection : null);
         })
         .on("end", ({ sourceEvent, selection }) => {
+          if (activeBrush === brushLayer.node()) activeBrush = null;
           if (!sourceEvent || !brushLayer.node().isConnected) return;
           if (!largeEnough(selection) || sourceEvent.type === "touchcancel") {
             preview?.(null);
@@ -866,8 +875,27 @@
     window.addEventListener("languagechange", onLang);
     const onPointerChange = () => { touchBrushArmed = false; drawMap(); readout(); };
     coarsePointer.addEventListener("change", onPointerChange);
+    const onEscape = (event) => {
+      if (event.key !== "Escape" || event.defaultPrevented || event.repeat || event.isComposing ||
+          event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      // Editors and open listboxes own Escape while the user is typing or choosing an option.
+      const target = event.target;
+      if (target instanceof Element && (target.isContentEditable || target.closest("input, textarea, select, [role='listbox'], dialog[open]"))) return;
+      if (activeBrush?.isConnected || touchBrushArmed) {
+        activeBrush = null;
+        touchBrushArmed = false;
+        // Redrawing detaches the old D3 gesture so releasing the pointer cannot commit it.
+        drawMap(); readout();
+      } else if (state.pairRegion) change({ pairRegion: null });
+      else if (state.cohort) change({ cohort: null });
+      else if (state.team) choose(null, "A");
+      else return;
+      event.preventDefault();
+    };
+    document.addEventListener("keydown", onEscape);
     App._stop = () => {
       observer.disconnect(); clearTimeout(searchTimer); cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", onEscape);
       window.removeEventListener("languagechange", onLang);
       coarsePointer.removeEventListener("change", onPointerChange);
     };

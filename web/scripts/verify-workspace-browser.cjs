@@ -296,6 +296,51 @@ async function mouseDrag(page, start, end, beforeRelease) {
   await page.mouse.up();
 }
 
+async function checkEscape(page) {
+  const cohort = ["TUR", "URU"];
+  await page.goto(base + "/#/styles?cohort=TUR,URU&team=TUR&compare=URU&color=dial5&heatSort=dial5");
+  const selected = page.url();
+  const selectedRows = async () => (await ids(page, heatRows + ":visible")).sort();
+  assert.deepEqual(await selectedRows(), cohort);
+
+  const picker = page.locator("#ws-pick-a .sel-btn");
+  await picker.click();
+  await page.keyboard.press("Escape");
+  assert.equal(await picker.getAttribute("aria-expanded"), "false");
+  assert.equal(page.url(), selected, "Dismissing a team menu keeps the selection");
+
+  const {start, end} = await topStrip(page);
+  await mouseDrag(page, start, end, async () => {
+    assert.ok((await selectedRows()).includes("CAN"), "A new drag previews teams outside the saved region");
+    await page.keyboard.press("Escape");
+    assert.deepEqual(await selectedRows(), cohort);
+    await page.mouse.move(end.x - 8, end.y + 4);
+  });
+  assert.equal(page.url(), selected, "Releasing a cancelled drag keeps the saved region");
+  assert.deepEqual(await selectedRows(), cohort);
+
+  await page.keyboard.press("Escape");
+  assert.equal(params(page).has("cohort"), false);
+  assert.equal(await page.locator(heatRows).count(), 48);
+  assert.equal(params(page).get("team"), "TUR");
+  assert.equal(params(page).get("compare"), "URU");
+  await page.keyboard.press("Escape");
+  assert.equal(params(page).has("team") || params(page).has("compare"), false);
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial5");
+  assert.equal(await page.locator("#ws-heat-sort").inputValue(), "dial5");
+  const unselected = page.url();
+  await page.keyboard.press("Escape");
+  assert.equal(page.url(), unselected, "Escape with no selection preserves the view");
+
+  await page.goto(base + "/#/styles?view=pairs&cohort=TUR,URU&pairRegion=95,100,5,6");
+  await page.locator("#ws-clear-pair-region").waitFor();
+  await page.keyboard.press("Escape");
+  assert.equal(params(page).has("pairRegion"), false);
+  assert.equal(params(page).get("view"), "pairs");
+  assert.deepEqual(await selectedRows(), cohort, "Clearing a pair region keeps the team cohort");
+  assert.equal(await page.locator("#ws-pairs .wp-dot:not(.is-out)").count(), 1);
+}
+
 async function touchDrag(session, start, end, beforeRelease) {
   await session.send("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [start]});
   for (let i = 1; i <= 6; i++) {
@@ -402,6 +447,7 @@ async function run() {
     }
 
     await page.setViewportSize({width:1440,height:900});
+    await checkEscape(page);
     await checkLinkedOrdering(page);
     await checkPairExplorer(page);
     await checkTeamRanks(page);
