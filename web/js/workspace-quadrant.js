@@ -30,6 +30,8 @@
       .attr("aria-label", "Fate Quadrant: style similarity percentile versus goal difference gap");
     const defs = svg.append("defs");
     const clipRect = defs.append("clipPath").attr("id", "fq-plot-clip").append("rect");
+    defs.append("clipPath").attr("id", "fq-flag-clip").attr("clipPathUnits", "objectBoundingBox")
+      .append("circle").attr("cx", 0.5).attr("cy", 0.5).attr("r", 0.5);
 
     const gGrid = svg.append("g").attr("class", "fq-grid");
     const gZone = svg.append("g").attr("class", "fq-zone").attr("clip-path", "url(#fq-plot-clip)");
@@ -99,6 +101,30 @@
       return d3.symbol(d3.symbolCircle, isA ? 50 : 20)();
     }
 
+    // Pair label as two round flags plus text, so fans recognise teams without three-letter codes.
+    function pairTag(px, py, a, b, text, { anchorEnd = false, strong = false } = {}) {
+      const g = gAnno.append("g").attr("class", `fq-pair-tag-g${strong ? " is-ab" : ""}`).attr("pointer-events", "none");
+      const label = g.append("text").attr("class", `fq-pair-tag${strong ? " is-ab" : ""}`)
+        .attr("y", 4).text(text);
+      App.i18n?.translate?.(label.node());
+      const tw = label.node().getComputedTextLength?.() || 60;
+      const fr = strong ? 8 : 7;
+      const flagsW = fr * 4 + 2;
+      const total = flagsW + 4 + tw;
+      const x0 = anchorEnd ? -total : 0;
+      g.append("rect").attr("x", x0 - 3).attr("y", -fr - 2).attr("width", total + 6).attr("height", fr * 2 + 4)
+        .attr("rx", fr + 2).attr("fill", "rgba(255,255,255,0.88)");
+      [a, b].forEach((id, k) => {
+        const cx = x0 + fr + k * (fr * 2 + 2);
+        g.append("image").attr("href", App.flagUrl(id)).attr("x", cx - fr).attr("y", -fr).attr("width", fr * 2).attr("height", fr * 2)
+          .attr("clip-path", "url(#fq-flag-clip)").attr("preserveAspectRatio", "xMidYMid slice");
+        g.append("circle").attr("cx", cx).attr("cy", 0).attr("r", fr).attr("fill", "none").attr("stroke", "rgba(36,51,58,0.25)");
+      });
+      label.raise().attr("x", x0 + flagsW + 4);
+      g.attr("transform", `translate(${px},${py})`);
+      return g;
+    }
+
     function draw(model, { animate = false } = {}) {
       currentModel = model;
       const { state } = model;
@@ -122,9 +148,10 @@
 
       const W = Math.max(240, canvasEl.clientWidth || 520);
       const H = Math.max(180, canvasEl.clientHeight || 280);
-      const m = { t: 24, r: 16, b: 32, l: 38 };
+      const m = { t: 26, r: 22, b: 36, l: 40 };
       svg.attr("viewBox", `0 0 ${W} ${H}`);
-      clipRect.attr("x", m.l).attr("y", m.t).attr("width", Math.max(10, W - m.l - m.r)).attr("height", Math.max(10, H - m.t - m.b));
+      // Let markers at 100% similarity or at the top of the scale render whole rather than half-clipped.
+      clipRect.attr("x", m.l - 8).attr("y", m.t - 8).attr("width", Math.max(10, W - m.l - m.r + 16)).attr("height", Math.max(10, H - m.t - m.b + 16));
 
       const xDom = state.pairRegion ? [Math.max(0, state.pairRegion[0]), Math.min(100, state.pairRegion[1])] : [0, 100];
       const yDom = state.pairRegion
@@ -374,11 +401,8 @@
           .attr("fill", "none").attr("stroke", C.ink).attr("stroke-width", 2.2);
         const anchorEnd = px > W - m.r - 110;
         const tagY = Math.max(m.t + 26, Math.min(H - m.b - 22, py - 12));
-        gAnno.append("text").attr("class", "fq-pair-tag is-ab").attr("translate", "no")
-          .attr("x", anchorEnd ? px - 13 : px + 13)
-          .attr("y", tagY)
-          .attr("text-anchor", anchorEnd ? "end" : "start")
-          .text(`${activePair.a}–${activePair.b} (${App.fix(activePair.sim, 1)}% · Δ${App.fix(activePair.gap, 2)})`);
+        pairTag(anchorEnd ? px - 15 : px + 15, tagY, activePair.a, activePair.b,
+          `${App.fix(activePair.sim, 1)}% alike · ${App.fix(activePair.gap, 2)} goals/m apart`, { anchorEnd, strong: true });
       } else if (hasA) {
         const aStar = orderedPairs.filter((p) => hasTeamA(p)).sort((u, v) => v.sim - u.sim);
         const picks = [];
@@ -390,11 +414,8 @@
           const px = x(p.sim), py = y(p.gap);
           if (placed.some(([ox, oy]) => Math.abs(px - ox) < 62 && Math.abs(py - oy) < 16)) continue;
           placed.push([px, py]);
-          const anchorEnd = px > W - m.r - 80;
-          gAnno.append("text").attr("class", "fq-pair-tag").attr("translate", "no")
-            .attr("x", anchorEnd ? px - 8 : px + 8).attr("y", Math.max(m.t + 24, py - 6))
-            .attr("text-anchor", anchorEnd ? "end" : "start")
-            .text(`${p.a}–${p.b}`);
+          const anchorEnd = px > W - m.r - 120;
+          pairTag(anchorEnd ? px - 10 : px + 10, Math.max(m.t + 24, py - 8), p.a, p.b, `${App.fix(p.gap, 2)}`, { anchorEnd });
         }
       } else if (starPairs.length) {
         const byGap = [...starPairs].sort((u, v) => v.gap - u.gap);
@@ -415,14 +436,11 @@
         const placed = [];
         for (const p of candidates) {
           const px = x(p.sim), py = y(p.gap);
-          const lx = px > W - m.r - 78 ? px - 8 : px + 8;
-          const ly = Math.max(m.t + 24, py - 6);
-          if (placed.some(([ox, oy]) => Math.abs(lx - ox) < 58 && Math.abs(ly - oy) < 14)) continue;
+          const lx = px - 10;
+          const ly = Math.max(m.t + 24, py);
+          if (placed.some(([ox, oy]) => Math.abs(lx - ox) < 80 && Math.abs(ly - oy) < 20)) continue;
           placed.push([lx, ly]);
-          gAnno.append("text").attr("class", "fq-pair-tag").attr("translate", "no")
-            .attr("x", lx).attr("y", ly)
-            .attr("text-anchor", px > W - m.r - 78 ? "end" : "start")
-            .text(`${p.a}–${p.b}`);
+          pairTag(lx, ly, p.a, p.b, `${App.fix(p.gap, 2)}`, { anchorEnd: true });
         }
       }
 

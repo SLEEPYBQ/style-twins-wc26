@@ -20,7 +20,6 @@
     "Press intensity": { label: "Pressures", short: "Pressures", unit: "per 50% opponent possession", zone: "mid", help: "Pressures per match, scaled to 50% opponent possession." },
   };
   App.indicator = (id) => indicators[id];
-  App.CORR_DIAL_ORDER = [0, 6, 4, 1, 8, 9, 5, 7, 2, 3];
   App.reducedMotion = () => Boolean(typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
   // Descriptive names summarize the stored full-tournament centroids.
   const groupLabels = {

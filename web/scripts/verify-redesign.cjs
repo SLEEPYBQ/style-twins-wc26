@@ -1,4 +1,4 @@
-// Playwright verification for Style Twins v3 (COMP6411D lecture-grounded upgrade).
+// Playwright verification for the Style Twins single-screen workspace (1920×1080 presentation target).
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const os = require("node:os");
@@ -88,24 +88,32 @@ async function assertDesktopBounds(page, label) {
   assert.equal(await page.locator("#sm-canvas .sm-node image").count(), 48, "Style Map must render 48 circular flags");
   assert.equal(await page.locator("#fq-canvas path.fq-mark.is-star").count(), 53, "Fate Quadrant must render 53 Gold star glyphs");
 
+  // The overview states a comparison (twins vs dissimilar pairs), not a share of a circular cohort.
   const fateText = await page.locator("#ws2-fate-body").innerText();
-  assert.match(fateText, /91%/, "Overview takeaway should show 91% chances & finishing");
-  assert.match(fateText, /9%/, "Overview takeaway should show 9% style & opponents");
-  assert.match(fateText, /53/, "Overview takeaway should show 53 high-similarity pairs");
+  assert.match(fateText, /explain \+0\.15 of a 1\.69 goal gap/, "Overview headline should compare style share for twins");
+  assert.match(fateText, /\+0\.77 of 2\.36/, "Overview should state the dissimilar-pair baseline");
+  assert.doesNotMatch(fateText, /\d+%\s+of the gap/, "Overview must not show circular percentage shares");
+  // Pair rows come only from the data-driven ★ cohort (≥90% similar, ≥1.0 gap); no author-picked pairs.
+  const caseMeta = await page.locator(".wf2-case-row").evaluateAll((rows) => rows.map((r) => ({
+    key: r.dataset.try,
+    sim: parseFloat(r.querySelectorAll(".wf2-case-meta")[0].textContent),
+    gap: parseFloat(r.querySelectorAll(".wf2-case-meta")[1].textContent),
+  })));
+  assert.equal(caseMeta.length, 53, "Overview lists all 53 ★ pairs");
+  assert.ok(caseMeta.every((c) => c.sim >= 90 && c.gap >= 1), "Every listed pair must belong to the ★ cohort");
+  assert.ok(!caseMeta.some((c) => /ESP-ARG|ARG-ESP/.test(c.key)), "ESP–ARG (44% similar) must not be injected");
+  // Negative contributions are drawn left of zero rather than clamped away.
+  const negSegments = await page.locator(".wf2-case-bar").evaluateAll((bars) => bars.filter((bar) => {
+    const zero = parseFloat(bar.querySelector("u").style.left);
+    return [...bar.querySelectorAll("i")].some((i) => parseFloat(i.style.left) < zero - 0.01 && parseFloat(i.style.width) > 0.01);
+  }).length);
+  assert.ok(negSegments >= 10, `Negative contributions must be visible (got ${negSegments} bars with a left segment)`);
   await page.screenshot({ path: path.join(OUT, "v3-overview-1920.png") });
 
-  // 2. Carryover slopegraph + ParCoords views
-  await page.locator('#ws2-fate-ctrl [data-omode="carryover"]').click();
-  await settle(page);
-  assert.equal(await page.locator(".wf2-slope-line").count(), 64, "Carryover renders 32 exec + 32 luck lines");
-  await page.screenshot({ path: path.join(OUT, "v3-carryover-1920.png") });
-  await page.locator('#ws2-fate-ctrl [data-omode="breakdown"]').click();
-
-  await page.locator('#ws2-dna-ctrl [data-dview="par"]').click();
-  await settle(page);
-  assert.equal(await page.locator("#dna-par-host path.dna-par-path").count(), 48, "ParCoords renders all 48 team polylines");
-  await page.screenshot({ path: path.join(OUT, "v3-parcoords-1920.png") });
-  await page.locator('#ws2-dna-ctrl [data-dview="matrix"]').click();
+  // 2. Removed modes stay removed (one encoding per panel).
+  for (const sel of ['[data-omode]', '[data-dview]', '[data-dcol]', '[data-lmode="ego"]', '[data-act="trail"]', '[data-vmode="conn"]', '[data-vmode="table"]']) {
+    assert.equal(await page.locator(sel).count(), 0, `${sel} control must not be rendered`);
+  }
 
   // 3. Playstyle Highlight (architects -> 4/10 dials) + Isolate verifying negative -0.13 without clamping
   await page.locator('#ws2-arch-pills [data-arch="architects"]').click();
@@ -134,20 +142,33 @@ async function assertDesktopBounds(page, label) {
   await settle(page);
   assert.equal(await page.locator('#sm-legend [data-act="clear-color"]').count(), 0);
 
-  // 5. Story Beat 2 (ESP vs TUR false-2D neighbor guard)
+  // 5. Story Beat 1/2: captions are computed from the live model and spotlight the panels they describe.
+  await page.locator('#ws2-story-nav [data-beat="1"]').click();
+  await settle(page, 300);
+  assert.deepEqual(
+    await page.locator(".ws2-panel.is-beat-focus").evaluateAll((els) => els.map((e) => e.dataset.panel)),
+    ["map", "dna"],
+    "Beat 1 spotlights the Style Map and Style DNA"
+  );
   await page.locator('#ws2-story-nav [data-beat="2"]').click();
-  await settle(page);
-  assert.match(await page.locator("#sm-readout").innerText(), /39\.7%|2D vs 10-dial guard/, "Beat 2 warns ESP-TUR is a 2D projection trap");
-  await page.screenshot({ path: path.join(OUT, "v3-beat2-trap-1920.png") });
+  await settle(page, 300);
+  const beat2 = await page.locator("#ws2-story-banner").innerText();
+  assert.match(beat2, /1\.60 for teams that play differently/, "Beat 2 states the dissimilar median gap");
+  assert.match(beat2, /0\.92 for style twins/, "Beat 2 states the twin median gap");
+  assert.match(beat2, /53 twin pairs/, "Beat 2 counts the ★ pairs");
+  await page.screenshot({ path: path.join(OUT, "v3-beat2-1920.png") });
 
-  // 6. Story Beat 3 (ECU vs USA + Timeline + pinned M34 v CUW dual tether + decreasing .tw2-sim widths)
+  // 6. Story Beat 3 (USA vs ECU + Timeline + decreasing .tw2-sim widths)
   await page.locator('#ws2-story-nav [data-beat="3"]').click();
-  await settle(page);
-  assert.equal(await page.locator(".dna-pin-row.is-a").getAttribute("data-team"), "ECU");
-  assert.equal(await page.locator(".dna-pin-row.is-b").getAttribute("data-team"), "USA");
+  await settle(page, 300);
+  assert.equal(await page.locator(".dna-pin-row.is-a").getAttribute("data-team"), "USA");
+  assert.equal(await page.locator(".dna-pin-row.is-b").getAttribute("data-team"), "ECU");
   assert.equal(await page.locator(".dna-diff-row").count(), 1);
-  assert.match(await page.locator(".sm-match-overlay").textContent(), /ECU v CUW/);
-  assert.equal(await page.locator(".sm-match-overlay line").count(), 2, "Match overlay draws dual tether to team and opponent");
+  assert.match(
+    await page.locator("#ws2-story-banner").innerText(),
+    /USA and Ecuador are 99\.7% alike, yet USA averaged 1\.10 more goals per match\.\s+Biggest factor:\s+Finishing vs xG\s+\(\+1\.90\)/,
+    "Beat 3 caption is computed from the selected pair"
+  );
   assert.ok((await page.locator("#wf2-timeline").count()) === 1, "Beat 3 defaults Panel 5 to G1..Gn Timeline");
   const simWidths = await page.locator(".tw2-sim-track i").evaluateAll((els) => els.map((e) => parseFloat(getComputedStyle(e).width)));
   assert.ok(simWidths.length >= 6 && simWidths[0] > simWidths[5] + 4, `Twin similarity bars must reflect magnitude (${simWidths[0]} > ${simWidths[5]})`);
@@ -162,6 +183,14 @@ async function assertDesktopBounds(page, label) {
   await page.locator('#ws2-fate-ctrl [data-vmode="beads"]').click();
   await settle(page);
   assert.equal(await page.locator(".wf2-bead").count(), 9, "ECU (4) + USA (5) = 9 match beads");
+
+  // DNA rows fill the panel at 1920×1080 without scrolling.
+  const dnaFill = await page.evaluate(() => {
+    const el = document.getElementById("dna-scroll");
+    return { sh: el.scrollHeight, ch: el.clientHeight, rowH: parseFloat(getComputedStyle(el).getPropertyValue("--dna-row-h")) };
+  });
+  assert.ok(dnaFill.rowH >= 13, `DNA rows should grow to fill the panel (row height ${dnaFill.rowH}px)`);
+  assert.ok(dnaFill.ch - dnaFill.sh < 60, `DNA should leave no large empty band (client ${dnaFill.ch}, content ${dnaFill.sh})`);
 
   // 7. Fate Quadrant Zoom ★ test + Reset
   await page.goto(`${BASE}/#/styles`, { waitUntil: "domcontentloaded" });
@@ -248,7 +277,7 @@ async function assertDesktopBounds(page, label) {
     caseRows: document.querySelectorAll(".wf2-case-row").length,
   }));
   assert.ok(overviewCounts.twinPairs >= 20, `Panel 2 Overview should list >= 20 star pairs, got ${overviewCounts.twinPairs}`);
-  assert.ok(overviewCounts.caseRows >= 4, `Panel 5 Overview should render >= 4 attribution case rows, got ${overviewCounts.caseRows}`);
+  assert.equal(overviewCounts.caseRows, 53, `Panel 5 Overview should list the 53 ★ pairs, got ${overviewCounts.caseRows}`);
 
   // Tall 2048x1280 Mac display check (Panel 2/3/5 fill without bottom blank voids)
   await page.setViewportSize({ width: 2048, height: 1280 });
@@ -303,14 +332,6 @@ async function assertDesktopBounds(page, label) {
   await page.locator('#ws2-map-ctrl [data-act="steer"]').click();
   await settle(page, 120);
 
-  // Check Carryover & Style->Real Chinese leaks
-  await page.locator('#ws2-fate-ctrl [data-omode="carryover"]').click();
-  await settle(page, 120);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Carryover must have zero English prose leaks");
-  await page.locator('#ws2-fate-ctrl [data-omode="slope"]').click();
-  await settle(page, 120);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Style->Real must have zero English prose leaks");
-
   // Check Story Beat 2 and Beat 3 in zh-Hans
   await page.locator('#ws2-story-nav [data-beat="2"]').click();
   await settle(page, 140);
@@ -320,17 +341,21 @@ async function assertDesktopBounds(page, label) {
   await settle(page, 160);
   assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 3 Timeline must have zero English prose leaks");
   await assertDesktopBounds(page, "1920x1080 zh-Hans Beat 3");
+  const zhDna = await page.evaluate(() => {
+    const el = document.getElementById("dna-scroll");
+    return { sh: el.scrollHeight, ch: el.clientHeight };
+  });
+  assert.ok(zhDna.sh <= zhDna.ch + 2, `zh-Hans Beat 3 DNA rows must fit after translation (${zhDna.sh} <= ${zhDna.ch})`);
+  assert.match(await page.locator("#fq-canvas .fq-pair-tag.is-ab").textContent(), /相似度/, "Quadrant pair tag is translated");
   await page.screenshot({ path: path.join(OUT, "fixed-zh-beat3.png") });
 
   await page.locator('#ws2-fate-ctrl [data-vmode="beads"]').click();
   await settle(page, 120);
   assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 3 Beads must have zero English prose leaks");
 
-  // Check ParCoords zh-Hans
-  await page.locator('#ws2-dna-ctrl [data-dview="par"]').click();
-  await settle(page, 120);
-  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans ParCoords must have zero English prose leaks");
-  await page.locator('#ws2-dna-ctrl [data-dview="matrix"]').click();
+  await page.locator('#ws2-story-nav [data-beat="4"]').click();
+  await settle(page, 160);
+  assert.deepEqual(await collectEnglishLeaks(), [], "zh-Hans Beat 4 must have zero English prose leaks");
 
   // Check Team A === Team B exclusion (阿根廷 cannot appear in Team B picker when A = 阿根廷)
   await page.goto(`${BASE}/#/styles?team=ARG`, { waitUntil: "domcontentloaded" });

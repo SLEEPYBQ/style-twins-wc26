@@ -574,7 +574,6 @@
     "ParCoords": ["平行坐标", "平行坐標"],
     "Pitch": ["球场三区", "球場三區"],
     "Corr": ["相关性", "相關性"],
-    "Gap": ["差异序", "差異序"],
     "Breakdown": ["结构分解", "結構分解"],
     "Carryover": ["阶段延续", "階段延續"],
     "Style→Real": ["预期→实际", "預期→實際"],
@@ -933,6 +932,66 @@
     "Network representation": ["网络视图切换", "網路視圖切換"],
     "Pass direction filter": ["传球方向筛选", "傳球方向篩選"],
     "Matrix seriation order": ["矩阵排序方式", "矩陣排序方式"],
+    // 1920×1080 presentation pass: story beats, comparative overview, list headers.
+    "{0} · Meet the {1} styles": ["{0} · 认识 {1} 支球队的打法", "{0} · 認識 {1} 支球隊的打法"],
+    "{0} · Same style, same result?": ["{0} · 打法相似，结果也相似吗？", "{0} · 打法相似，結果也相似嗎？"],
+    "{0} · Twins, opposite fates": ["{0} · 风格双胞胎，命运相反", "{0} · 風格雙胞胎，命運相反"],
+    "{0} · Why fates split": ["{0} · 差距从何而来", "{0} · 差距從何而來"],
+    "Each flag is a team, placed by {0} style dials; the heatmap shows the same dials. Playstyles run from Deep & direct to Final-third pressure.": [
+      "每面国旗是一支球队，位置由 {0} 个风格指标决定；热力图展示的是同一组指标。打法从“深守直攻”一直排到“前场施压”。",
+      "每面國旗是一支球隊，位置由 {0} 個風格指標決定；熱力圖展示的是同一組指標。打法從「深守直攻」一直排到「前場施壓」。"
+    ],
+    "Typical goal gap per match: {0} for teams that play differently (<{1} similar), {2} for style twins (≥{3}). Yet {4} twin pairs (★) still differ by ≥{5} goal per match.": [
+      "场均净胜球差的中位数：打法不同（相似度 <{1}）的组合为 {0}，风格双胞胎（≥{3}）为 {2}。但仍有 {4} 对双胞胎（★）每场相差 ≥{5} 球。",
+      "場均淨勝球差的中位數：打法不同（相似度 <{1}）的組合為 {0}，風格雙胞胎（≥{3}）為 {2}。但仍有 {4} 對雙胞胎（★）每場相差 ≥{5} 球。"
+    ],
+    "{0} and {1} are {2} alike, yet {3} averaged {4} more goals per match.": [
+      "{0} 与 {1} 的打法相似度达 {2}，但 {3} 场均净胜球多出 {4} 球。",
+      "{0} 與 {1} 的打法相似度達 {2}，但 {3} 場均淨勝球多出 {4} 球。"
+    ],
+    "Biggest factor:": ["最大原因：", "最大原因："],
+    "Across all twin pairs, compare the solid bars (twins) with the outlines (teams that play differently). Now pick your own team in the A / B boxes.": [
+      "看所有双胞胎组合：实心条是风格双胞胎，空心框是打法不同的组合。现在请在 A / B 框里选你自己的球队。",
+      "看所有雙胞胎組合：實心條是風格雙胞胎，空心框是打法不同的組合。現在請在 A / B 框裡選你自己的球隊。"
+    ],
+    "Style twins with different fates": ["风格相似、结果迥异", "風格相似、結果迥異"],
+    "Better team first": ["结果更好的球队在前", "結果更好的球隊在前"],
+    "Goal gap / match": ["场均净胜球差", "場均淨勝球差"],
+    "GD/m vs {0}": ["与 {0} 的场均净胜球差", "與 {0} 的場均淨勝球差"],
+    "Rows": ["行排序", "列排序"],
+    "Hover a column to colour the Style Map by it; click to sort by it.": ["悬停某列可按该指标给风格地图上色；点击则按该列排序。", "懸停某欄可按該指標為風格地圖上色；點擊則按該欄排序。"],
+    "Style twins: style & opponents explain": ["风格双胞胎：打法与对手只解释了", "風格雙胞胎：打法與對手只解釋了"],
+    "Style & opponents explain": ["打法与对手只解释了", "打法與對手只解釋了"],
+    "of a": ["，总差距为", "，總差距為"],
+    "goal gap per match.": ["球/场。", "球/場。"],
+    "Teams that play differently (<{0} similar, same ≥{1} gap):": ["打法不同的组合（相似度 <{0}，同样相差 ≥{1}）：", "打法不同的組合（相似度 <{0}，同樣相差 ≥{1}）："],
+    "of": ["，总差距", "，總差距"],
+    "· {0} pairs": ["· {0} 对", "· {0} 對"],
+    "Contribution to the gap (goals per match)": ["各因素对差距的贡献（球/场）", "各因素對差距的貢獻（球/場）"],
+    "Contribution to the goal gap per match": ["各因素对场均净胜球差的贡献", "各因素對場均淨勝球差的貢獻"],
+    "Twins ≥{0} ({1})": ["双胞胎 ≥{0}（{1}）", "雙胞胎 ≥{0}（{1}）"],
+    "Dissimilar <{0} ({1})": ["打法不同 <{0}（{1}）", "打法不同 <{0}（{1}）"],
+    "Goals vs xG: finishing & saves": ["进球对比 xG：射门与扑救", "進球對比 xG：射門與撲救"],
+    "Sim.": ["相似", "相似"],
+    "Gap": ["差距", "差距"],
+    "Contribution ({0} = no effect)": ["贡献（{0} = 无影响）", "貢獻（{0} = 無影響）"],
+    "Main driver": ["主因", "主因"],
+    "By match": ["逐场", "逐場"],
+    "{0} alike · {1} goals/m apart": ["相似度 {0} · 场均相差 {1} 球", "相似度 {0} · 場均相差 {1} 球"],
+    "Selected teams": ["已选球队", "已選球隊"],
+    "Playstyle spectrum": ["打法谱系", "打法譜系"],
+    "Twin links overlay": ["双胞胎连线", "雙胞胎連線"],
+    "Surprise sort": ["排序方式", "排序方式"],
+    "Sort Style DNA teams": ["风格 DNA 球队排序", "風格 DNA 球隊排序"],
+    "Evidence view": ["证据视图", "證據視圖"],
+    "Style Map of World Cup {0} teams": ["{0} 世界杯球队风格地图", "{0} 世界盃球隊風格地圖"],
+    "Fate Quadrant: style similarity percentile versus goal difference gap": ["命运象限：风格相似度百分位与净胜球差", "命運象限：風格相似度百分位與淨勝球差"],
+    "Solid teal link: twin has higher GD/m": ["实线：该双胞胎场均净胜球更高", "實線：該雙胞胎場均淨勝球更高"],
+    "Dashed slate link: twin has lower GD/m": ["虚线：该双胞胎场均净胜球更低", "虛線：該雙胞胎場均淨勝球更低"],
+    "Round by round cumulative expected versus actual goal difference": ["逐场累计预期与实际净胜球", "逐場累計預期與實際淨勝球"],
+    "Finishing vs xG across individual matches": ["各场比赛的临门一脚 (vs xG)", "各場比賽的臨門一腳 (vs xG)"],
+    "Chance prevention across individual matches": ["各场比赛的阻止机会", "各場比賽的阻止機會"],
+    "{0}:{1} variance explained: horizontal {2}, vertical {3} across {4} indicators": ["{0}:{1} 解释方差：横轴 {2}，纵轴 {3}（{4} 项指标）", "{0}:{1} 解釋變異：橫軸 {2}，縱軸 {3}（{4} 項指標）"],
   };
   for (const [k, [hs, ht]] of Object.entries(pairs)) {
     if (typeof hs === "string") {
@@ -942,6 +1001,15 @@
     if (typeof ht === "string") {
       if (M["zh-Hant"]) M["zh-Hant"][k] = ht;
       if (G?.["zh-Hant"] && (k === "Possession" || k === "Style Twins")) G["zh-Hant"][k] = ht;
+    }
+  }
+  // Map axis poles can read "Lower <indicator>" when no loading is positive enough.
+  const App = window.App;
+  for (const id of App?.dials || []) {
+    const short = App.indicator(id).short;
+    for (const [loc, prefix] of [["zh-Hans", "较低的"], ["zh-Hant", "較低的"]]) {
+      const local = G?.[loc]?.[short] ?? M[loc]?.[short];
+      if (M[loc] && typeof local === "string") M[loc][`Lower ${short}`] = `${prefix}${local}`;
     }
   }
 })();

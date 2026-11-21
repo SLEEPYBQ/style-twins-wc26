@@ -14,28 +14,70 @@
   const RECORD_BY_KEY = Object.fromEntries(A.records.map((r) => [r.key, r]));
   const num = (v) => (v != null && v !== "" && Number.isFinite(+v) ? +v : null);
 
+  // Presentation beats. Each caption is computed from the live model (see storyCaption), so
+  // the narration can never drift from what the panels show.
+  const BEAT_BASE = { match: null, comp: null, arch: "", cohort: null, pairRegion: null, dials: App.dials.slice(), weights: null, scope: "all", colorDial: null, heatSort: "spectrum", search: "", mapSteer: false };
   const STORY_BEATS = {
-    1: {
-      title: "Beat 1 · Global Paradox",
-      caption: "Across all 53 ★ style-twin pairs (≥90% similar, ≥1.0 GD/m gap), 91% of fate divergence is execution & finishing — only 9% is style or opponents.",
-      patch: { team: null, compare: null, match: null, comp: null, arch: "", cohort: null, pairRegion: null, dials: App.dials.slice(), weights: null, mapLinks: "stars", mapTrail: false, beat: 1 },
-    },
-    2: {
-      title: "Beat 2 · False 2D Neighbor vs. True Twin",
-      caption: "Spain & Turkey sit near each other visually in 2D, yet share only 39.7% 10-dial similarity (2D hides 2.42σ). Compare with true twins ECU vs. USA (99.7%).",
-      patch: { team: "ESP", compare: "TUR", match: null, comp: null, arch: "", cohort: null, pairRegion: null, dials: App.dials.slice(), weights: null, mapLinks: "off", mapTrail: false, beat: 2 },
-    },
-    3: {
-      title: "Beat 3 · Same Style, Opposite Fate (ECU vs. USA)",
-      caption: "99.7% identical tactics yet −1.10 GD/m gap: ECU built +2.16 xGD by Game 3 while actual GD dropped to 0 after M34 v Curaçao (−2.76 finishing).",
-      patch: { team: "ECU", compare: "USA", match: "2026-M034-ECU-CUW_ECU", comp: "c_finish", arch: "", cohort: null, pairRegion: null, dials: App.dials.slice(), weights: null, mapLinks: "off", mapTrail: true, beat: 3 },
-    },
-    4: {
-      title: "Beat 4 · Final & Open Exploration (ESP vs. ARG)",
-      caption: "Now explore live: inspect the World Cup Final, drag biplot spokes with Steer, brush ParCoords axes, or open any match in Match Lab.",
-      patch: { team: "ESP", compare: "ARG", match: null, comp: null, arch: "", cohort: null, pairRegion: null, dials: App.dials.slice(), weights: null, mapLinks: "off", mapTrail: false, beat: 4 },
-    },
+    1: { title: "1 · Meet the 48 styles", focus: ["map", "dna"], patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "off", beat: 1 } },
+    2: { title: "2 · Same style, same result?", focus: ["quad", "twins"], patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "stars", beat: 2 } },
+    3: { title: "3 · Twins, opposite fates", focus: ["fate", "map"], patch: { ...BEAT_BASE, team: "USA", compare: "ECU", comp: "c_finish", mapLinks: "off", beat: 3 } },
+    4: { title: "4 · Why fates split", focus: ["fate"], patch: { ...BEAT_BASE, team: null, compare: null, mapLinks: "stars", beat: 4 } },
   };
+
+  function median(values) {
+    const v = values.filter(Number.isFinite).sort((x, y) => x - y);
+    if (!v.length) return null;
+    const m = v.length >> 1;
+    return v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+  }
+
+  function scopePairs(model) {
+    const vis = new Set(model.visible);
+    const out = [];
+    for (const a of vis) {
+      for (const n of model.nearByTeam[a] || []) {
+        if (a >= n.id || !vis.has(n.id)) continue;
+        const ga = model.summaries[a]?.gd, gb = model.summaries[n.id]?.gd;
+        if (!Number.isFinite(ga) || !Number.isFinite(gb) || !Number.isFinite(n.sim)) continue;
+        out.push({ a, b: n.id, sim: n.sim * 100, gap: Math.abs(ga - gb) });
+      }
+    }
+    return out;
+  }
+
+  // Returns escaped HTML.
+  function storyCaption(beat, model) {
+    const s = model.state;
+    const pairs = scopePairs(model);
+    const twins = pairs.filter((p) => p.sim >= 90);
+    const stars = twins.filter((p) => p.gap >= 1);
+    const far = pairs.filter((p) => p.sim < 50);
+    const f2 = (v) => App.fix(v, 2);
+    if (beat === 1) {
+      const order = App.SPECTRUM_ORDER.map((id) => App.groupShort(id));
+      return esc(`Each flag is a team, placed by 10 style dials; the heatmap shows the same dials. Playstyles run from ${order[0]} to ${order.at(-1)}.`);
+    }
+    if (beat === 2) {
+      return esc(`Typical goal gap per match: ${f2(median(far.map((p) => p.gap)))} for teams that play differently (<50% similar), ${f2(median(twins.map((p) => p.gap)))} for style twins (≥90%). Yet ${stars.length} twin pairs (★) still differ by ≥1 goal per match.`);
+    }
+    if (beat === 3 && s.team && s.compare) {
+      const sa = model.summaries[s.team], sb = model.summaries[s.compare];
+      const sim = (model.nearByTeam[s.team] || []).find((n) => n.id === s.compare)?.sim;
+      const gm = sa && sb ? A.outcomeGap(sa, sb) : null;
+      if (!gm || gm.status !== "ok" || !Number.isFinite(sim)) return "";
+      const top = gm.steps.slice(0, 6).sort((u, v) => Math.abs(v.value) - Math.abs(u.value))[0];
+      const name = (id) => App.team[id].name;
+      // Split into spans so each piece is a stable translation key (the component label is translated on its own).
+      return [
+        `<span>${esc(`${name(s.team)} and ${name(s.compare)} are ${App.fix(sim * 100, 1)}% alike, yet ${name(s.team)} averaged ${f2(sa.gd - sb.gd)} more goals per match.`)}</span>`,
+        `<span>${esc("Biggest factor:")}</span>`,
+        `<b>${esc(top.label)}</b>`,
+        `<span translate="no">(${esc(App.signed(top.value, 2))})</span>`,
+      ].join(" ");
+    }
+    if (beat === 4) return esc("Across all twin pairs, compare the solid bars (twins) with the outlines (teams that play differently). Now pick your own team in the A / B boxes.");
+    return "";
+  }
 
   function pairRegionFrom(value) {
     if (!value) return null;
@@ -71,8 +113,7 @@
       pairRegion: pairRegionFrom(p.pairRegion),
       match: match && A.inScope(match, scope) ? match.key : null,
       comp: COMP_IDS.has(p.comp) ? p.comp : null,
-      mapLinks: ["off", "stars", "ego"].includes(p.mapLinks) ? p.mapLinks : (beat === 1 ? "stars" : "off"),
-      mapTrail: p.mapTrail === "1" || beat === 3,
+      mapLinks: ["off", "stars"].includes(p.mapLinks) ? p.mapLinks : (beat === 2 || beat === 4 ? "stars" : "off"),
       mapSteer: p.mapSteer === "1",
       beat,
       tableSort: ["name", "group", "n", "xgd", "gd"].includes(p.tableSort) ? p.tableSort : "gd",
@@ -97,7 +138,6 @@
       match: s.match || null,
       comp: s.comp || null,
       mapLinks: s.mapLinks && s.mapLinks !== "off" ? s.mapLinks : null,
-      mapTrail: s.mapTrail ? "1" : null,
       mapSteer: s.mapSteer ? "1" : null,
       beat: s.beat ? String(s.beat) : null,
     })}`;
@@ -146,10 +186,7 @@
       <div class="ws2-story-nav" id="ws2-story-nav" role="group" aria-label="Presentation story beats">
         <span class="ws2-bar-lbl">Story</span>
         <div class="ws2-seg">
-          <button type="button" data-beat="1" aria-pressed="false" title="Beat 1: Global Proof (91% vs 9%)">1</button>
-          <button type="button" data-beat="2" aria-pressed="false" title="Beat 2: False 2D Neighbor (ESP vs TUR)">2</button>
-          <button type="button" data-beat="3" aria-pressed="false" title="Beat 3: True Twins, Opposite Fate (ECU vs USA)">3</button>
-          <button type="button" data-beat="4" aria-pressed="false" title="Beat 4: Final & Live Exploration (ESP vs ARG)">4</button>
+          ${Object.entries(STORY_BEATS).map(([k, b]) => `<button type="button" data-beat="${k}" aria-pressed="false" title="${esc(b.title)}">${k}</button>`).join("")}
         </div>
       </div>
       <div class="ws2-pickers" role="region" aria-label="Selected teams">
@@ -248,13 +285,13 @@
       )) {
         next.beat = null;
       }
+      // Leaving a story beat also drops the ★ overlay it switched on, so the map returns to A/B twin links.
+      if (state.beat && !next.beat && !Object.prototype.hasOwnProperty.call(patch, "mapLinks")) next.mapLinks = "off";
       if (next.team && next.match) {
         const rec = RECORD_BY_KEY[next.match];
         const validTeamMatch = rec && (rec.team_id === next.team || rec.team_id === next.compare);
         if (!validTeamMatch && next.compare) next.match = null;
       }
-      if (!next.team && next.mapLinks === "ego") next.mapLinks = "off";
-      if (!next.team && next.mapTrail) next.mapTrail = false;
       const targetUrl = stateUrl(next);
       if (targetUrl === location.hash) {
         state = next;
@@ -391,9 +428,6 @@
           change({ heatSort: order });
         }
       },
-      onCohortBrush(ids) {
-        change({ cohort: ids && ids.length ? ids : null });
-      },
     });
 
     const quadView = App.workspaceQuadrant(q("#ws2-quad-body"), q("#ws2-quad-ctrl"), {
@@ -418,7 +452,6 @@
         change({ beat: null });
         return;
       }
-      if (bNum === 1) fateView.setOverviewMode("breakdown");
       if (bNum === 3) fateView.setViewMode("timeline");
       change(b.patch);
     };
@@ -439,7 +472,6 @@
       }
     };
     q("#ws2-reset").onclick = () => {
-      fateView.setOverviewMode("breakdown");
       fateView.setViewMode("beads");
       App.go("#/styles");
     };
@@ -591,7 +623,7 @@
         bannerEl.hidden = false;
         bannerEl.innerHTML = `
           <span class="ws2-story-badge">${esc(b.title)}</span>
-          <span class="ws2-story-cap">${esc(b.caption)}</span>
+          <span class="ws2-story-cap">${storyCaption(state.beat, model)}</span>
           <span class="ws2-story-acts">
             ${state.beat < 4 ? `<button type="button" class="ws2-mini-btn" data-next-beat="${state.beat + 1}">Next beat →</button>` : ""}
             <button type="button" class="ws2-mini-btn" data-close-beat="1" aria-label="Close story banner">×</button>
@@ -602,6 +634,10 @@
       } else {
         bannerEl.hidden = true;
       }
+      const wsEl = root.querySelector(".ws2");
+      const focus = state.beat ? STORY_BEATS[state.beat]?.focus || [] : [];
+      wsEl.classList.toggle("has-beat-focus", focus.length > 0);
+      wsEl.querySelectorAll(".ws2-panel").forEach((el) => el.classList.toggle("is-beat-focus", focus.includes(el.dataset.panel)));
 
       const nTeams = Object.keys(model.space.team).length;
       q("#ws2-scope-meta").textContent = `${nTeams} teams · ${model.scopeAvg.n / 2} matches`;
@@ -609,7 +645,7 @@
       const isDefault = !state.team && !state.compare && state.scope === "all" && !state.arch
         && !state.search && state.dials.length === App.dials.length && !state.weights && !state.cohort
         && !state.pairRegion && state.colorDial === null && state.heatSort === "spectrum"
-        && state.mapLinks === "off" && !state.mapTrail && !state.mapSteer && !state.beat;
+        && state.mapLinks === "off" && !state.mapSteer && !state.beat;
       q("#ws2-reset").hidden = isDefault;
 
       q("#ws2-arch-pills").querySelectorAll("button").forEach((b) => {
@@ -678,7 +714,7 @@
         const zoomBase = minTop8 >= 80 ? 80 : minTop8 >= 70 ? 70 : 0;
         ctrlEl.innerHTML = `<span class="ws2-badge-pill">${state.dials.length} dims · ${zoomBase}–100%</span>`;
 
-        bodyEl.innerHTML = `<ol class="tw2-list">
+        bodyEl.innerHTML = `<div class="tw2-head" aria-hidden="true"><span>#</span><span>Team</span><span>Style similarity</span><span>GD/m vs ${esc(state.team)}</span></div><ol class="tw2-list">
           ${rows.map((n) => {
             const simPct = n.sim * 100;
             const simBarW = zoomBase
@@ -711,7 +747,7 @@
       }
 
       // Overview mode: top style-twin surprises (linked to state.pairRegion!)
-      titleEl.textContent = "Biggest style-twin surprises";
+      titleEl.textContent = "Style twins with different fates";
       const visSet = new Set(visible);
       const region = state.pairRegion;
       const starPairs = [];
@@ -749,22 +785,22 @@
       }
 
       const maxStarGap = Math.max(1.5, ...topPairs.map((p) => p.gap));
-      bodyEl.innerHTML = `<ol class="tw2-pairs">
+      bodyEl.innerHTML = `<div class="tw2-head is-pairs" aria-hidden="true"><span>#</span><span>Better team first</span><span>Similarity</span><span>Goal gap / match</span></div><ol class="tw2-pairs">
         ${topPairs.map((p, idx) => {
           const wGap = (p.gap / maxStarGap) * 100;
           return `
           <li class="tw2-pair-row" data-team-a="${p.a}" data-team-b="${p.b}" tabindex="0">
             <span class="tw2-rank">${idx + 1}</span>
             <span class="tw2-pair-teams">
-              ${App.flag(p.a, 14)}<b>${esc(App.team[p.a].name)}</b>
-              <span class="tw2-vs">&gt;</span>
-              ${App.flag(p.b, 14)}<b>${esc(App.team[p.b].name)}</b>
+              ${App.flag(p.a, 16)}<b>${esc(App.team[p.a].name)}</b>
+              <span class="tw2-vs">vs</span>
+              ${App.flag(p.b, 16)}<b>${esc(App.team[p.b].name)}</b>
             </span>
             <span class="tw2-pair-metrics">
               <span class="tw2-sim-pill">${App.fix(p.sim, 1)}%</span>
               <span class="tw2-gap-mini" title="${esc(App.team[p.a].name)} outperformed ${esc(App.team[p.b].name)} by ${App.fix(p.gap, 2)} goals/match">
                 <span class="tw2-gap-track"><i style="width:${wGap.toFixed(1)}%"></i></span>
-                <b>+${App.fix(p.gap, 2)}/m</b>
+                <b>${App.fix(p.gap, 2)}</b>
               </span>
             </span>
           </li>`;
@@ -824,8 +860,7 @@
       App.tip.hide();
       if (state.beat !== lastEnteredBeat) {
         lastEnteredBeat = state.beat;
-        if (state.beat === 1) fateView.setOverviewMode("breakdown");
-        else if (state.beat === 3) fateView.setViewMode("timeline");
+        if (state.beat === 3) fateView.setViewMode("timeline");
       }
       const space = A.space(state.dials, state.scope, state.weights);
       const full = A.space(App.dials, state.scope);
@@ -899,6 +934,7 @@
     const redrawCharts = () => {
       if (!root.isConnected) return;
       mapView.redraw();
+      dnaView.redraw();
       quadView.redraw();
       fateView.redraw();
     };

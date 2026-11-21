@@ -1,6 +1,6 @@
 /* Panel 1: Exploratory Style Map with 1:1 Euclidean PCA scale, biplot spokes,
- * Dust & Magnet steering, Polar Loupe fan-out, centroid-bundled twin links,
- * match-by-match trajectories, and Heer & Robertson staged transitions. */
+ * Dust & Magnet steering, Polar Loupe fan-out, bundled ★ twin links and
+ * staged transitions. Playstyle names are placed in free space next to their centroid. */
 (function () {
   "use strict";
   const App = window.App;
@@ -64,15 +64,11 @@
     const defs = svg.append("defs");
     defs.append("clipPath").attr("id", "sm-flag-clip").attr("clipPathUnits", "objectBoundingBox")
       .append("circle").attr("cx", 0.5).attr("cy", 0.5).attr("r", 0.5);
-    defs.append("marker").attr("id", "sm-trail-arrow").attr("viewBox", "0 -3 7 6")
-      .attr("refX", 6).attr("refY", 0).attr("markerWidth", 5).attr("markerHeight", 5).attr("orient", "auto")
-      .append("path").attr("d", "M0,-3L7,0L0,3Z").attr("fill", C.ink2);
 
     const gGrid = svg.append("g").attr("class", "sm-grid");
     const gBiplot = svg.append("g").attr("class", "sm-biplot");
     const gLandmarks = svg.append("g").attr("class", "sm-landmarks").attr("pointer-events", "none");
     const gLinks = svg.append("g").attr("class", "sm-links");
-    const gTrail = svg.append("g").attr("class", "sm-trail");
     const gLoupeTethers = svg.append("g").attr("class", "sm-loupe-tethers").attr("pointer-events", "none");
     const gMotionGhosts = svg.append("g").attr("class", "sm-motion-ghosts").attr("pointer-events", "none");
     const gMatch = svg.append("g").attr("class", "sm-match-overlay").attr("pointer-events", "none");
@@ -97,27 +93,12 @@
     function linkModeOf(model) {
       return model?.state?.mapLinks || "off";
     }
-    function trailOn(model) {
-      return Boolean(model?.state?.mapTrail && model?.state?.team);
-    }
     function steerOn(model) {
       return Boolean(model?.state?.mapSteer);
     }
     function hasWeights(model) {
       const w = model?.state?.weights;
       return Boolean(w && Object.keys(w).length > 0);
-    }
-
-    function residualStats(model, aId, bId) {
-      const { pos, space, nearByTeam } = model;
-      if (!aId || !bId || !pos[aId] || !pos[bId] || !space.team[aId] || !space.team[bId]) return null;
-      const d2 = Math.hypot(pos[aId][0] - pos[bId][0], pos[aId][1] - pos[bId][1]);
-      const dFull = App.dist(space.team[aId], space.team[bId]);
-      const ortho = Math.sqrt(Math.max(0, dFull * dFull - d2 * d2));
-      const nItem = (nearByTeam[aId] || []).find((n) => n.id === bId);
-      const sim = nItem ? nItem.sim * 100 : 100;
-      const warn = sim < 85 && dFull > 0.5 && ortho / dFull > 0.62;
-      return { d2, dFull, ortho, sim, warn };
     }
 
     function computeScales(model, W, H, m) {
@@ -167,7 +148,6 @@
         const vy = pca ? Math.round((pca.vars[1] || 0) * 100) : 0;
         const lm = linkModeOf(model);
         const st = steerOn(model);
-        const tr = trailOn(model);
         const weighted = hasWeights(model);
         ctrlHost.innerHTML = `
           ${state.cohort ? `<button type="button" class="ws2-mini-btn" data-act="clear-cohort">Brush (${state.cohort.length}) ×</button>` : ""}
@@ -175,9 +155,7 @@
           <div class="wf2-seg" role="group" aria-label="Twin links overlay">
             <button type="button" data-lmode="off" aria-pressed="${lm === "off"}">Off</button>
             <button type="button" data-lmode="stars" aria-pressed="${lm === "stars"}">53 ★</button>
-            ${state.team ? `<button type="button" data-lmode="ego" aria-pressed="${lm === "ego"}">Ego</button>` : ""}
           </div>
-          ${state.team ? `<button type="button" class="ws2-mini-btn sm-mode-btn" data-act="trail" aria-pressed="${tr}" title="Show chronological 1..N match trajectory">Trail</button>` : ""}
           <button type="button" class="ws2-mini-btn sm-mode-btn" data-act="steer" aria-pressed="${st}" title="Drag tactic pills on the map to re-weight style dimensions">Steer</button>
           <span class="ws2-badge-pill" title="1:1 variance explained: horizontal ${vx}%, vertical ${vy}% across ${state.dials.length} indicators">X ${vx}% · Y ${vy}% · ${state.dials.length} dims</span>`;
 
@@ -188,8 +166,6 @@
         ctrlHost.querySelectorAll("[data-lmode]").forEach((btn) => {
           btn.onclick = () => onMapMode?.({ mapLinks: btn.dataset.lmode });
         });
-        const trailBtn = ctrlHost.querySelector('[data-act="trail"]');
-        if (trailBtn) trailBtn.onclick = () => onMapMode?.({ mapTrail: !tr });
         const steerBtn = ctrlHost.querySelector('[data-act="steer"]');
         if (steerBtn) steerBtn.onclick = () => onMapMode?.({ mapSteer: !st });
       }
@@ -210,21 +186,12 @@
           ? `<span>${esc(App.indicator(App.dials[activeColorDial]).short)} <b>${App.signed(full.team[focusId][activeColorDial], 2)}σ</b></span>`
           : "";
         const rankText = rankIdx >= 0 ? `<span>Twin <b>#${rankIdx + 1}</b> (${App.fix(near[rankIdx].sim * 100, 1)}%)</span>` : "";
-        const res = state.team && focusId !== state.team ? residualStats(model, state.team, focusId) : null;
-        const warnTag = res?.warn ? `<span class="sm-warn-pill">2D trap: ${App.fix(res.sim, 0)}% true sim</span>` : "";
-        readoutEl.innerHTML = `${App.flag(focusId, 14)}<b>${esc(t.name)}</b><span class="sm-sep">·</span><span>${esc(App.groupShort(t.archetype))}</span><span class="sm-sep">·</span><span>GD <b>${App.signed(s.gd, 2)}</b>/m (${s.n}m)</span>${rankText ? `<span class="sm-sep">·</span>${rankText}` : ""}${dialDetail ? `<span class="sm-sep">·</span>${dialDetail}` : ""}${warnTag}`;
+        readoutEl.innerHTML = `${App.flag(focusId, 14)}<b>${esc(t.name)}</b><span class="sm-sep">·</span><span>${esc(App.groupShort(t.archetype))}</span><span class="sm-sep">·</span><span>GD <b>${App.signed(s.gd, 2)}</b>/m (${s.n}m)</span>${rankText ? `<span class="sm-sep">·</span>${rankText}` : ""}${dialDetail ? `<span class="sm-sep">·</span>${dialDetail}` : ""}`;
         return;
       }
       if (liveBrushIds) {
         readoutEl.textContent = `Brushing ${liveBrushIds.size} teams — release to filter.`;
         return;
-      }
-      if (state.team && state.compare) {
-        const res = residualStats(model, state.team, state.compare);
-        if (res?.warn) {
-          readoutEl.innerHTML = `<span class="sm-warn-pill">2D vs ${state.dials.length}-dial guard</span><span>${esc(state.team)}–${esc(state.compare)} appear close in 2D (ortho <b>${App.fix(res.ortho, 2)}</b>σ), yet share only <b>${App.fix(res.sim, 1)}%</b> style similarity.</span>`;
-          return;
-        }
       }
       readoutEl.textContent = state.team
         ? "Click another flag to set B (Shift-click sets A). Hover dense clusters to fan out."
@@ -580,6 +547,23 @@
       gLandmarks.selectAll("*").remove();
       const mapCx = d3.mean(Object.keys(pos), (id) => x(pos[id][0])) ?? W / 2;
       const mapCy = d3.mean(Object.keys(pos), (id) => y(pos[id][1])) ?? H / 2;
+      const nodeXY = Object.keys(pos).map(P);
+      const placedLabels = [];
+      const freeLabelSpot = (cx, cy, w, h) => {
+        const clear = (tx, ty) => {
+          if (tx - w / 2 < m.l || tx + w / 2 > W - m.r || ty - h < m.t || ty + 3 > H - m.b) return false;
+          if (nodeXY.some(([px, py]) => px > tx - w / 2 - 17 && px < tx + w / 2 + 17 && py > ty - h - 16 && py < ty + 18)) return false;
+          return !placedLabels.some((b) => tx + w / 2 > b.x0 && tx - w / 2 < b.x1 && ty + 3 > b.y0 && ty - h < b.y1);
+        };
+        for (let r = 0; r <= 140; r += 6) {
+          for (let k = 0; k < (r ? 24 : 1); k++) {
+            const a = (k * Math.PI) / 12;
+            const tx = cx + r * 1.6 * Math.cos(a), ty = cy + r * Math.sin(a);
+            if (clear(tx, ty)) return [tx, ty];
+          }
+        }
+        return [cx, cy];
+      };
       const archCentroids = {};
       for (const archId of App.SPECTRUM_ORDER) {
         const members = App.arch[archId].members.filter((id) => pos[id]);
@@ -603,15 +587,15 @@
               .attr("stroke", C.ink2).attr("stroke-width", 1.3).attr("stroke-dasharray", "4 3");
           }
         }
-        // Push landmark slightly toward perimeter away from congested center so flags don't slice words
-        const pdx = cx - mapCx, pdy = cy - mapCy, plen = Math.hypot(pdx, pdy) || 1;
-        const push = archId === "allrounders" ? 28 : 18;
-        const lx = Math.max(m.l + 52, Math.min(W - m.r - 52, cx + (archId === "allrounders" ? 0 : (pdx / plen) * push)));
-        const ly = Math.max(m.t + 16, Math.min(H - m.b - 10, cy + (archId === "allrounders" ? 28 : (pdy / plen) * push) - (focused ? 18 : 14)));
-        gLandmarks.append("text")
+        // Place the playstyle name at the free spot nearest its centroid so no flag covers it.
+        const label = gLandmarks.append("text")
           .attr("class", focused ? "sm-landmark is-focus" : "sm-landmark")
-          .attr("x", lx).attr("y", ly).attr("text-anchor", "middle")
+          .attr("text-anchor", "middle")
           .text(App.groupShort(archId));
+        const tw = (label.node().getComputedTextLength?.() || 90) + 6;
+        const [lx, ly] = freeLabelSpot(cx, cy, tw, 13);
+        label.attr("x", lx).attr("y", ly);
+        placedLabels.push({ x0: lx - tw / 2, x1: lx + tw / 2, y0: ly - 13, y1: ly + 3 });
       }
 
       if (state.cohort && state.cohort.length >= 3) {
@@ -683,27 +667,6 @@
             .on("pointerleave", () => { highlight(null); App.tip.hide(); })
             .on("click", (ev) => { ev.stopPropagation(); choose(e.a, "A"); });
         }
-      } else if (lm === "ego" && state.team && pos[state.team]) {
-        const [ax, ay] = P(state.team);
-        const hop1 = twins.filter((id) => pos[id]);
-        for (const t1 of hop1) {
-          const [x1, y1] = P(t1);
-          const diff = (summaries[t1]?.gd ?? 0) - (summaries[state.team]?.gd ?? 0);
-          gLinks.append("line")
-            .attr("x1", ax).attr("y1", ay).attr("x2", x1).attr("y2", y1)
-            .attr("stroke", diff > 0.3 ? C.pos : diff < -0.3 ? C.muted : C.neutral)
-            .attr("stroke-width", t1 === state.compare ? 2.6 : 1.8)
-            .attr("stroke-dasharray", diff < -0.3 ? "4 3" : "none")
-            .attr("stroke-opacity", 0.85);
-          // 2-hop neighbors
-          const subTwins = (nearByTeam[t1] || []).slice(0, 3).map((n) => n.id).filter((id) => id !== state.team && !hop1.includes(id) && pos[id]);
-          for (const t2 of subTwins) {
-            const [x2, y2] = P(t2);
-            gLinks.append("line")
-              .attr("x1", x1).attr("y1", y1).attr("x2", x2).attr("y2", y2)
-              .attr("stroke", C.twin).attr("stroke-width", 1).attr("stroke-opacity", 0.32).attr("stroke-dasharray", "2 3");
-          }
-        }
       } else if (state.team && pos[state.team]) {
         const [ax, ay] = P(state.team);
         const gdA = summaries[state.team]?.gd ?? 0;
@@ -727,41 +690,6 @@
             .attr("stroke", C.ink2).attr("stroke-width", 1.8).attr("stroke-dasharray", "4 3").attr("stroke-opacity", 0.72)
             .attr("pointer-events", "none");
         }
-      }
-
-      // Match-by-match trajectory overlay (1..N) when Trail enabled
-      gTrail.selectAll("*").remove();
-      if (trailOn(model)) {
-        const trailTeams = [state.team, state.compare].filter((id) => id && pos[id]);
-        trailTeams.forEach((tid, sIdx) => {
-          const col = sIdx === 0 ? C.a : C.b;
-          const mRows = A.rows(tid, state.scope).sort((u, v) => u.number - v.number);
-          const pts = mRows
-            .filter((r) => space.match[r.key])
-            .map((r, k) => {
-              const pr = pca.project(space.match[r.key]);
-              return { row: r, idx: k + 1, xy: [x(pr[0]), y(pr[1])] };
-            });
-          if (pts.length >= 2) {
-            gTrail.append("path")
-              .attr("d", d3.line().curve(d3.curveCatmullRom.alpha(0.6))(pts.map((p) => p.xy)))
-              .attr("fill", "none").attr("stroke", col).attr("stroke-width", 1.6)
-              .attr("stroke-opacity", 0.65).attr("marker-end", "url(#sm-trail-arrow)").attr("pointer-events", "none");
-          }
-          pts.forEach((p) => {
-            const gPt = gTrail.append("g").attr("transform", `translate(${p.xy})`).style("cursor", "pointer");
-            gPt.append("circle").attr("r", 6.5).attr("fill", "#ffffff").attr("stroke", col).attr("stroke-width", 1.5);
-            gPt.append("text").attr("text-anchor", "middle").attr("dy", "0.35em")
-              .attr("font-size", 8.5).attr("font-weight", 750).attr("fill", col).attr("translate", "no")
-              .text(p.idx);
-            gPt.on("pointerenter", (ev) => {
-              highlight([p.row.team_id, p.row.opp_id]);
-              App.tip.show(`<div class="tt-title">M${p.row.number} · ${esc(p.row.team_id)} ${p.row.goals}–${p.row.goals_opp} ${esc(p.row.opp_id)}</div><div class="tt-dim">${esc(p.row.stage)} · Match #${p.idx} in trajectory</div>`, ev);
-            }).on("pointermove", (ev) => App.tip.move(ev))
-              .on("pointerleave", () => { highlight(null); App.tip.hide(); })
-              .on("click", (ev) => { ev.stopPropagation(); onSelectMatch?.(p.row.key); });
-          });
-        });
       }
 
       // Dual-tether Match Overlay Diamond (tethered to BOTH team_id and opp_id)
@@ -912,13 +840,12 @@
         highlight([id]);
         const s = summaries[id];
         if (s) {
-          const res = state.team && id !== state.team ? residualStats(currentModel, state.team, id) : null;
-          const resRow = res ? [["10d style sim", `${App.fix(res.sim, 1)}%`]] : [];
+          const simToA = state.team && id !== state.team ? (nearByTeam[state.team] || []).find((n) => n.id === id)?.sim : null;
+          const resRow = Number.isFinite(simToA) ? [[`Similarity to ${state.team}`, `${App.fix(simToA * 100, 1)}%`]] : [];
           App.tip.show(
             `<div class="tt-title">${App.flag(id, 16)} ${esc(App.team[id].name)}</div>` +
             `<div class="tt-dim">${esc(App.groupShort(App.team[id].archetype))}</div>` +
-            App.ttRows([["Goal diff. / m", App.signed(s.gd, 2)], ["xG diff. / m", App.signed(s.xgd, 2)], ["Matches", s.n], ...resRow]) +
-            (res?.warn ? `<div class="tt-warn">2D close, ${state.dials.length}-dial differs (ortho ${App.fix(res.ortho, 2)} σ)</div>` : ""),
+            App.ttRows([["Goal diff. / m", App.signed(s.gd, 2)], ["xG diff. / m", App.signed(s.xgd, 2)], ["Matches", s.n], ...resRow]),
             e
           );
         }

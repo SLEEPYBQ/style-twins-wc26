@@ -1,6 +1,5 @@
-/* Panel 3: Style DNA — Full-48 TableLens Matrix + Diverging Bars + Parallel Coordinates.
- * Supports 3-zone schematic pitch strip, Yang '03 similarity column ordering,
- * outcome columns (xGD/m, GD/m, LineUp score), sticky A/B/A-B focus rows, and FLIP reorder. */
+/* Panel 3: Style DNA — full-48 heatmap (TableLens-style) with a fixed 3-zone pitch column order,
+ * outcome columns (xGD/m, GD/m, LineUp score), sticky A / B / A − B focus rows and FLIP row reordering. */
 (function () {
   "use strict";
   const App = window.App;
@@ -10,24 +9,13 @@
   const PITCH_ORDER = [1, 7, 0, 2, 3, 6, 8, 9, 4, 5]; // Own Box (2) | Midfield (6) | Opp Box (2)
   const validSortKeys = ["spectrum", "near", "pc1", "pc2", "lineup", "gd", "xgd", ...App.dials.map((_, i) => `dial${i}`)];
 
-  App.workspaceDna = function (bodyHost, ctrlHost, { choose, sortBy, highlight, previewDial, onCohortBrush }) {
+  App.workspaceDna = function (bodyHost, ctrlHost, { choose, sortBy, highlight, previewDial }) {
     ctrlHost.innerHTML = `
-      <div class="wf2-seg" id="dna-view-seg" role="group" aria-label="DNA view mode">
-        <button type="button" data-dview="matrix" aria-pressed="true">Matrix</button>
-        <button type="button" data-dview="bars" aria-pressed="false">Bars</button>
-        <button type="button" data-dview="par" aria-pressed="false">ParCoords</button>
-      </div>
-      <div class="wf2-seg" id="dna-col-seg" role="group" aria-label="Column grouping">
-        <button type="button" data-dcol="pitch" aria-pressed="true" title="3-zone pitch order (Own → Midfield → Opp)">Pitch</button>
-        <button type="button" data-dcol="corr" aria-pressed="false" title="Correlated metrics clustered together (Yang '03)">Corr</button>
-        <button type="button" data-dcol="gap" aria-pressed="false" title="Order columns by |A − B| difference">Gap</button>
-      </div>
-      <span id="dna-sort-host"></span>`;
+      <span class="dna-sort-lbl">Rows</span><span id="dna-sort-host"></span>`;
 
     bodyHost.innerHTML = `
       <div class="dna-scroll" id="dna-scroll" tabindex="0" aria-label="Style DNA Heatmap">
         <table class="dna-table"><thead id="dna-thead"></thead><tbody id="dna-tbody"></tbody></table>
-        <div class="dna-par-host" id="dna-par-host" hidden></div>
       </div>
       <div class="dna-foot">
         <div class="dna-readout" id="dna-readout" aria-live="polite"></div>
@@ -36,18 +24,14 @@
 
     const sortHost = ctrlHost.querySelector("#dna-sort-host");
     const scrollEl = bodyHost.querySelector("#dna-scroll");
-    const tableEl = bodyHost.querySelector(".dna-table");
     const thead = bodyHost.querySelector("#dna-thead");
     const tbody = bodyHost.querySelector("#dna-tbody");
-    const parHost = bodyHost.querySelector("#dna-par-host");
     const readoutEl = bodyHost.querySelector("#dna-readout");
     const info = App.dials.map((id) => App.indicator(id));
 
     let currentModel = null;
     let canRank = null;
     let pickSort = null;
-    let viewMode = "matrix"; // "matrix" | "bars" | "par"
-    let colMode = "pitch";   // "pitch" | "corr" | "gap"
     let rawMeans = {};
     let lineupScores = {};
     let hoveredList = [];
@@ -113,37 +97,6 @@
         };
       }
 
-      if (colMode === "corr") {
-        const cols = App.CORR_DIAL_ORDER.slice();
-        return {
-          cols,
-          groups: [
-            { label: "Positional · Press (Yang '03)", span: 7, cls: "is-zone-mid", zone: "mid" },
-            { label: "Direct · Deep", span: 3, cls: "dna-split is-zone-own", zone: "own" },
-          ],
-          splitSet: new Set([cols[7]]),
-          activeSet: new Set(cols),
-        };
-      }
-
-      if (colMode === "gap" && state.team && full.team[state.team]) {
-        const bId = state.compare || model.near[0]?.id;
-        if (bId && full.team[bId]) {
-          const cols = [...Array(10).keys()].sort((u, v) =>
-            Math.abs(full.team[state.team][v] - full.team[bId][v]) - Math.abs(full.team[state.team][u] - full.team[bId][u])
-          );
-          return {
-            cols,
-            groups: [
-              { label: `Largest |${state.team} − ${bId}| differences`, span: 5, cls: "is-active-grp", zone: "" },
-              { label: "Closest indicators", span: 5, cls: "dna-split is-muted-grp", zone: "" },
-            ],
-            splitSet: new Set([cols[5]]),
-            activeSet: new Set(cols),
-          };
-        }
-      }
-
       // Default 3-Zone Schematic Pitch order
       const cols = PITCH_ORDER.slice();
       return {
@@ -207,11 +160,7 @@
         isSplit ? "dna-split" : "",
         !isActive ? "is-muted" : "",
         isColored ? "is-colored-col" : "",
-        viewMode === "bars" ? "is-bar-cell" : "",
       ].filter(Boolean).join(" ");
-      if (viewMode === "bars") {
-        return `<td class="${cls}" data-dial-idx="${colIdx}" data-z="${z}" data-raw="${rawVal}">${microBarInner(z, 2.3)}</td>`;
-      }
       const txt = inlineNum && Number.isFinite(z)
         ? `<span class="dna-pin-z" style="color:${Math.abs(z) > 1.15 ? "#ffffff" : "#24333a"}">${App.signed(z, 1)}</span>`
         : "";
@@ -246,6 +195,9 @@
       </tr>`;
     }
 
+    // A − B numbers take the colour of the side they favour (A blue, B red); near-zero stays neutral.
+    const diffCls = (d) => (d >= 0.25 ? "is-fav-a" : d <= -0.25 ? "is-fav-b" : "");
+
     function diffRowHtml(aId, bId, cols, colMeta, full, summaries, showLineup, maxLu) {
       const zA = full.team[aId], zB = full.team[bId];
       if (!zA || !zB) return "";
@@ -260,11 +212,11 @@
             colMeta.splitSet.has(idx) ? "dna-split" : "",
             !colMeta.activeSet.has(idx) ? "is-muted" : "",
           ].filter(Boolean).join(" ");
-          return `<td class="${cls}" data-dial-idx="${idx}" data-diff="${d}" translate="no">${microBarInner(d, 2.5, "is-a", "is-b")}<b>${App.signed(d, 1)}</b></td>`;
+          return `<td class="${cls} ${diffCls(d)}" data-dial-idx="${idx}" data-diff="${d}" translate="no"><b>${App.signed(d, 1)}</b></td>`;
         }).join("")}
-        <td class="dna-out-cell dna-split" data-outcome="xgd" data-diff="${dXgd}" translate="no">${microBarInner(dXgd, 2.8, "is-a", "is-b")}<b>${App.signed(dXgd, 1)}</b></td>
-        <td class="dna-out-cell" data-outcome="gd" data-diff="${dGd}" translate="no">${microBarInner(dGd, 3.2, "is-a", "is-b")}<b>${App.signed(dGd, 1)}</b></td>
-        ${showLineup ? `<td class="dna-out-cell" data-outcome="lineup" data-diff="${dLu}" translate="no">${microBarInner(dLu, maxLu || 1.5, "is-a", "is-b")}<b>${App.signed(dLu, 1)}</b></td>` : ""}
+        <td class="dna-out-cell dna-split ${diffCls(dXgd)}" data-outcome="xgd" data-diff="${dXgd}" translate="no"><b>${App.signed(dXgd, 1)}</b></td>
+        <td class="dna-out-cell ${diffCls(dGd)}" data-outcome="gd" data-diff="${dGd}" translate="no"><b>${App.signed(dGd, 1)}</b></td>
+        ${showLineup ? `<td class="dna-out-cell ${diffCls(dLu)}" data-outcome="lineup" data-diff="${dLu}" translate="no"><b>${App.signed(dLu, 1)}</b></td>` : ""}
       </tr>`;
     }
 
@@ -289,10 +241,8 @@
       if (!id || !App.team[id]) {
         if (liveBrushIds) {
           readoutEl.textContent = `Showing ${liveBrushIds.size} brushed teams.`;
-        } else if (viewMode === "par") {
-          readoutEl.textContent = "ParCoords: drag vertically on any axis to brush · dashed = A/B matches.";
         } else {
-          readoutEl.textContent = "Hover a column to preview tint on Style Map; click to sort & lock tint.";
+          readoutEl.textContent = "Hover a column to colour the Style Map by it; click to sort by it.";
         }
         return;
       }
@@ -313,151 +263,6 @@
       }
     }
 
-    function drawParCoords(model, ids, cols) {
-      parHost.innerHTML = "";
-      const W = Math.max(360, scrollEl.clientWidth - 4 || 520);
-      const H = Math.max(260, scrollEl.clientHeight - 6 || 680);
-      const m = { t: 48, r: 22, b: 28, l: 22 };
-      const { state, full, summaries, twins } = model;
-
-      const dims = [
-        ...cols.map((idx) => ({
-          key: `dial${idx}`,
-          label: info[idx].short,
-          domain: [-2.5, 2.5],
-          active: state.dials.includes(App.dials[idx]),
-          val: (id) => full.team[id]?.[idx] ?? 0,
-          matchVal: (r) => {
-            const sp = full.match[r.key];
-            return sp ? sp[idx] : null;
-          },
-        })),
-        { key: "xgd", label: "xGD/m", domain: [-2.6, 2.6], active: true, val: (id) => summaries[id]?.xgd ?? 0 },
-        { key: "gd", label: "GD/m", domain: [-3.0, 3.0], active: true, val: (id) => summaries[id]?.gd ?? 0 },
-      ];
-
-      const x = d3.scalePoint().domain(dims.map((d) => d.key)).range([m.l, W - m.r]).padding(0.25);
-      const yScales = Object.fromEntries(dims.map((d) => [d.key, d3.scaleLinear().domain(d.domain).clamp(true).range([H - m.b, m.t])]));
-      const lineGen = d3.line().defined(([, py]) => Number.isFinite(py));
-
-      const svg = d3.select(parHost).append("svg")
-        .attr("class", "dna-par-svg")
-        .attr("viewBox", `0 0 ${W} ${H}`)
-        .attr("role", "img")
-        .attr("aria-label", "Parallel Coordinates style profile across all 10 tactical dimensions and outcomes");
-
-      // Zero horizontal baseline
-      svg.append("line").attr("x1", m.l).attr("x2", W - m.r).attr("y1", yScales.gd(0)).attr("y2", yScales.gd(0))
-        .attr("stroke", "#d7dfdc").attr("stroke-dasharray", "3 3");
-
-      // Optional archetype IQR band when an archetype is focused
-      if (state.arch) {
-        const archIds = App.arch[state.arch].members.filter((id) => full.team[id]);
-        if (archIds.length >= 3) {
-          const bandPts = dims.map((d) => {
-            const vals = archIds.map((id) => d.val(id)).filter(Number.isFinite).sort(d3.ascending);
-            return { x: x(d.key), q25: yScales[d.key](d3.quantile(vals, 0.25)), q75: yScales[d.key](d3.quantile(vals, 0.75)) };
-          });
-          svg.append("path")
-            .attr("d", d3.area().x((p) => p.x).y0((p) => p.q75).y1((p) => p.q25)(bandPts))
-            .attr("fill", "rgba(36, 51, 58, 0.08)");
-        }
-      }
-
-      const idSet = new Set(ids);
-      const gLines = svg.append("g").attr("class", "dna-par-lines");
-      const allIds = Object.keys(full.team).sort((u, v) => {
-        const rank = (k) => k === state.team ? 4 : k === state.compare ? 3 : twins.includes(k) ? 2 : idSet.has(k) ? 1 : 0;
-        return rank(u) - rank(v);
-      });
-
-      const activeBrushes = new Map();
-      const applyAxisBrushes = () => {
-        if (!activeBrushes.size) return null;
-        return allIds.filter((id) => {
-          for (const [key, [lo, hi]] of activeBrushes.entries()) {
-            const dim = dims.find((d) => d.key === key);
-            const v = dim.val(id);
-            if (!Number.isFinite(v) || v < lo || v > hi) return false;
-          }
-          return true;
-        });
-      };
-
-      const paths = gLines.selectAll("path.dna-par-path")
-        .data(allIds, (id) => id)
-        .join("path")
-        .attr("class", (id) => `dna-par-path ${id === state.team ? "is-a" : id === state.compare ? "is-b" : ""}`)
-        .attr("data-team", (id) => id)
-        .attr("d", (id) => lineGen(dims.map((d) => [x(d.key), yScales[d.key](d.val(id))])))
-        .attr("fill", "none")
-        .attr("stroke", (id) => id === state.team ? "#24639a" : id === state.compare ? "#b44e32" : twins.includes(id) && state.team ? "#1c736f" : "#6c7c83")
-        .attr("stroke-width", (id) => (id === state.team || id === state.compare) ? 2.6 : twins.includes(id) && state.team ? 1.6 : 1.05)
-        .attr("stroke-opacity", (id) => {
-          if (id === state.team || id === state.compare) return 0.96;
-          if (!idSet.has(id)) return 0.06;
-          if (state.team && twins.includes(id)) return 0.72;
-          return state.team ? 0.14 : 0.24;
-        });
-
-      // Chameleon per-match variance polylines for A and B
-      [state.team, state.compare].filter(Boolean).forEach((tid, idx) => {
-        const col = idx === 0 ? "#24639a" : "#b44e32";
-        const mRows = A.rows(tid, state.scope);
-        for (const r of mRows) {
-          const pts = dims.slice(0, cols.length).map((d) => {
-            const mv = d.matchVal ? d.matchVal(r) : null;
-            return [x(d.key), Number.isFinite(mv) ? yScales[d.key](mv) : NaN];
-          });
-          svg.append("path")
-            .attr("d", lineGen(pts))
-            .attr("fill", "none").attr("stroke", col).attr("stroke-width", 0.9)
-            .attr("stroke-opacity", 0.24).attr("stroke-dasharray", "3 2").attr("pointer-events", "none");
-        }
-      });
-
-      paths.on("pointerenter", (e, id) => {
-        highlight([id]);
-        d3.select(e.currentTarget).attr("stroke-opacity", 1).attr("stroke-width", 2.6).raise();
-        const s = summaries[id];
-        readoutEl.innerHTML = `${App.flag(id, 13)}<b>${esc(App.team[id].name)}</b><span class="sm-sep">·</span><span>${esc(App.groupShort(App.team[id].archetype))}</span><span class="sm-sep">·</span><span>GD <b>${App.signed(s?.gd, 2)}</b>/m · Chameleon <b>${App.fix(App.team[id].chameleon, 2)}</b></span>`;
-      }).on("pointerleave", (_, id) => {
-        highlight(null);
-        d3.select(`path.dna-par-path[data-team="${id}"]`)
-          .attr("stroke-opacity", id === state.team || id === state.compare ? 0.96 : idSet.has(id) ? (state.team ? 0.14 : 0.24) : 0.06)
-          .attr("stroke-width", (id === state.team || id === state.compare) ? 2.6 : 1.05);
-        updateReadout(null, null);
-      }).on("click", (e, id) => {
-        e.stopPropagation();
-        choose(id, e.shiftKey ? "A" : undefined);
-      });
-
-      // Vertical axes + labels + d3.brushY cross-filtering
-      const gAxes = svg.append("g").attr("class", "dna-par-axes");
-      dims.forEach((d) => {
-        const ax = x(d.key);
-        const yS = yScales[d.key];
-        const gAx = gAxes.append("g").attr("transform", `translate(${ax},0)`);
-        gAx.append("line").attr("y1", m.t).attr("y2", H - m.b).attr("stroke", d.active ? "#7b8a91" : "#cfd6d3").attr("stroke-width", d.active ? 1.2 : 0.9);
-        gAx.append("text").attr("class", `dna-par-lbl ${d.active ? "" : "is-muted"}`).attr("y", m.t - 8)
-          .attr("transform", `rotate(-32, 0, ${m.t - 8})`).attr("text-anchor", "start")
-          .text(d.label);
-        gAx.append("text").attr("class", "dna-par-tick").attr("y", m.t + 8).attr("x", 3).text(d.key.startsWith("dial") ? "+2.5" : `+${d.domain[1]}`);
-        gAx.append("text").attr("class", "dna-par-tick").attr("y", H - m.b - 2).attr("x", 3).text(d.key.startsWith("dial") ? "−2.5" : `${d.domain[0]}`);
-
-        const brushY = d3.brushY()
-          .extent([[-10, m.t], [10, H - m.b]])
-          .on("end", ({ selection, sourceEvent }) => {
-            if (!sourceEvent) return;
-            if (!selection || Math.abs(selection[1] - selection[0]) < 5) activeBrushes.delete(d.key);
-            else activeBrushes.set(d.key, [yS.invert(selection[1]), yS.invert(selection[0])]);
-            const brushed = applyAxisBrushes();
-            if (onCohortBrush) onCohortBrush(brushed && brushed.length ? brushed : null);
-          });
-        gAx.append("g").attr("class", "dna-par-brush").call(brushY);
-      });
-    }
-
     function render(model) {
       currentModel = model;
       liveBrushIds = null;
@@ -472,13 +277,6 @@
       if (order === "near" && !hasRank) order = "spectrum";
       if (pickSort) pickSort.value = order;
 
-      // Update view/col mode pills
-      ctrlHost.querySelectorAll("[data-dview]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.dview === viewMode)));
-      ctrlHost.querySelectorAll("[data-dcol]").forEach((b) => {
-        b.setAttribute("aria-pressed", String(b.dataset.dcol === colMode));
-        b.disabled = state.dials.length < 10 || viewMode === "par";
-      });
-
       const { cols, groups, splitSet, activeSet } = orderedColumns(model);
       const colMeta = { splitSet, activeSet, colored: model.activeColorDial };
       const ids = sortTeams(visible, order, model);
@@ -490,17 +288,6 @@
         const rows = A.rows(id, state.scope);
         if (rows.length) rawMeans[id] = App.dials.map((_, i) => d3.mean(rows, (r) => r.dials[i]));
       }
-
-      if (viewMode === "par") {
-        tableEl.hidden = true;
-        parHost.hidden = false;
-        drawParCoords(model, ids, cols);
-        updateReadout(null, null);
-        return;
-      }
-
-      tableEl.hidden = false;
-      parHost.hidden = true;
 
       // Capture old Y positions for FLIP animation
       const prevScroll = scrollEl.scrollTop;
@@ -605,8 +392,24 @@
         });
       }
 
+      fitRows();
+      // Translation can change the header height after this frame; size the rows again once it settles.
+      requestAnimationFrame(fitRows);
       applyHoverStyles();
       updateReadout(null, null);
+    }
+
+    // Size rows so every visible team fits the panel without scrolling (scrolling remains the fallback).
+    function fitRows() {
+      const nTeams = tbody.querySelectorAll("tr.dna-team-row, tr.dna-mean-row").length;
+      const nGroups = tbody.querySelectorAll("tr.dna-group-row").length;
+      if (!nTeams) return;
+      const avail = scrollEl.clientHeight - thead.offsetHeight - 2;
+      const grpH = 16;
+      const rowH = Math.max(12, Math.min(24, Math.floor((avail - nGroups * grpH) / nTeams)));
+      scrollEl.style.setProperty("--dna-row-h", `${rowH}px`);
+      scrollEl.style.setProperty("--dna-grp-h", `${grpH}px`);
+      scrollEl.style.setProperty("--dna-font", `${Math.min(13, Math.max(10, rowH - 3))}px`);
     }
 
     function applyHoverStyles() {
@@ -614,15 +417,12 @@
       bodyHost.querySelectorAll("tr[data-team]").forEach((tr) => {
         tr.classList.toggle("is-hover", set.has(tr.dataset.team));
       });
-      parHost.querySelectorAll("path.dna-par-path").forEach((p) => {
-        p.classList.toggle("is-hover", set.has(p.dataset.team));
-      });
     }
 
     function setHovered(ids) {
       hoveredList = Array.isArray(ids) ? ids.filter(Boolean) : [];
       applyHoverStyles();
-      if (viewMode !== "par" && hoveredList.length === 1) {
+      if (hoveredList.length === 1) {
         const tr = tbody.querySelector(`tr[data-team="${hoveredList[0]}"]`);
         if (tr && !tr.matches(":hover")) {
           const box = scrollEl.getBoundingClientRect();
@@ -639,14 +439,6 @@
 
     function previewRegion(ids) {
       liveBrushIds = ids ? new Set(ids) : null;
-      if (viewMode === "par") {
-        parHost.querySelectorAll("path.dna-par-path").forEach((p) => {
-          const show = !liveBrushIds || liveBrushIds.has(p.dataset.team);
-          p.style.opacity = show ? "" : "0.06";
-        });
-        updateReadout(null, null);
-        return;
-      }
       const rows = tbody.querySelectorAll("tr.dna-team-row");
       rows.forEach((tr) => {
         tr.hidden = liveBrushIds ? !liveBrushIds.has(tr.dataset.team) : false;
@@ -663,18 +455,6 @@
       updateReadout(null, null);
     }
 
-    ctrlHost.querySelectorAll("[data-dview]").forEach((b) => {
-      b.onclick = () => {
-        viewMode = b.dataset.dview;
-        if (currentModel) render(currentModel);
-      };
-    });
-    ctrlHost.querySelectorAll("[data-dcol]").forEach((b) => {
-      b.onclick = () => {
-        colMode = b.dataset.dcol;
-        if (currentModel) render(currentModel);
-      };
-    });
 
     thead.addEventListener("pointerover", (e) => {
       const th = e.target.closest("th[data-dial-idx]");
@@ -733,6 +513,6 @@
       if (tr) choose(tr.dataset.team, e.shiftKey ? "A" : undefined);
     });
 
-    return { render, setHovered, previewRegion, viewMode: () => viewMode, setViewMode: (m) => { viewMode = m; if (currentModel) render(currentModel); } };
+    return { render, setHovered, previewRegion, redraw: fitRows };
   };
 })();
