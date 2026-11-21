@@ -633,6 +633,8 @@ async function run() {
       await page.waitForFunction(() => [...document.querySelectorAll("#ws-heat tbody tr[data-team]")].filter(row => row.getClientRects().length).length < 48);
       preview = await ids(page, heatRows + ":visible");
       assert.ok(preview.includes("CAN") && preview.length < 48, "Heatmap should show the subset while dragging");
+      const plotted = await ids(page, ".xp-goals-mark:not(.is-out)");
+      assert.deepEqual(plotted.sort(), [...preview].sort(), "outcome distribution follows the live brush");
       // The table is in a drawer. Its rows still update during the unfinished drag.
       assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out):not([hidden])")).sort(), [...preview].sort());
       assert.equal(await page.locator("#ws-teams tr[data-team='ECU'].is-out .ws-pinned-note:not([hidden])").count(), 1);

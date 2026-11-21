@@ -89,7 +89,7 @@ async function checkExplore(page) {
   await svgBox(page, "#ws-map svg");
   const text = await page.locator("#ws-map .axis text").all();
   await Promise.all(text.map(label => fullyVisible(label, "map axis label")));
-  const labels = ["#ws-view", "#ws-legend", "#ws-projection", "#ws-readout", ".hm-tools", ".hm-readout"];
+  const labels = ["#ws-style-preview", "#ws-outcome-preview", ".xp-style-row:last-child", ".xp-goals-readout", "#ws-view", "#ws-legend", "#ws-projection", "#ws-readout", ".hm-tools", ".hm-readout"];
   await Promise.all(labels.map(s => fullyVisible(page.locator(s), s)));
   const matrix = page.locator(".hm-scroll");
   const extent = await matrix.evaluate(el => [el.clientHeight, el.scrollHeight]);
@@ -275,6 +275,77 @@ async function sharing(page) {
   await svgBox(page, "#ws-map svg");
 }
 
+async function linkedExplorePanels(page) {
+  await page.setViewportSize({width:1440, height:900});
+  await page.goto(base + "/#/styles");
+  await ready(page, "explore");
+  const rows = page.locator("#ws-style-preview .xp-style-row");
+  const marks = page.locator("#ws-outcome-preview .xp-goals-mark");
+  async function verifyValues(a, b) {
+    const expected = await page.evaluate(([a,b]) => {
+      const records = Object.values(App.tm);
+      const plotted = [...document.querySelectorAll("#ws-heat tbody tr[data-team]")].map(el => el.dataset.team);
+      const mean = values => values.reduce((s,v) => s+v, 0) / values.length;
+      const gd = {};
+      const z = {};
+      for (const id of new Set([...plotted, a, b].filter(Boolean))) {
+        const games = records.filter(r => r.team_id === id);
+        gd[id] = mean(games.map(r => r.goals - r.goals_opp));
+        z[id] = App.dials.map((_,i) => {
+          const baseline = mean(records.map(r => r.dials[i]));
+          const sd = Math.sqrt(mean(records.map(r => (r.dials[i]-baseline)**2)));
+          return (mean(games.map(r => r.dials[i]))-baseline) / sd;
+        });
+      }
+      const top = App.dials.map((_, i) => ({i, v: a ? z[a][i] - (b ? z[b][i] : 0) :
+        Math.max(...plotted.map(id => z[id][i])) - Math.min(...plotted.map(id => z[id][i]))}))
+        .sort((l,r) => Math.abs(r.v)-Math.abs(l.v) || l.i-r.i).slice(0,3);
+      return {gd,top};
+    }, [a,b]);
+    const actual = await rows.evaluateAll(els => els.map(el => [Number(el.dataset.indicator),Number(el.dataset.value)]));
+    assert.equal(actual.length, 3);
+    actual.forEach(([i,v], j) => {
+      assert.equal(i, expected.top[j].i);
+      assert.ok(Math.abs(v-expected.top[j].v) < 1e-8);
+    });
+    const points = await marks.evaluateAll(els => els.map(el => [el.dataset.team,Number(el.dataset.gd)]));
+    assert.deepEqual(points.map(p => p[0]).sort(), Object.keys(expected.gd).sort());
+    for (const [id, v] of points) assert.ok(Math.abs(expected.gd[id]-v) < 1e-8);
+  }
+  await verifyValues();
+  const dot = id => page.locator(`.xp-goals-mark[data-team="${id}"]`);
+  await dot("UZB").focus();
+  assert.ok(await team(page, "UZB").evaluate(el => el.classList.contains("is-hover")));
+  await dot("UZB").press("Enter");
+  await verifyValues("UZB");
+  await dot("GER").press("Enter");
+  await verifyValues("UZB","GER");
+  const i = await rows.first().getAttribute("data-indicator");
+  await rows.first().focus();
+  await rows.first().press("Enter");
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial" + i);
+  assert.equal(await page.locator("#ws-heat-sort").inputValue(), "dial" + i);
+  await page.locator("#ws-style-preview .xp-open").click();
+  await ready(page,"compare");
+  assert.equal(await page.locator("#ws-lens [data-v=difference]").getAttribute("aria-pressed"), "true");
+  await page.goBack();
+  await ready(page,"explore");
+  await page.locator("#ws-outcome-preview .xp-open").click();
+  await ready(page,"explain");
+  assert.ok(await page.locator("#ws-matches tbody [data-match]:visible").count() > 0);
+  await page.goBack();
+  await ready(page,"explore");
+  await page.locator("#ws-swap").click();
+  await verifyValues("GER","UZB");
+  await page.goto(base + "/#/styles?cohort=ECU,USA");
+  await ready(page,"explore");
+  await verifyValues();
+  await page.goto(base + "/#/styles?search=zzzzzz");
+  await ready(page,"explore");
+  assert.equal(await marks.count(), 0);
+  assert.equal(await rows.count(), 0);
+}
+
 async function keyboardRows(page) {
   await page.goto(base + "/#/styles?mode=compare&team=ECU");
   await ready(page, "compare");
@@ -331,8 +402,10 @@ async function phone(browser, errors) {
   await page.locator("#ws-pick-b .sel-btn").tap();
   await page.locator("#ws-pick-b input").fill("USA");
   await page.locator("#ws-pick-b .sel-opt").last().tap();
-  await page.locator(tab("compare")).tap();
+  await page.locator("#ws-style-preview .xp-open").tap();
   await ready(page, "compare");
+  await fullyVisible(page.locator("#ws-modes"), "phone drill-through shows mode tabs");
+  assert.ok(await page.evaluate(() => window.scrollY < 2));
   await page.locator("#ws-lens [data-v=difference]").tap();
   await viewport(page, "phone compare", true);
   await page.locator(tab("explain")).tap();
@@ -365,6 +438,7 @@ async function openPage(browser, errors, options) {
     await sharing(page);
     await translatedLayout(page);
     await keyboardRows(page);
+    await linkedExplorePanels(page);
     await phone(browser, errors);
     assert.deepEqual(errors, []);
     const report = {browser: await browser.version(), tolerance, measurements, pageErrors: errors};

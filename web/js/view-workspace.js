@@ -157,6 +157,10 @@
         <div class="ws-gutter" role="separator" aria-orientation="vertical" aria-label="Resize map and heatmap" aria-valuemin="32" aria-valuemax="65" tabindex="0" title="Drag to resize · double-click to reset"></div>
         ${panel("G", "Style DNA Heatmap", "", '<div id="ws-heat"></div>')}
       </div>
+      <div id="ws-explore-panels" class="ws-explore-panels">
+        <section class="ws-explore-panel" id="ws-style-preview" aria-labelledby="ws-style-preview-title"></section>
+        <section class="ws-explore-panel" id="ws-outcome-preview" aria-labelledby="ws-outcome-preview-title"></section>
+      </div>
         ${panel("D", "Style Profile <span class=\"ws-count\" title=\"Team mean, standard deviations from the tournament average\">z-score</span>",
           seg("ws-lens", [["absolute", "Absolute profiles"], ["difference", "Difference view"]], "Style comparison mode"),
           `<div class="lens-tools"><span class="ws-pc-label">Order</span>${seg("ws-order", [["fixed", "Fixed"], ["gap", "By gap"]], "Indicator order")}</div>
@@ -238,6 +242,16 @@
 
     /* ---------- state changes ---------- */
     const change = (patch, { replace = false } = {}) => { App.tip.hide(); App.go(stateUrl({ ...state, ...patch }), { replace }); };
+    function openMode(mode, settings = {}) {
+      const patch = { mode, ...settings };
+      // Preserve a pending search if navigation happens before the debounce fires.
+      if (state.mode === "explore" && q("#ws-search").value !== state.search) patch.search = q("#ws-search").value;
+      change(patch);
+      // A phone user can enter a mode from a panel well below the team pickers.
+      if (window.scrollY && q("#ws-modes").getBoundingClientRect().top < document.querySelector(".topbar").getBoundingClientRect().bottom) {
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+    }
     const choose = (id, side) => {
       if (!side && (id === state.team || id === state.compare)) return;
       side = side || (state.team ? "B" : "A");
@@ -268,6 +282,24 @@
       },
     });
     const lens = App.workspaceLens(q("#ws-profile"), heat.markLensColumn);
+    const stylePreview = App.exploreStyle(q("#ws-style-preview"), {
+      selectIndicator(index) {
+        const dial = "dial" + index;
+        if (state.view === "pairs") change({ heatSort: dial });
+        else selectEncoding(dial);
+      },
+      previewIndicator(index) {
+        inspectIndicator(index);
+        if (state.view === "pairs") heat.markLensColumn(index);
+      },
+      openCompare() {
+        openMode("compare", state.compare ? { lens: "difference", order: "gap" } : {});
+      },
+    });
+    const outcomePreview = App.exploreOutcomes(q("#ws-outcome-preview"), {
+      choose, highlight,
+      openEvidence() { openMode("explain", { evidence: "matches" }); },
+    });
     const pairView = App.workspacePairs(q("#ws-pairs"), {
       choosePair(first, second) {
         const keepA = state.team === second;
@@ -311,12 +343,7 @@
     };
     tabs.forEach((tab, i) => {
       tab.onclick = () => {
-        if (state.mode !== tab.dataset.mode) {
-          const patch = { mode: tab.dataset.mode };
-          // Flush a pending debounced search before changing the route.
-          if (q("#ws-search").value !== state.search) patch.search = q("#ws-search").value;
-          change(patch);
-        }
+        if (state.mode !== tab.dataset.mode) openMode(tab.dataset.mode);
       };
       tab.onkeydown = event => {
         const rtl = getComputedStyle(tab).direction === "rtl" ? -1 : 1;
@@ -455,7 +482,10 @@
         heat.markIndicator(null);
         pairView.render({ visible, nearByTeam, summaries, region: state.pairRegion, touchArmed: touchBrushArmed, scope: state.scope, dials: state.dials });
       }
-      if (state.mode === "explore") drawMap(!isPairs);
+      if (state.mode === "explore") {
+        drawExplorePanels(visible);
+        drawMap(!isPairs);
+      }
       if (state.mode === "compare") drawProfile();
       if (state.mode === "explain" && state.evidence === "outcomes") drawOutcomes();
       drawMatches(); readout();
@@ -470,6 +500,11 @@
       lastProjection = projection;
       lastPins = pins;
       drawWaterfall();
+    }
+
+    function drawExplorePanels(ids) {
+      stylePreview.render({ state, full, ids });
+      outcomePreview.render({ state, summaries, ids, hover });
     }
 
     function drawWaterfall() {
@@ -494,7 +529,7 @@
         tab.tabIndex = tab === selectedTab ? 0 : -1;
       }
       q(".ws-content").setAttribute("aria-labelledby", selectedTab.id);
-      q(".ws-filters").hidden = primary.hidden = !explore;
+      q("#ws-explore-panels").hidden = q(".ws-filters").hidden = primary.hidden = !explore;
       q("#ws-near-strip").hidden = !explore || !twins.length;
       q('[data-tool="similar"]').hidden = mode === "compare" && !!team;
       similarPanel.hidden = !(mode === "compare" && team) && activeTool !== "similar";
@@ -780,6 +815,7 @@
           brushPreview = key;
           const ids = new Set(matching(cohort));
           heat.previewRegion(ids);
+          drawExplorePanels([...ids]);
           let shown = 0;
           for (const row of qa("#ws-teams tbody tr[data-team]")) {
             const pinned = row.querySelector(".ws-pinned-note"), inside = ids.has(row.dataset.team);
@@ -804,6 +840,7 @@
     function clearBrushPreview() {
       if (brushPreview === null) return;
       brushPreview = null;
+      drawExplorePanels(visible);
       heat.render({ state, full, visible, summaries, near, twins });
       drawTeamRows(visible);
       paintMapColours();
@@ -1056,6 +1093,7 @@
       hover = id;
       if (id) qa(`[data-team="${id}"], .relationship[data-to="${id}"]`).forEach((el) => el.classList.add("is-hover"));
       paintMapHover();
+      if (state.mode === "explore") outcomePreview.highlight(id);
       if (reveal && id) {
         const row = q(`#ws-teams tr[data-team="${id}"]`), box = q("#ws-team-scroll");
         if (row && box) { const r = row.getBoundingClientRect(), s = box.getBoundingClientRect(); if (r.top < s.top + 30) box.scrollTop -= s.top + 30 - r.top; else if (r.bottom > s.bottom) box.scrollTop += r.bottom - s.bottom; }
@@ -1114,6 +1152,7 @@
     App._stop = () => {
       if (toolDialog.open) closeTool();
       credits.replaceWith(...creditBody.children);
+      outcomePreview.destroy();
       observer.disconnect(); clearTimeout(searchTimer); cancelAnimationFrame(frame);
       document.removeEventListener("keydown", onEscape);
       window.removeEventListener("languagechange", onLang);
@@ -1139,6 +1178,7 @@
       state = next;
       if (presentationOnly) {
         layoutMode();
+        if (state.mode === "explore") drawExplorePanels(visible);
         if (state.mode === "compare") drawProfile();
         if (state.mode === "explain") { drawMatches(); drawWaterfall(); }
         redraw();

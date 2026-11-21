@@ -36,9 +36,11 @@ Selections are retained in shareable analysis URLs and return links. Comparison 
 
 | Mode | What you can investigate |
 | --- | --- |
-| **Explore** | Brush the map to filter the heatmap. Pin A to see its five nearest teams beside the tabs. Hover or focus one to locate it in both views. Select it to pin B. |
+| **Explore** | See the map, heatmap, three style indicators and distribution of goal differences together. Brush a cohort or pin teams in either plot. Use a style row to recolour the map and reorder the heatmap. |
 | **Compare** | Inspect A’s profile and ranked neighbors. With two teams, switch the Style DNA Difference Lens between absolute values and signed A minus B differences. Change the indicators to test the ranking. |
 | **Explain** | Inspect the six contributions to the observed goal-difference gap. Select a step and one of its match records to locate the game in Match evidence. Switch to Outcomes for scoped benchmarks. |
+
+The three style rows change with the question. With no pins, they show the widest ranges among visible teams’ mean indicator values. With A pinned, they show its largest departures from the tournament mean. With A and B pinned, they show the three largest A minus B differences. Values are in standard deviations. Each dot in the goal-difference plot is one team’s mean across its in-scope matches. Hover or focus a dot to locate the team on the map and in the heatmap. **Compare profiles** and **Match evidence** open the full analysis with the same pair. [See the four-panel workspace](review/viewport-workspace/four-panel-uzb-ger.png)
 
 The team pickers, comparison summary and match scope stay visible across modes on desktop. The dense heatmap and tables scroll within their panels. On phones the active workspace scrolls vertically. **Team Table** opens the filtered records and CSV export in a dialog. **Similarity indicators** opens the model controls in Explore and Explain. Close a dialog with **Esc**. When the mode tabs have focus, use the left and right arrows or Home and End.
 

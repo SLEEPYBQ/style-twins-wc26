@@ -15,7 +15,11 @@ The starting revision was `6eabeb1`. With Ecuador and the United States pinned, 
 
 The layout regression recorded 49 states. In all four desktop viewports the document stayed at scroll position zero across the tested modes and selections. Neither dimension overflowed the viewport. The 48-team matrix and the team table have internal scroll areas that reach the last row. On a 390 × 844 touch-emulated phone, the active mode scrolls vertically and the document is 390 pixels wide. The matrix can be panned within its own panel.
 
-## Rendered screens
+## Explore with four linked views
+
+The current Explore layout keeps both main charts visible alongside the three leading style indicators and a dot plot of team goal differences. For Uzbekistan versus Germany, the largest style difference is possession (−1.82 standard deviations for Uzbekistan minus Germany). Their respective mean goal differences are −2.00 and +1.50 goals per match. Clicking an indicator sorts the heatmap and colours the team map. Clicking a team’s goal-difference mark pins it for comparison. [All-team overview](four-panel-overview.png) · [Uzbekistan and Germany](four-panel-uzb-ger.png)
+
+## Screens from the initial three-mode layout
 
 | View | Screenshot |
 | --- | --- |
