@@ -5,6 +5,7 @@ const path = require("node:path");
 
 async function checkLens(page, base, output) {
   await page.goto(base + "/#/styles?team=ECU&compare=USA", {waitUntil:"domcontentloaded"});
+  await page.locator('#ws-modes [data-mode="compare"]').click();
   const rows = page.locator(".lens-row"), mode = page.locator("#ws-lens"), scope = page.locator("#ws-scope");
   await rows.first().waitFor();
   const absolute = mode.locator('[data-v="absolute"]'), difference = mode.locator('[data-v="difference"]');
@@ -82,12 +83,14 @@ async function checkLens(page, base, output) {
   await absolute.click();
   await page.goBack();
   assert.equal(await difference.getAttribute("aria-pressed"),"true");
+  await page.locator('#ws-modes [data-mode="explain"]').click();
   const matchRow = page.locator("#ws-matches tbody [data-match]").first();
   await matchRow.press("Enter");
   assert.equal(await page.locator(":focus").getAttribute("data-match"), await matchRow.getAttribute("data-match"));
   await matchRow.press("Space");
   assert.equal(await matchRow.getAttribute("aria-selected"), "false");
   await matchRow.press("Enter");
+  await page.locator('#ws-modes [data-mode="compare"]').click();
   assert.equal(await absolute.getAttribute("aria-pressed"),"true");
   assert.equal(await page.locator(".lens-overlay.is-match:visible").count(),10);
 }

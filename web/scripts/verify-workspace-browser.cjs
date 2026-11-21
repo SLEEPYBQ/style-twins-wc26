@@ -14,6 +14,10 @@ const params = page => new URLSearchParams(new URL(page.url()).hash.split("?")[1
 const heatTeam = (page, id) => page.locator(heatRows + '[data-team="' + id + '"]');
 const mapTeam = (page, id) => page.locator(mapMarks + '[data-team="' + id + '"]');
 
+const modeTab = (page, mode) => page.locator(`#ws-modes button[data-mode="${mode}"]`);
+const openTool = (page, tool) => page.locator(`#ws-utilities [data-tool="${tool}"]`).click();
+const closeTool = page => page.locator("#ws-tools-dialog .ws-dialog-close").click();
+
 async function overview(page) {
   await page.goto(base + "/");
   await page.reload();
@@ -127,6 +131,9 @@ async function checkIndicatorPreview(page) {
 async function checkTeamRanks(page) {
   await page.goto(base + "/#/styles?team=GER&compare=URU&color=group");
   await page.locator("#ws-heat tbody tr[data-team]").first().waitFor();
+  await modeTab(page, "compare").click();
+  await page.locator("#ws-profile .lens-row").first().waitFor();
+  await modeTab(page, "explore").click();
   await checkIndicatorPreview(page);
   const readout = page.locator("#ws-readout");
   const url = page.url();
@@ -161,7 +168,9 @@ async function checkTeamRanks(page) {
   const custom = await readout.innerText();
   assert.doesNotMatch(custom, /PCA/i, "Only PCA mode can identify a PCA neighbour");
   assert.match(custom, /Style similarity rank\s*#8\b/i);
+  await openTool(page, "similar");
   await page.locator("#ws-dials input[data-i='5']").uncheck();
+  await closeTool(page);
   await mapTeam(page, "FRA").focus();
   assert.match(await readout.innerText(), /Style similarity rank\s*#6\b/i);
   assert.deepEqual(await gap.evaluateAll(cells => cells.map(c => c.dataset.i)), ["8","8"],
@@ -171,6 +180,7 @@ async function checkTeamRanks(page) {
 async function checkMapRefit(page) {
   await page.goto(base + "/#/styles?team=GER", {waitUntil:"domcontentloaded"});
   await mapTeam(page, "GER").waitFor();
+  await openTool(page, "similar");
   for (const preference of ["reduce", "no-preference"]) {
     await page.emulateMedia({reducedMotion:preference});
     const result = await page.evaluate(() => {
@@ -194,6 +204,7 @@ async function checkMapRefit(page) {
       assert.ok(!result.properties.includes("transform"), "A refit must not imply movement in a fixed plane");
     }
   }
+  await closeTool(page);
 }
 
 async function checkTouchIndicator(page) {
@@ -488,14 +499,22 @@ async function run() {
       else await heatTeam(client, "ECU").locator("button").first().click();
       assert.equal(params(client).get("team"), "ECU");
       assert.equal(params(client).has("compare"), false);
+      const nearest = client.locator("#ws-near-strip [data-team]");
+      assert.equal(await nearest.first().getAttribute("data-team"), "USA");
+      await modeTab(client, "compare").click();
       assert.ok(await client.locator("[data-panel='D']").isVisible());
+      assert.equal(await client.locator("#ws-profile [data-team='ECU']").count(), 10);
+      await modeTab(client, "explain").click();
       assert.ok(await client.locator("[data-panel='F']").isVisible());
       assert.equal(await client.locator("[data-panel='E']").isVisible(), false);
-      assert.equal(await client.locator("#ws-twins [data-team]").first().getAttribute("data-team"), "USA");
-      await client.locator("#ws-twins [data-team]").first().click();
+      await modeTab(client, "explore").click();
+      await nearest.first().click();
       assert.equal(params(client).get("compare"), "USA");
+      await modeTab(client, "explain").click();
+      assert.equal(await client.locator("#ws-matches [data-match]:visible").count(), 9);
+      await client.locator("#ws-evidence-view [data-v='outcomes']").click();
       assert.ok(await client.locator("[data-panel='E']").isVisible());
-      assert.equal(await client.locator("#ws-matches [data-match]").count(), 9);
+      await modeTab(client, "explore").click();
       if (client === phone) {
         await checkTouchIndicator(client);
         await checkTouchBrush(client);
@@ -555,9 +574,12 @@ async function run() {
     await page.locator("#ws-pick-b .sel-opt").filter({hasText:"Clear comparison"}).click();
     assert.equal(params(page).get("team"), "ECU");
     assert.equal(params(page).has("compare"), false);
+    await modeTab(page, "compare").click();
+    assert.equal(await page.locator("#ws-profile [data-team='ECU']:visible").count(), 10);
+    await modeTab(page, "explain").click();
     assert.equal(await page.locator("[data-panel='E']").isVisible(), false);
-    assert.equal(await page.locator("#ws-profile [data-team='ECU']").count(), 10);
-    assert.equal(await page.locator("#ws-matches tr[data-match]").count(), 4);
+    assert.equal(await page.locator("#ws-matches tr[data-match]:visible").count(), 4);
+    await modeTab(page, "explore").click();
     await page.locator("#ws-pick-b .sel-btn").click();
     await page.locator("#ws-pick-b input").fill("USA");
     await page.locator("#ws-pick-b .sel-opt").click();
@@ -566,6 +588,7 @@ async function run() {
     // The view's nearest-team order must use the selected dimensions and scope.
     await page.locator("#ws-heat-sort").selectOption("near");
     assert.deepEqual((await ids(page, heatRows)).slice(0, 2), ["ECU","USA"]);
+    await openTool(page, "similar");
     await page.locator("#ws-dials input[data-i='0']").uncheck();
     assert.equal(await page.locator("#ws-heat thead th[data-i='0']").getAttribute("data-model"), "out");
     const expected = await page.evaluate(() => {
@@ -575,6 +598,7 @@ async function run() {
     assert.deepEqual(await ids(page, heatRows), ["ECU",...expected]);
     assert.deepEqual((await ids(page, "#ws-twins [data-team]")).slice(0, 5), expected.slice(0, 5));
     await page.locator("#ws-dials-all").click();
+    await closeTool(page);
 
     const group = await page.evaluate(() => App.team.ECU.archetype);
     const included = await page.evaluate(group => App.teams.filter(t => t.archetype === group).map(t => t.id), group);
@@ -609,8 +633,9 @@ async function run() {
       await page.waitForFunction(() => [...document.querySelectorAll("#ws-heat tbody tr[data-team]")].filter(row => row.getClientRects().length).length < 48);
       preview = await ids(page, heatRows + ":visible");
       assert.ok(preview.includes("CAN") && preview.length < 48, "Heatmap should show the subset while dragging");
-      assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out):visible")).sort(), [...preview].sort());
-      assert.ok(await page.locator("#ws-teams tr[data-team='ECU'].is-out .ws-pinned-note").isVisible(), "A remains identifiable outside the preview region");
+      // The table is in a drawer. Its rows still update during the unfinished drag.
+      assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out):not([hidden])")).sort(), [...preview].sort());
+      assert.equal(await page.locator("#ws-teams tr[data-team='ECU'].is-out .ws-pinned-note:not([hidden])").count(), 1);
       assert.match(await page.locator("#ws-heat .hm-count").innerText(), new RegExp("^" + preview.length + "\\s*/\\s*48\\b"));
       assert.equal(page.url(), beforeBrush, "Drag previews should not add history entries");
       await page.screenshot({path:path.join(output,"workspace-live-brush.png")});
@@ -621,6 +646,10 @@ async function run() {
     assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out)")).sort(), brushedIds.sort());
     assert.equal(params(page).get("team"), "ECU");
     assert.equal(params(page).get("compare"), "USA");
+    await openTool(page, "table");
+    assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out):visible")).sort(), [...preview].sort());
+    assert.ok(await page.locator("#ws-teams tr[data-team='ECU'].is-out .ws-pinned-note").isVisible(), "A remains identifiable outside the committed region");
+    await closeTool(page);
     const retainedCohort = page.url();
     const blank = (await topStrip(page)).start;
     await page.mouse.click(blank.x, blank.y);
@@ -651,8 +680,9 @@ async function run() {
 
     // Export orders filtered teams as displayed and retains canonical data values in every locale.
     await page.locator("#ws-group").selectOption(group);
-    await page.locator("#ws-teams [data-sort='gd']").click();
     await page.locator("#language-select").selectOption("zh-Hant");
+    await openTool(page, "table");
+    await page.locator("#ws-teams [data-sort='gd']").click();
     const expectedCsv = await page.evaluate(() => [...document.querySelectorAll("#ws-teams tbody tr[data-team]:not(.is-out)")].map(row => {
       const team = App.team[row.dataset.team];
       return [team.name, App.arch[team.archetype].name.replace(/^The /, "")];
@@ -664,27 +694,37 @@ async function run() {
     const csv = fs.readFileSync(await download.path(), "utf8").trim().split("\n");
     const keys = csv.slice(1).map(line => line.slice(1,-1).split('","').slice(0,2));
     assert.deepEqual(keys, expectedCsv);
+    await closeTool(page);
     await page.locator("#language-select").selectOption("en");
     await page.locator("#ws-group").selectOption("");
 
     await page.locator("#ws-scope [data-v='group']").click();
-    assert.equal(await page.locator("#ws-matches [data-match]").count(), 6);
+    await modeTab(page, "compare").click();
     assert.match(await page.locator("#ws-sim-reference").innerText(), /1128 team pairs in scope at least this far apart/);
+    await modeTab(page, "explain").click();
+    await page.locator("#ws-evidence-view [data-v='matches']").click();
+    assert.equal(await page.locator("#ws-matches [data-match]:visible").count(), 6);
+    await page.locator("#ws-evidence-view [data-v='outcomes']").click();
     const references = await page.locator("#ws-outcomes line title").allTextContents();
     const groupAvg = await page.evaluate(() => {
       const values = Object.values(App.tm).filter(r => r.stage === "Group").map(r => r.xg).filter(Number.isFinite);
       return (values.reduce((a,b) => a+b,0)/values.length).toFixed(2);
     });
     assert.ok(references.some(label => /(?:scope|group)/i.test(label) && label.includes(groupAvg)), "Outcome reference should identify scoped mean xG: " + references);
+    await modeTab(page, "explore").click();
     await page.locator("#ws-view [data-v='custom']").click();
     await page.locator("#ws-x").selectOption("dial0");
     await page.locator("#ws-y").selectOption("dial9");
     await checkCustomUnits(page, "ECU");
 
+    await modeTab(page, "explain").click();
+    await page.locator("#ws-evidence-view [data-v='matches']").click();
     const evidence = page.locator('#ws-matches tr[data-match="2026-M034-ECU-CUW_ECU"]');
     await evidence.click();
     assert.equal(await evidence.getAttribute("aria-selected"), "true");
+    await modeTab(page, "explore").click();
     await checkCustomUnits(page, "ECU", "2026-M034-ECU-CUW_ECU");
+    await modeTab(page, "explain").click();
     const matchLink = page.locator('#ws-match-actions a[href^="#/lab/"]');
     const matchUrl = await matchLink.getAttribute("href");
     assert.match(matchUrl, /2026-M034-ECU-CUW/);
@@ -696,6 +736,7 @@ async function run() {
     await page.goBack();
     assert.equal(page.url(), retained);
     assert.equal(await evidence.getAttribute("aria-selected"), "true");
+    await modeTab(page, "explore").click();
     await page.locator("#ws-view [data-v='pca']").click();
     await page.evaluate(() => window.scrollTo({top:0, left:0, behavior:"instant"}));
     await page.screenshot({path:path.join(output,"workspace-ecuador-usa.png")});

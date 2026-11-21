@@ -4,7 +4,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { chromium } = require("playwright");
 const base = process.env.STYLE_TWINS_BASE_URL || "http://127.0.0.1:8642";
-const out = process.env.STYLE_TWINS_QA_OUTPUT || path.resolve(__dirname, "../../review/visual-interactions");
+const out = process.env.STYLE_TWINS_QA_OUTPUT || path.join(require("node:os").tmpdir(), "style-twins-walkthrough");
 
 async function capture() {
   fs.mkdirSync(out, { recursive: true });
@@ -45,18 +45,16 @@ async function capture() {
     await mark("USA").focus();
     await shot(page, "candidate-preview");
     await mark("USA").press("Enter");
+    await page.locator('#ws-modes [data-mode="compare"]').click();
     await shot(page, "comparison");
     const profile = '[data-panel="D"]';
-    await page.locator("#ws-to-analysis").click();
-    assert.equal(await page.locator(":focus").getAttribute("id"), "ws-D-title");
     await page.locator("#ws-lens [data-v=absolute]").click();
     await shot(page, "absolute-profiles", profile);
     await page.locator("#ws-lens [data-v=difference]").click();
     await page.locator("#ws-order [data-v=gap]").click();
     await page.locator(".lens-row").first().focus();
     await shot(page, "signed-differences", profile);
-    await page.locator("#ws-to-waterfall").click();
-    assert.equal(await page.locator(":focus").getAttribute("id"), "ws-W-title");
+    await page.locator('#ws-modes [data-mode="explain"]').click();
     await page.locator('#ws-waterfall [data-step=c_finish]').click();
     await shot(page, "waterfall", '[data-panel="W"]');
     await page.locator('#ws-waterfall .wf-records summary').click();
@@ -72,13 +70,13 @@ async function capture() {
     const phone = await pageFor(390, 844, true);
     await shot(phone, "phone-overview");
     await phone.goto(base + "/#/styles?team=ECU&compare=USA&lens=difference&order=gap");
-    await phone.locator("#ws-to-analysis").tap();
-    assert.ok(await phone.locator("#ws-D-title").evaluate(el =>
-      el.getBoundingClientRect().top >= document.querySelector(".topbar").getBoundingClientRect().bottom));
+    await phone.locator('#ws-modes [data-mode="compare"]').tap();
     await shot(phone, "phone-differences", profile);
+    await phone.locator('#ws-modes [data-mode="explain"]').tap();
     await phone.locator("#ws-waterfall [data-step=c_finish]").tap();
     await shot(phone, "phone-waterfall", '[data-panel="W"]');
     await phone.selectOption("#language-select", "zh-Hans");
+    await phone.locator('#ws-modes [data-mode="compare"]').tap();
     await shot(phone, "phone-differences-zh", profile);
     assert.match(await phone.locator("#ws-D-title").innerText(), /[\p{Script=Han}]/u);
     await phone.close();

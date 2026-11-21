@@ -45,7 +45,7 @@ module.exports = async function checkWaterfall(page, base, output) {
     assert.ok(connectorOffsets.every(v => v < 0.1), "Connect each cumulative level to the next row");
   };
   await page.setViewportSize({width:1440,height:900});
-  await open("#/styles?team=ECU&compare=USA");
+  await open("#/styles?mode=explain&team=ECU&compare=USA");
   await geometry("ECU","USA","all");
   const finish = chart.locator('[data-step="c_finish"]');
   await finish.focus();
@@ -64,19 +64,18 @@ module.exports = async function checkWaterfall(page, base, output) {
   assert.equal(new URLSearchParams(new URL(page.url()).hash.split("?")[1]).get("match"), key);
   assert.equal(await page.locator(`#ws-matches [data-match="${key}"]`).getAttribute("aria-selected"), "true");
   await chart.locator("summary").click();
-  await chart.evaluate(el => window.scrollBy({top: el.closest("section").getBoundingClientRect().top - 72, behavior:"instant"}));
   await page.screenshot({path:path.join(output,"outcome-waterfall.png")});
   const before = await chart.locator(".wf-bar").evaluateAll(nodes=>nodes.map(node=>node.style.cssText));
-  await open("#/styles?team=ECU&compare=USA&dials=0,1");
+  await open("#/styles?mode=explain&team=ECU&compare=USA&dials=0,1");
   assert.deepEqual(await chart.locator(".wf-bar").evaluateAll(nodes=>nodes.map(node=>node.style.cssText)), before);
   for (const [a,b,scope] of [["USA","ECU","all"],["CIV","SEN","all"],["NED","MEX","knockout"]]) {
-    await open(`#/styles?team=${a}&compare=${b}&scope=${scope}`);
+    await open(`#/styles?mode=explain&team=${a}&compare=${b}&scope=${scope}`);
     await geometry(a,b,scope);
   }
-  await open("#/styles?team=BIH&compare=GHA");
+  await open("#/styles?mode=explain&team=BIH&compare=GHA");
   await geometry("BIH","GHA","all");
   assert.equal(await chart.locator('[data-step="c_opp"] strong').textContent(), "−0.00005");
-  await open("#/styles?team=IRQ&compare=NED&scope=knockout");
+  await open("#/styles?mode=explain&team=IRQ&compare=NED&scope=knockout");
   assert.equal(await chart.locator(".wf-row").count(), 0);
   assert.match(await chart.innerText(), /match records/);
 
