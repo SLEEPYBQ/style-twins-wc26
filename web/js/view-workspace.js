@@ -3,7 +3,12 @@
 (function () {
   "use strict";
   const App = window.App, A = App.analysis;
-  const C = { a: "#2f6bd8", b: "#e0702a", twin: "#129a86", dot: "#8f99a5", off: "#dde1e6", ink: "#18202b", ink2: "#465161", muted: "#7d8794", faint: "#b8c0c9", line: "#e4e7eb", grid: "#eef0f3" };
+  const C = {
+    a: "var(--ws-a)", b: "var(--ws-b)", twin: "var(--ws-twin)",
+    aInk: "var(--ws-a-ink)", bInk: "var(--ws-b-ink)", twinInk: "var(--ws-twin-ink)",
+    dot: "var(--ws-dot)", off: "var(--ws-dot-off)", faint: "var(--ws-faint)",
+    ink: "var(--ws-ink)", ink2: "var(--ws-ink-2)", muted: "var(--ws-muted)", grid: "var(--grid)",
+  };
   const K = 5; // twins of A highlighted across views
   const measures = [
     { id: "xgd", label: "xG difference", unit: "per match" }, { id: "gd", label: "Goal difference", unit: "per match" },
@@ -733,7 +738,7 @@
       axis.append("text").attr("class", "title").attr("x", m.l).attr("y", 18).text(yl);
       if (!pca && ["xgd", "gd"].includes(state.x) && ["xgd", "gd"].includes(state.y) && state.x !== state.y) {
         const lo = Math.max(x.domain()[0], y.domain()[0]), hi = Math.min(x.domain()[1], y.domain()[1]);
-        svg.append("line").attr("x1", x(lo)).attr("x2", x(hi)).attr("y1", y(lo)).attr("y2", y(hi)).attr("stroke", C.faint || "#b8c0c9").attr("stroke-dasharray", "4 4");
+        svg.append("line").attr("x1", x(lo)).attr("x2", x(hi)).attr("y1", y(lo)).attr("y2", y(hi)).attr("stroke", C.faint).attr("stroke-dasharray", "4 4");
       }
       const P = (id) => [x(pos[id][0]), y(pos[id][1])];
       svg.classed("has-anchor", !!pos[state.team]);
@@ -795,7 +800,7 @@
         occupied.push([lx, ly]);
         codeLayer.append("text").attr("class", "code").attr("x", lx).attr("y", ly)
           .attr("text-anchor", "middle").attr("data-label-for", id)
-          .attr("fill", selected ? ({ a: C.a, b: C.b, twin: "#147266" }[role(id)]) : C.ink2).text(id);
+          .attr("fill", selected ? ({ a: C.aInk, b: C.bInk, twin: C.twinInk }[role(id)]) : C.ink2).text(id);
       }
       svg.append("g").attr("class", "hover-label");
       paintMapHover();
@@ -803,7 +808,7 @@
       if (fpos) {
         const [px, py] = [x(fpos[0]), y(fpos[1])];
         if (pos[f.team_id]) svg.append("line").attr("x1", px).attr("y1", py).attr("x2", P(f.team_id)[0]).attr("y2", P(f.team_id)[1]).attr("stroke", C.ink).attr("stroke-dasharray", "2 3").attr("pointer-events", "none");
-        svg.append("path").attr("d", d3.symbol(d3.symbolDiamond, 120)()).attr("transform", `translate(${px},${py})`).attr("fill", "#fff").attr("stroke", C.ink).attr("stroke-width", 2).attr("pointer-events", "none");
+        svg.append("path").attr("d", d3.symbol(d3.symbolDiamond, 120)()).attr("transform", `translate(${px},${py})`).attr("fill", "var(--ws-panel)").attr("stroke", C.ink).attr("stroke-width", 2).attr("pointer-events", "none");
         svg.append("text").attr("class", "code").attr("x", px + 10).attr("y", py + 16).attr("fill", C.ink).text(`${f.team_id} v ${f.opp_id}`);
       }
       if (!plotted.length) svg.append("text").attr("x", W / 2).attr("y", H / 2).attr("text-anchor", "middle").attr("fill", C.muted).text("No team has matches in this scope");
@@ -907,7 +912,7 @@
         else if (state.color === "group" && !filtered) fill = App.arch[App.team[id].archetype].color;
         const ring = outlined && ["a", "b", "twin"].includes(r);
         d3.select(this).attr("fill", fill).attr("fill-opacity", index !== null && filtered ? 0.25 : 1)
-          .attr("stroke", ring ? roleColours[r] : filtered || index !== null ? C.faint : "#fff")
+          .attr("stroke", ring ? roleColours[r] : filtered || index !== null ? C.faint : "var(--ws-panel)")
           .attr("stroke-width", ring ? 2.5 : filtered ? 0.75 : 1.2);
       });
       const item = (symbol, label) => `<span><i class="${symbol}"></i>${esc(label)}</span>`;
@@ -987,15 +992,15 @@
       metrics.forEach(([k, label]) => {
         const y0 = y(k) + y.bandwidth() / 2 - bh - 1;
         svg.append("text").attr("x", m.l - 10).attr("y", y(k) + y.bandwidth() / 2 + 4).attr("text-anchor", "end").attr("fill", C.ink).text(label);
-        [[state.team, ta?.[k], C.a], [state.compare, tb?.[k], C.b]].filter(([id]) => id).forEach(([id, v, col], i) => {
+        [[state.team, ta?.[k], C.a, C.aInk], [state.compare, tb?.[k], C.b, C.bInk]].filter(([id]) => id).forEach(([id, v, col, ink], i) => {
           const yy = y0 + i * (bh + 2), ok = Number.isFinite(v);
           const g = svg.append("g").attr("data-team", id);
           g.append("rect").attr("x", m.l).attr("y", yy).attr("width", ok ? Math.max(0, x(v) - m.l) : 0).attr("height", bh).attr("rx", 2).attr("fill", col);
-          g.append("text").attr("x", (ok ? x(v) : m.l) + 5).attr("y", yy + bh - 1.5).attr("fill", col).attr("font-size", 11).attr("font-weight", 600).text(fmt(v));
+          g.append("text").attr("x", (ok ? x(v) : m.l) + 5).attr("y", yy + bh - 1.5).attr("fill", ink).attr("font-size", 11).attr("font-weight", 600).text(fmt(v));
           g.on("pointerenter", () => highlight(id)).on("pointerleave", () => highlight(null));
         });
         const tick = (v, col, dash, title) => { if (!Number.isFinite(v)) return; svg.append("line").attr("x1", x(v)).attr("x2", x(v)).attr("y1", y(k) - 2).attr("y2", y(k) + y.bandwidth() + 2).attr("stroke", col).attr("stroke-width", 2).attr("stroke-dasharray", dash).append("title").text(`${title}: ${fmt(v)}`); };
-        tick(scopeAvg[k], "#9aa3ae", "2 2", referenceLabel);
+        tick(scopeAvg[k], C.muted, "2 2", referenceLabel);
         tick(twinAvg[k], C.twin, null, `Average of A's ${K} closest twins`);
       });
     }
@@ -1008,7 +1013,7 @@
       q("#ws-match-count").textContent = `${rows.length} team performances`;
       const ext = d3.max(rows, (r) => Math.abs(A.metric(r, "xgd") ?? 0)) || 1;
       q("#ws-matches tbody").innerHTML = rows.map((r) => {
-        const v = A.metric(r, "xgd"), w = Math.min(50, (Math.abs(v ?? 0) / ext) * 50), col = r.team_id === state.team ? C.a : C.b;
+        const v = A.metric(r, "xgd"), w = Math.min(50, (Math.abs(v ?? 0) / ext) * 50), col = r.team_id === state.team ? C.aInk : C.bInk;
         return `<tr data-match="${r.key}" data-team="${r.team_id}" tabindex="0" class="${r.key === state.match ? "is-focus" : ""}" aria-selected="${r.key === state.match}" aria-label="${esc(App.team[r.team_id].name)} against ${esc(App.team[r.opp_id].name)}">
           <td><span class="ws-team-tag" translate="no" style="color:${col}">${r.team_id}</span></td>
           <td><span class="opp">${App.flag(r.opp_id, 15)}<span>${esc(App.team[r.opp_id].name)}</span></span></td>

@@ -2,7 +2,7 @@
 (function () {
   const App = window.App;
   const C = (App.charts = {});
-  const POS = "#5b4a9e", NEG = "#a8601e", INK = "#1f2933", GRID = "#eceef1", AXIS = "#c3c9d0", MUTED = "#858a96";
+  const POS = "var(--pos)", NEG = "var(--neg)", INK = "var(--ink)", GRID = "var(--grid)", AXIS = "var(--axis)";
 
   /** Rounded-end bar path from x0 to x1 (data end rounded, baseline end square). */
   function hbar(x0, x1, y, h, r = 4) {
@@ -63,7 +63,7 @@
           .attr("fill", "#fff").attr("stroke", INK).attr("stroke-width", 1.6);
       }
       row.append("text").attr("x", W).attr("y", rowH / 2).attr("dominant-baseline", "central").attr("text-anchor", "end")
-        .attr("font-size", 12).attr("font-weight", 700).attr("fill", "#4a5263").attr("class", "tnum")
+        .attr("font-size", 12).attr("font-weight", 700).attr("fill", "var(--ink-2)").attr("class", "tnum")
         .text(App.fix(r.raw, r.dial === "Press intensity" ? 0 : 1));
       row.append("rect").attr("x", 0).attr("width", W).attr("height", rowH).attr("fill", "transparent")
         .on("mousemove", (evt) => {
@@ -173,8 +173,8 @@
       row.append("div").attr("class", "lbl").text(r.label);
       row.append("div").attr("class", "v tnum").text(r.fmt ? r.fmt(r.a) : r.a);
       const bar = row.append("div").attr("class", "dual-bar");
-      bar.append("i").style("width", `${(a / tot) * 100}%`).style("background", kits[0]).style("box-shadow", App.isLight(kits[0]) ? "inset 0 0 0 1.5px #c3c9d0" : null);
-      bar.append("i").style("width", `${(b / tot) * 100}%`).style("background", kits[1]).style("box-shadow", App.isLight(kits[1]) ? "inset 0 0 0 1.5px #c3c9d0" : null);
+      bar.append("i").style("width", `${(a / tot) * 100}%`).style("background", kits[0]).style("box-shadow", App.isLight(kits[0]) ? "inset 0 0 0 1.5px var(--axis)" : null);
+      bar.append("i").style("width", `${(b / tot) * 100}%`).style("background", kits[1]).style("box-shadow", App.isLight(kits[1]) ? "inset 0 0 0 1.5px var(--axis)" : null);
       row.append("div").attr("class", "v r tnum").text(r.fmt ? r.fmt(r.b) : r.b);
     }
   };
@@ -247,16 +247,16 @@
         const left = mid - labelW / 2 - 4, right = mid + labelW / 2 + 4, yb = y + (rowH - barH) / 2;
         const row = svg.append("g").attr("class", "phase-row").style("cursor", "default");
         row.append("rect").attr("x", mid - labelW / 2).attr("y", y + 1.5).attr("width", labelW).attr("height", rowH - 3).attr("rx", (rowH - 3) / 2)
-          .attr("fill", hot ? "#f3e7cf" : "#f3f0e8");
+          .attr("fill", hot ? "var(--line)" : "var(--card-2)");
         const barA = row.append("path").attr("fill", kits[0]).attr("stroke", kitStroke(kits[0])).attr("opacity", hot ? 1 : 0.78);
         const barB = row.append("path").attr("fill", kits[1]).attr("stroke", kitStroke(kits[1])).attr("opacity", hot ? 1 : 0.78);
         const grow = (t) => { barA.attr("d", hbar(left, left - x(a) * t, yb, barH, barH / 2)); barB.attr("d", hbar(right, right + x(b) * t, yb, barH, barH / 2)); };
         row.append("text").attr("x", mid).attr("y", y + rowH / 2).attr("text-anchor", "middle").attr("dominant-baseline", "central")
-          .attr("font-size", fs).attr("font-weight", hot ? 800 : 600).attr("fill", hot ? INK : "#4a5263").text(phaseLabel(p));
+          .attr("font-size", fs).attr("font-weight", hot ? 800 : 600).attr("fill", hot ? INK : "var(--ink-2)").text(phaseLabel(p));
         const valA = row.append("text").attr("x", left - x(a) - 5).attr("y", y + rowH / 2).attr("text-anchor", "end").attr("dominant-baseline", "central")
-          .attr("class", "tnum").attr("font-size", fs).attr("font-weight", 700).attr("fill", hot ? INK : "#5b6170").text(`${a}%`);
+          .attr("class", "tnum").attr("font-size", fs).attr("font-weight", 700).attr("fill", hot ? INK : "var(--ink-2)").text(`${a}%`);
         const valB = row.append("text").attr("x", right + x(b) + 5).attr("y", y + rowH / 2).attr("dominant-baseline", "central")
-          .attr("class", "tnum").attr("font-size", fs).attr("font-weight", 700).attr("fill", hot ? INK : "#5b6170").text(`${b}%`);
+          .attr("class", "tnum").attr("font-size", fs).attr("font-weight", 700).attr("fill", hot ? INK : "var(--ink-2)").text(`${b}%`);
         row.append("rect").attr("x", 0).attr("y", y).attr("width", W).attr("height", rowH).attr("fill", "transparent")
           .on("mousemove", (evt) => App.tip.show(`<div class="tt-title">${phaseLabel(p)}</div><div class="tt-dim">${PHASE_HELP[p] || ""}</div>` +
             App.ttRows([[names[0], `${a}%`], [names[1], `${b}%`]]), evt))

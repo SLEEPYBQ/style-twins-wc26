@@ -6,7 +6,10 @@
   const esc = App.esc;
   const sortKeys = ["group", "near", "xgd", "gd", ...App.dials.map((_, i) => `dial${i}`)];
   const sortKey = (value, fallback = "dial0") => sortKeys.includes(value) ? value : fallback;
-  const color = d3.scaleLinear().domain([-2, 0, 2]).range(["#985522", "#f4f3f2", "#594899"]).clamp(true);
+  const theme = getComputedStyle(document.documentElement);
+  const color = d3.scaleLinear().domain([-2, 0, 2])
+    .range(["--neg", "--mid", "--pos"].map(name => theme.getPropertyValue(name).trim()))
+    .clamp(true);
   const legend = '<span class="hm-scale"><span>≤ −2</span><i class="hm-low" aria-hidden="true"></i><span>0</span><i class="hm-high" aria-hidden="true"></i><span>≥ +2</span></span>';
   const groupIndex = new Map(App.data.archetypes.map((group, i) => [group.id, i]));
 

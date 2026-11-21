@@ -1,20 +1,29 @@
-/* Site-wide theme, loaded after every other stylesheet.
- * Neutral analytic surfaces; colour carries data only (A blue, B orange, A's closest teams teal,
- * five muted style-group hues, purple/brown for signed values). System UI type on Apple devices, with Inter and
- * script-specific fallbacks elsewhere. Small radii, hairlines, no shadows. */
+/* Neutral surfaces support the figures. Team roles, signed measurements and
+ * the reference distribution each have their own colours across views. */
 :root {
-  --paper: #f3f4f6;
+  --paper: #f2f3ef;
   --card: #ffffff;
-  --card-2: #f6f7f9;
-  --ink: #1f2933;
-  --ink-2: #4b5563;
-  --muted: #6b7480;
-  --line: #e1e4e8;
-  --grid: #eceef1;
-  --axis: #c3c9d0;
-  --pos: #5b4a9e;
-  --neg: #a8601e;
-  --mid: #eceef1;
+  --card-2: #f6f7f4;
+  --ink: #24333a;
+  --ink-2: #495961;
+  --muted: #5c6a70;
+  --line: #dbe1dd;
+  --grid: #e8ede9;
+  --axis: #bdc8c4;
+  --pos: #216e70;
+  --neg: #a5692e;
+  --mid: #f7f6f1;
+  --team-a: #24639a;
+  --team-a-ink: #194e7b;
+  --team-a-soft: #e7f0f7;
+  --team-b: #b44e32;
+  --team-b-ink: #8e3e29;
+  --team-b-soft: #faece6;
+  --team-a-on-dark: #8cc2eb;
+  --team-b-on-dark: #f2a787;
+  --cohort-fill: #c7d8df;
+  --cohort-line: #566f7d;
+  --cohort-ink: #263f4d;
   --gold: #b88a1c;
   --a-architects: #7a6bb0;
   --a-stormers: #b5536f;
@@ -74,7 +83,7 @@ html { scrollbar-gutter: stable; scroll-padding-block-start: 48px; }
 .note { font-size: 12px; color: var(--muted); }
 .callout { border-radius: 3px; font-size: 13px; background: var(--card-2); border: 1px solid var(--line); }
 .result { border-radius: 2px; font: 600 11px var(--sans); }
-.result.W { background: #3f7d5a; } .result.D { background: #8a929c; } .result.L { background: #a8463a; }
+.result.W { background: var(--pos); } .result.D { background: var(--muted); } .result.L { background: var(--neg); }
 .tooltip { border-radius: 3px; font-size: 12px; box-shadow: 0 4px 14px rgba(31, 41, 51, .18); }
 .tooltip .tt-title { font-weight: 600; font-size: 13px; }
 .tooltip .tt-row span:last-child { font-weight: 600; }
@@ -118,9 +127,9 @@ body:not(.ws-route) #view h3 { font-size: 14px !important; font-weight: 600 !imp
 #view svg [font-weight="800"], #view svg [font-weight="700"] { font-weight: 600; }
 
 /* Paired pages: first team = A (blue), second team = B (orange), as in the workspace */
-:root, .review-home { --review-teal: #2f6bd8; --review-rust: #e0702a; --review-orange: #e0702a; }
-.robust-page { --robust-teal: #2f6bd8; --robust-coral: #e0702a; }
-.review-bar-track .home { background: #2f6bd8; }
-.review-bar-track .away { background: #e0702a; }
+:root, .review-home { --review-teal: var(--team-a); --review-rust: var(--team-b); --review-orange: var(--team-b); }
+.robust-page { --robust-teal: var(--team-a); --robust-coral: var(--team-b); }
+.review-bar-track .home { background: var(--team-a); }
+.review-bar-track .away { background: var(--team-b); }
 .review-similarity b, .review-sim strong, .review-nearest strong, .robust-pairline > .robust-percentile, .duel-reading > span b { color: var(--ink); }
 .kicker:empty { display: none; }

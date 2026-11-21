@@ -1,17 +1,17 @@
 .ws-pairs { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 .wp-guide { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 8px; padding: 3px 10px; font-size: 12px; color: var(--ws-ink-2); }
-.wp-guide-button::before { content: ""; display: inline-block; width: .75em; height: .65em; margin-inline-end: .4em; background: #ecf2f6; border: 1px dashed #61798c; }
+.wp-guide-button::before { content: ""; display: inline-block; width: .75em; height: .65em; margin-inline-end: .4em; background: var(--ws-dot-off); border: 1px dashed var(--ws-muted); }
 .wp-guide-button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--ws-ink); }
-.wp-reference { fill: #d4e2eb; fill-opacity: .4; stroke: #61798c; stroke-dasharray: 4 3; pointer-events: none; }
+.wp-reference { fill: var(--ws-dot-off); stroke: var(--ws-muted); stroke-dasharray: 4 3; pointer-events: none; }
 .wp-axis-title { flex: none; text-align: left; padding: 4px 12px 0; font-size: 12px; color: var(--ws-ink-2); }
 .wp-x-title { padding: 0 12px 3px; text-align: right; }
 .wp-chart { flex: 1 1 auto; min-width: 0; min-height: 92px; }
 .wp-chart svg { display: block; width: 100%; height: 100%; }
 .wp-axis text { fill: var(--ws-ink-2); font-size: 12px; font-variant-numeric: tabular-nums; }
 .wp-axis path, .wp-axis line { stroke: var(--ws-line-2); }
-.wp-dot { fill: #405977; opacity: .58; cursor: pointer; }
+.wp-dot { fill: var(--ws-ink-2); opacity: .58; cursor: pointer; }
 .wp-dot.is-out { opacity: .12; pointer-events: none; }
-.wp-dot.wp-active { opacity: 1; stroke: var(--ws-ink); stroke-width: 2px; fill: #fff; r: 5px; }
+.wp-dot.wp-active { opacity: 1; stroke: var(--ws-ink); stroke-width: 2px; fill: var(--ws-panel); r: 5px; }
 .wp-region { fill: var(--ws-ink); fill-opacity: .035; stroke: var(--ws-ink-2); stroke-dasharray: 3 3; pointer-events: none; }
 .wp-readout, .wp-list-tools, .wp-cols, .wp-result { font-size: 12px; color: var(--ws-ink-2); }
 .wp-readout { flex: none; height: 30px; padding: 3px 10px; display: flex; align-content: safe center; align-items: center; flex-wrap: wrap; gap: 3px 9px; overflow-y: auto; }

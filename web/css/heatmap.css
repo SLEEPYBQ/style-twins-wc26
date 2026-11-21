@@ -28,8 +28,8 @@
 .hm-legend { padding-block: 5px 8px; }
 .hm-scale { display: inline-flex; gap: 5px; align-items: center; direction: ltr; font-variant-numeric: tabular-nums; }
 .hm-scale i { display: inline-block; width: 32px; height: 8px; }
-.hm-scale .hm-low { background: linear-gradient(90deg, #985522, #f4f3f2); }
-.hm-scale .hm-high { background: linear-gradient(90deg, #f4f3f2, #594899); }
+.hm-scale .hm-low { background: linear-gradient(90deg, var(--neg), var(--mid)); }
+.hm-scale .hm-high { background: linear-gradient(90deg, var(--mid), var(--pos)); }
 .hm-excluded i { font-style: normal; }
 .hm-scroll { flex: 1; min-height: 0; overflow: auto; border-top: 1px solid var(--ws-line); scrollbar-gutter: stable; }
 .ws-heat .hm-table { width: 100%; min-width: 518px; border-spacing: 0; border-collapse: separate; table-layout: fixed; font-size: 12px; line-height: 1.2; color: var(--ws-ink); }
@@ -48,7 +48,7 @@
 .hm-table thead th[data-model="out"] button { color: var(--ws-muted); }
 .hm-table thead i { font-style: normal; }
 .hm-table .hm-team-head { padding: 6px 10px; text-align: start; font-weight: 500; }
-.hm-table tbody th { position: sticky; inset-inline-start: 0; z-index: 1; background: #fff; font-weight: 500; text-align: start; }
+.hm-table tbody th { position: sticky; inset-inline-start: 0; z-index: 1; background: var(--ws-panel); font-weight: 500; text-align: start; }
 .hm-table tbody tr[data-team] { cursor: pointer; }
 .hm-table tbody td[data-i] { height: 20px; border-inline-end: 1px solid white; border-bottom: 1px solid white; }
 .hm-table td.is-inspected { border-inline: 1px solid rgb(31 41 51 / .4); }
@@ -59,7 +59,7 @@
 .hm-team .flag { flex: none; }
 .hm-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hm-side { margin-inline-start: auto; font-size: 11px; }
-.hm-near-rank { margin-inline-start: auto; color: #147266; font-size: 11px; font-variant-numeric: tabular-nums; }
+.hm-near-rank { margin-inline-start: auto; color: var(--ws-twin-ink); font-size: 11px; font-variant-numeric: tabular-nums; }
 .hm-near-rank + .hm-side { margin-inline-start: 0; }
 .is-a .hm-team { color: var(--ws-a-ink); background: var(--ws-a-soft); }
 .is-b .hm-team { color: var(--ws-b-ink); background: var(--ws-b-soft); }
@@ -68,7 +68,7 @@
 .hm-table td.is-gap { position: relative; }
 .hm-table td.is-gap::after { content: ""; position: absolute; inset: 2px; border: 2px solid var(--ws-ink); outline: 1px solid #fff; pointer-events: none; }
 .hm-table .hm-group-heading th {
-  position: static; padding: 6px 8px 3px; height: 23px; border-bottom: 1px solid var(--ws-line); background: #f5f6f7; font-weight: 600;
+  position: static; padding: 6px 8px 3px; height: 23px; border-bottom: 1px solid var(--ws-line); background: var(--ws-sunken); font-weight: 600;
 }
 .hm-group-title { position: sticky; inset-inline-start: 8px; display: inline-flex; }
 .hm-group-count { margin-inline-start: 6px; color: var(--ws-muted); font-weight: 400; }

@@ -152,9 +152,9 @@ html:not([lang="en"]) .lab-page .lab-tabs button { white-space: nowrap; }
 .lab-page .lab-matrix tbody th button { padding: 5px 4px; border: 0; background: transparent; font-size: 12.5px; font-weight: 600; white-space: nowrap; text-align: start; }
 .lab-page .lab-matrix tbody th button span { display: inline-block; width: 22px; color: var(--muted); }
 .lab-page .lab-matrix tbody th button[aria-pressed="true"] { color: var(--pos); }
-.lab-page .lab-matrix td { height: 30px; border-radius: 3px; background: rgb(10 147 150 / var(--intensity)); font-variant-numeric: tabular-nums; }
-.lab-page .lab-matrix td.lab-cell-in { background: rgb(232 116 59 / var(--intensity)); }
-.lab-page .lab-matrix td.lab-cell-out { outline: 1.5px solid rgb(10 147 150 / .35); }
+.lab-page .lab-matrix td { height: 30px; border-radius: 3px; background: color-mix(in srgb, var(--pos) calc(var(--intensity) * 75%), transparent); font-variant-numeric: tabular-nums; }
+.lab-page .lab-matrix td.lab-cell-in { background: color-mix(in srgb, var(--neg) calc(var(--intensity) * 75%), transparent); }
+.lab-page .lab-matrix td.lab-cell-out { outline: 1.5px solid color-mix(in srgb, var(--pos) 35%, transparent); }
 
 /* Line breaks ----------------------------------------------------------- */
 .lab-page .lab-break-overview { display: grid; grid-template-columns: 1.15fr 1fr; gap: clamp(14px, 1.6vw, 20px); }

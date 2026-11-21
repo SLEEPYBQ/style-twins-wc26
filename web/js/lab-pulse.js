@@ -1,10 +1,26 @@
 /* Linked event-count timeline. Full-match xG is never distributed across attempts. */
 (function () {
   const App = window.App, P = App.matchPulseData;
-  const P_THEMES = {
-    phone: { teams: ["#54e0c5", "#ffb782"], bg: "#102531", shade: "#73d8cb", grid: "#29424f", tick: "#9db8c7", axis: "#547181", label: "#90acbc", period: "#789bad", divider: "#476270", strip: "#1a3441", mark: "#102531", selected: "#fff", ink: ["#edf7f9", "#b2cfdb", "#8caebf"] },
-    desktop: { teams: ["#2f6bd8", "#e0702a"], bg: "#ffffff", shade: "#2f6bd8", grid: "#eceef1", tick: "#858a96", axis: "#c3c9d0", label: "#858a96", period: "#4a5263", divider: "#c3c9d0", strip: "#f6f7f9", mark: "#ffffff", selected: "#1d2433", ink: ["#1d2433", "#4a5263", "#858a96"] },
-  };
+  // Exported SVGs need literal colours because the site stylesheet is not embedded.
+  function pulseTheme() {
+    const css = getComputedStyle(document.documentElement);
+    const token = name => css.getPropertyValue(name).trim();
+    if (!App.isDesktop()) {
+      return {
+        teams: [token("--team-a-on-dark"), token("--team-b-on-dark")],
+        bg: "#102531", shade: "#9db8c7", grid: "#29424f", tick: "#9db8c7", axis: "#547181", label: "#90acbc",
+        period: "#9db8c7", divider: "#476270", strip: "#1a3441", mark: "#102531", selected: "#fff",
+        ink: ["#edf7f9", "#b2cfdb", "#8caebf"],
+      };
+    }
+    return {
+      teams: [token("--team-a"), token("--team-b")],
+      bg: token("--card"), shade: token("--cohort-line"), grid: token("--grid"), tick: token("--muted"),
+      axis: token("--axis"), label: token("--muted"), period: token("--ink-2"), divider: token("--axis"),
+      strip: token("--card-2"), mark: token("--card"), selected: token("--ink"),
+      ink: [token("--ink"), token("--ink-2"), token("--muted")],
+    };
+  }
   const outcome = (event) => event.type === "goal" ? "Goal" : ({ saved: "Saved", blocked: "Blocked", off: "Off target", other: "Other recorded outcome" })[event.outcome] || "Not recorded";
   const player = (match, event) => match.teams[event.team]?.players[event.p];
   const download = (name, value, type) => {
@@ -13,7 +29,7 @@
   };
   App.matchPulse = {
     render(host, match, { teamId, params = {}, onParams } = {}) {
-      const T = App.isDesktop() ? P_THEMES.desktop : P_THEMES.phone, COLORS = T.teams;
+      const T = pulseTheme(), COLORS = T.teams;
       const data = P.prepare(match), side = Math.max(0, match.teams.findIndex((team) => team.team_id === teamId));
       const team = match.teams[side];
       const extent = P.positions(data);
@@ -143,8 +159,14 @@
         while (copy.firstChild) body.appendChild(copy.firstChild);
         copy.appendChild(body); copy.setAttribute("viewBox", `0 0 ${width} ${height + 78}`); copy.setAttribute("width", width); copy.setAttribute("height", height + 78);
         const bg = document.createElementNS("http://www.w3.org/2000/svg", "rect"); bg.setAttribute("width", width); bg.setAttribute("height", 78); bg.setAttribute("fill", T.bg); copy.prepend(bg);
-        [[`Match ${match.number} · Cumulative recorded attempts`, 24, width < 500 ? 12 : 18, T.ink[0]], [`${match.teams[0].name} (teal) · ${match.teams[1].name} (orange)`, 45, width < 500 ? 9 : 12, T.ink[1]], [`Window ${P.clock(data, range[0])}–${P.clock(data, range[1])} · Minute-based records · Style Twins`, 64, width < 500 ? 8 : 11, T.ink[2]]].forEach(([text, y, size, fill]) => {
+        [[`Match ${match.number} · Cumulative recorded attempts`, 24, width < 500 ? 12 : 18, T.ink[0]], [`Window ${P.clock(data, range[0])}–${P.clock(data, range[1])} · Minute-based records · Style Twins`, 64, width < 500 ? 8 : 11, T.ink[2]]].forEach(([text, y, size, fill]) => {
           const line = document.createElementNS("http://www.w3.org/2000/svg", "text"); line.setAttribute("x", 15); line.setAttribute("y", y); line.setAttribute("fill", fill); line.setAttribute("font-family", "system-ui, sans-serif"); line.setAttribute("font-size", size); line.textContent = text; copy.appendChild(line);
+        });
+        const key = d3.select(copy).append("text").attr("x", 15).attr("y", 45)
+          .attr("font-family", "system-ui, sans-serif").attr("font-size", width < 500 ? 9 : 12);
+        match.teams.forEach((team, i) => {
+          key.append("tspan").attr("dx", i ? 14 : 0).attr("fill", COLORS[i]).text("●");
+          key.append("tspan").attr("dx", 4).attr("fill", T.ink[1]).text(team.name);
         });
         copy.prepend(desc); copy.prepend(title);
         // Translate newly added export captions as well as the visible chart labels.

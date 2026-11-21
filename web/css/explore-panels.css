@@ -84,12 +84,12 @@
 .xp-box-axis-track { grid-column: 2; }
 .xp-box-axis > :last-child { text-align: end; }
 .xp-box-ticks text { font: inherit; fill: currentColor; font-variant-numeric: tabular-nums; }
-.xp-box-zero { stroke: var(--ws-line-2); stroke-dasharray: 2 2; }
-.xp-box-whisker, .xp-box-cap { stroke: var(--ws-dot); stroke-width: 1.3px; }
-.xp-box-body { fill: var(--ws-dot-off); stroke: var(--ws-dot); }
-.xp-box-median { stroke: var(--ws-ink); stroke-width: 2px; }
-.xp-box-outlier { fill: var(--ws-panel); stroke: var(--ws-ink-2); }
-.xp-box-observation { fill: var(--ws-ink-2); }
+.xp-box-zero { stroke: var(--ws-faint); stroke-dasharray: 2 2; }
+.xp-box-whisker, .xp-box-cap { stroke: var(--cohort-line); stroke-width: 1.3px; }
+.xp-box-body { fill: var(--cohort-fill); stroke: var(--cohort-line); }
+.xp-box-median { stroke: var(--cohort-ink); stroke-width: 2px; }
+.xp-box-outlier { fill: var(--ws-panel); stroke: var(--cohort-line); }
+.xp-box-observation { fill: var(--cohort-line); }
 .xp-box-pin { pointer-events: none; }
 .xp-box-pin path { stroke: var(--ws-panel); stroke-width: 1.2px; }
 .xp-box-pin[data-role="a"] path { fill: var(--ws-a); }
@@ -98,11 +98,11 @@
 .xp-box-kind-key, .xp-box-team { display: inline-flex; align-items: center; gap: 4px; margin-inline-start: .8em; }
 .xp-box-kind-key::before, .xp-box-team::before { content: ""; flex: none; }
 .xp-box-kind-key[data-key="box"]::before {
-  width: 12px; height: 8px; background: var(--ws-dot-off); border: 1px solid var(--ws-dot);
+  width: 12px; height: 8px; background: var(--cohort-fill); border: 1px solid var(--cohort-line);
 }
-.xp-box-kind-key[data-key="median"]::before { width: 2px; height: 10px; background: var(--ws-ink); }
+.xp-box-kind-key[data-key="median"]::before { width: 2px; height: 10px; background: var(--cohort-ink); }
 .xp-box-kind-key[data-key="outliers"]::before {
-  width: 7px; height: 7px; border: 1.5px solid var(--ws-ink-2); border-radius: 50%;
+  width: 7px; height: 7px; border: 1.5px solid var(--cohort-line); border-radius: 50%;
 }
 .xp-box-team[data-role="hover"]::before {
   width: 10px; height: 10px;
@@ -129,8 +129,8 @@
 }
 .xp-goals-axis text { fill: var(--ws-ink-2); font: 12px var(--sans); font-variant-numeric: tabular-nums; }
 .xp-goals-axis :is(path,line) { stroke: var(--ws-line-2); }
-.xp-goals-zero { stroke: var(--ws-muted); stroke-dasharray: 2 3; }
-.xp-goals-dot { fill: var(--ws-dot); stroke: var(--ws-panel); stroke-width: 1; }
+.xp-goals-zero { stroke: var(--ws-faint); stroke-dasharray: 2 3; }
+.xp-goals-dot { fill: var(--cohort-line); stroke: var(--ws-panel); stroke-width: 1; }
 .xp-goals-mark { cursor: pointer; }
 .xp-goals-mark.is-a .xp-goals-dot { fill: var(--ws-a); }
 .xp-goals-mark.is-b .xp-goals-dot { fill: var(--ws-b); }
@@ -154,41 +154,41 @@
 .xp-goals-pin.is-a { color: var(--ws-a-ink); }
 .xp-goals-pin.is-b { color: var(--ws-b-ink); }
 
-.xp-cohort-range { fill: none; stroke: var(--ws-dot); stroke-width: 1.25; }
-.xp-cohort-band { fill: var(--ws-dot); fill-opacity: .34; }
+.xp-cohort-range { fill: none; stroke: var(--cohort-line); stroke-width: 1.25; }
+.xp-cohort-band { fill: var(--cohort-fill); stroke: var(--cohort-line); stroke-width: .75; }
 .xp-cohort-median, .xp-cohort-preview path {
   fill: none;
   stroke-width: 2;
   stroke-linejoin: round;
 }
-.xp-cohort-median { stroke: var(--ws-ink-2); }
-.xp-cohort-whisker { stroke: var(--ws-dot); stroke-width: 5; stroke-opacity: .45; }
-.xp-cohort-dot { fill: var(--ws-ink-2); stroke: var(--ws-panel); stroke-width: 1.3; }
+.xp-cohort-median { stroke: var(--cohort-ink); }
+.xp-cohort-whisker { stroke: var(--cohort-fill); stroke-width: 5; }
+.xp-cohort-dot { fill: var(--cohort-ink); stroke: var(--ws-panel); stroke-width: 1.3; }
 .xp-cohort-mark { cursor: pointer; }
 .xp-cohort-mark:is(:hover, :focus) .xp-cohort-dot {
   fill: var(--ws-panel);
   stroke: var(--ws-ink);
   stroke-width: 2;
 }
-.xp-cohort-preview { color: var(--ws-a-ink); pointer-events: none; }
-.xp-cohort-preview path { stroke: currentColor; }
-.xp-cohort-preview circle { fill: currentColor; stroke: var(--ws-panel); }
+.xp-cohort-preview { color: var(--ws-ink); pointer-events: none; }
+.xp-cohort-preview path { stroke: currentColor; stroke-dasharray: 4 2; }
+.xp-cohort-preview circle { fill: var(--ws-panel); stroke: currentColor; }
 .xp-cohort-key { display: inline-flex; align-items: center; gap: 5px; }
 .xp-cohort-key::before { content: ""; width: 16px; }
 .xp-cohort-key.is-median::before {
   height: 6px;
-  background: radial-gradient(circle, var(--ws-ink-2) 2.5px, transparent 3px) center,
-    linear-gradient(var(--ws-ink-2), var(--ws-ink-2)) center / 100% 2px no-repeat;
+  background: radial-gradient(circle, var(--cohort-ink) 2.5px, transparent 3px) center,
+    linear-gradient(var(--cohort-ink), var(--cohort-ink)) center / 100% 2px no-repeat;
 }
-.xp-cohort-key.is-team::before { border-block-start: 2px solid var(--ws-a-ink); }
+.xp-cohort-key.is-team::before { border-block-start: 2px dashed var(--ws-ink); }
 .xp-cohort-key.is-range::before {
   width: 7px;
   height: 11px;
   margin-inline: 4px;
-  border-block: 1px solid var(--ws-dot);
-  background: linear-gradient(var(--ws-dot), var(--ws-dot)) center / 1px 100% no-repeat;
+  border-block: 1px solid var(--cohort-line);
+  background: linear-gradient(var(--cohort-line), var(--cohort-line)) center / 1px 100% no-repeat;
 }
-.xp-cohort-key.is-band::before { height: 8px; background: var(--ws-dot); opacity: .34; }
+.xp-cohort-key.is-band::before { height: 8px; background: var(--cohort-fill); border: 1px solid var(--cohort-line); }
 
 .xp-trend-series.is-a { color: var(--ws-a); }
 .xp-trend-series.is-b { color: var(--ws-b); }

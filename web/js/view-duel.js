@@ -1,7 +1,7 @@
 /* Compare two observed team-match performances while retaining the chosen style definition. */
 (function () {
   const App = window.App;
-  const colors = ["#2f6bd8", "#e0702a"]; // A blue, B orange, as in the workspace
+  const colors = ["var(--team-a)", "var(--team-b)"]; // A blue, B orange, as in the workspace
   const safeReturn = (value) => /^#\/(twins|styles|matches|match|team|duel|lab|robustness)(\/|\?|$)/.test(value || "") ? value : "#/matches";
 
   App.views.duel = function (root, params, firstKey, secondKey) {

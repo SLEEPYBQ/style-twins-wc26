@@ -1,11 +1,11 @@
 /* A shared horizontal running total, with signed component changes in the last column. */
-.wf { --wf-a: #2f6bd8; --wf-b: #e0702a; --wf-row: 33px; color: var(--ink); min-width: 0; }
+.wf { --wf-row: 33px; color: var(--ink); min-width: 0; }
 #ws-waterfall { padding: 9px 14px 11px; }
 .wf-head, .wf-team { display: flex; align-items: center; flex-wrap: wrap; }
 .wf-head { gap: 4px 10px; margin-block: 3px 12px; }
 .wf-team { gap: 5px; font-weight: 600; }
 .wf-role { font-size: 11px; font-weight: 700; }
-.wf-a { color: var(--wf-a); } .wf-b { color: #a34e16; }
+.wf-a { color: var(--team-a-ink); } .wf-b { color: var(--team-b-ink); }
 .wf-scope, .wf-team small { color: var(--ink-2); font-size: 12px; font-weight: 400; }
 .wf-scope { margin-inline-start: auto; }
 .wf-grid { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 16px 28px; align-items: start; }
@@ -20,14 +20,14 @@
 .wf-row strong { text-align: end; font-variant-numeric: tabular-nums; }
 .wf button.wf-total { font-weight: 700; border-top: 1px solid var(--line); }
 .wf-track { display: block; position: relative; align-self: stretch; direction: ltr; }
-.wf-track::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--zero); border-left: 1px solid #808893; }
+.wf-track::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--zero); border-left: 1px solid var(--muted); }
 .wf-bar, .wf-end, .wf-connector, .wf-from { position: absolute; }
 .wf-bar { top: calc(50% - 5px); height: 10px; }
 .wf-end { height: 14px; top: calc(50% - 7px); border-left: 1px solid var(--ink-2); }
-.wf-connector, .wf-from { border-left: 1px dashed #89929d; pointer-events: none; }
+.wf-connector, .wf-from { border-left: 1px dashed var(--muted); pointer-events: none; }
 .wf-connector { top: calc(50% + 5px); bottom: 0; }
 .wf-from { top: 0; bottom: calc(50% + 5px); }
-.wf-positive { background: var(--wf-a); } .wf-negative { background: var(--wf-b); } .wf-observed { background: var(--ink); }
+.wf-positive { background: var(--team-a); } .wf-negative { background: var(--team-b); } .wf-observed { background: var(--ink); }
 .wf-axis { padding: 0 5px; }
 .wf-ticks { position: relative; grid-column: 2; height: 22px; border-top: 1px solid var(--axis); direction: ltr; }
 .wf-ticks i { position: absolute; top: 0; height: 3px; border-left: 1px solid var(--axis); font-style: normal; }
