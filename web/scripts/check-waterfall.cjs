@@ -73,6 +73,9 @@ module.exports = async function checkWaterfall(page, base, output) {
     await open(`#/styles?team=${a}&compare=${b}&scope=${scope}`);
     await geometry(a,b,scope);
   }
+  await open("#/styles?team=BIH&compare=GHA");
+  await geometry("BIH","GHA","all");
+  assert.equal(await chart.locator('[data-step="c_opp"] strong').textContent(), "−0.00005");
   await open("#/styles?team=IRQ&compare=NED&scope=knockout");
   assert.equal(await chart.locator(".wf-row").count(), 0);
   assert.match(await chart.innerText(), /match records/);

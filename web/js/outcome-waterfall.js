@@ -14,7 +14,12 @@
   };
   const fixedNote = "Scope selects the matches to average. Similarity indicators change the ranking. Model estimates always come from the full-tournament fit using all ten indicators.";
   const matchNote = "Each row shows the selected term for one match. Subtract the two team means to obtain this step.";
-  const format = (v) => App.signed(v, Math.abs(v) > 1e-10 && Math.abs(v) < 0.005 ? 4 : 2);
+  function format(value) {
+    const magnitude = Math.abs(value);
+    if (magnitude < 1e-10 || magnitude >= 0.005) return App.signed(value);
+    const decimals = 1 - Math.floor(Math.log10(magnitude));
+    return App.signed(value, decimals).replace(/0+$/, "");
+  }
 
   App.outcomeWaterfall = function (host, { a, b, scope, sums, inspectMatch }) {
     // Recolouring, comparing indicators and resizing do not change these data.
@@ -43,8 +48,9 @@
           <i class="wf-end" style="left:${x(step.end)}%"></i>${total ? "" : `<i class="wf-connector" style="left:${x(step.end)}%"></i>`}</span>
         <strong dir="ltr">${format(step.value)}</strong></button>`;
     }).join("");
+    const precise = steps.some(step => format(step.value).length > 6);
     host.innerHTML = `<div class="wf-head">${teamKey}<span class="wf-scope">${scopeNames[scope]}</span></div>
-      <div class="wf-grid"><div class="wf-plot" style="--zero:${x(0)}%" role="group" aria-label="Cumulative goal-difference contributions">
+      <div class="wf-grid"><div class="wf-plot${precise ? " wf-precise" : ""}" style="--zero:${x(0)}%" role="group" aria-label="Cumulative goal-difference contributions">
         <div class="wf-colheads"><span>Component</span><span>Running gap · goals per match</span><span>A − B</span></div>
         ${bars}<div class="wf-axis" aria-hidden="true"><div class="wf-ticks">${x.ticks(4).map(v => `<i style="left:${x(v)}%"><span>${tick(v)}</span></i>`).join("")}</div></div></div>
         <div class="wf-inspect"><div class="wf-detail" aria-live="polite"></div>

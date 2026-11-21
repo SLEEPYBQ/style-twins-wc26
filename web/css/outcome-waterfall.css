@@ -10,7 +10,8 @@
 .wf-scope, .wf-team small { color: var(--ink-2); font-size: 12px; font-weight: 400; }
 .wf-scope { margin-inline-start: auto; }
 .wf-grid { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 16px 28px; align-items: start; }
-.wf-plot { min-width: 0; --cols: minmax(5.25rem, 23%) minmax(0, 1fr) 3.5rem; }
+.wf-plot { min-width: 0; --cols: minmax(5.25rem, 23%) minmax(0, 1fr) var(--wf-value-column, 3.5rem); }
+.wf-plot.wf-precise { --wf-value-column: 72px; }
 .wf-row, .wf-axis, .wf-colheads { display: grid; grid-template-columns: var(--cols); align-items: center; gap: 8px; }
 .wf-colheads { padding: 0 5px 5px; color: var(--ink-2); font-size: 12px; border-bottom: 1px solid var(--line); }
 .wf-colheads > :last-child { text-align: end; }
@@ -53,7 +54,7 @@
   .wf-row, .wf-axis, .wf-colheads { gap: 5px; }
   .wf-inspect { border: 0; padding: 8px 0 0; border-top: 1px solid var(--line); }
   .wf-scope { margin-inline-start: 0; }
-  .wf-plot { --cols: minmax(5.75rem, 32%) minmax(0, 1fr) 2.75rem; }
+  .wf-plot { --cols: minmax(5.75rem, 32%) minmax(0, 1fr) var(--wf-value-column, 3.5rem); }
 }
 @media (pointer: coarse) {
   .wf { --wf-row: 44px; }
