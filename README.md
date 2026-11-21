@@ -34,9 +34,15 @@ Selections are retained in shareable analysis URLs and return links. Comparison 
 
 ### Linked analysis workbench
 
-Pinning A reveals its five closest teams across the map, heatmap and ranking. Pinning B opens the signed Style DNA comparison and a six-step waterfall of the observed goal-difference gap. From any waterfall step, inspect the match records used in each team's mean. The Team pairs map includes a selectable, labeled example region for finding other comparisons.
+| Mode | What you can investigate |
+| --- | --- |
+| **Explore** | Brush the map to filter the heatmap. Pin A to see its five nearest teams beside the tabs. Hover or focus one to locate it in both views. Select it to pin B. |
+| **Compare** | Inspect A’s profile and ranked neighbors. With two teams, switch the Style DNA Difference Lens between absolute values and signed A minus B differences. Change the indicators to test the ranking. |
+| **Explain** | Inspect the six contributions to the observed goal-difference gap. Select a step and one of its match records to locate the game in Match evidence. Switch to Outcomes for scoped benchmarks. |
 
-[Classroom walkthrough](docs/visual-interaction-demo.md) · [Interaction design](docs/visual-interaction-spec.md) · [Browser screenshots and verification](review/visual-interactions/README.md)
+The team pickers, comparison summary and match scope stay visible across modes on desktop. The dense heatmap and tables scroll within their panels. On phones the active workspace scrolls vertically. **Team Table** opens the filtered records and CSV export in a dialog. **Similarity indicators** opens the model controls in Explore and Explain. Close a dialog with **Esc**. When the mode tabs have focus, use the left and right arrows or Home and End.
+
+[Seven-minute classroom walkthrough](docs/visual-interaction-demo.md) · [Interaction design](docs/visual-interaction-spec.md) · [Viewport screenshots and measurements](review/viewport-workspace/README.md) · [Numerical verification](review/visual-interactions/README.md)
 
 The site opens with all 48 teams. Map points and heatmap cells share a colour scale. The map initially shows possession in colour, and the heatmap lists teams from highest to lowest possession. Hover or focus a point or row to locate the same team in the other view. Click a team to set A, then another to set B. The searchable pickers also accept a team name or code. Shift-click sets A. Use **Clear comparison** in the B picker to return to one team, or **Reset view** to return to the full tournament.
 
@@ -47,9 +53,9 @@ The site opens with all 48 teams. Map points and heatmap cells share a colour sc
 - **Team pairs** shows each unordered combination of two visible teams once. Across all 48 teams there are 1,128 pairs. The horizontal axis uses the same similarity percentile as Similar teams, referenced to all pairs in the current match scope. The vertical axis is the absolute difference between the teams’ mean goal differences per match. Brush a region to narrow the pair list, then choose a dot or a listed pair to open its A/B comparison. The region is saved in the URL.
 - **Similar teams** ranks teams against A using two or more selected indicators. Its percentile is the share of all in-scope team pairs at least as far apart as that pair, including ties. Search, group, outcome and brush filters restrict the overview cohort. The similarity ranking retains all eligible teams in the match scope.
 - **Team Table** gives sortable outcomes and a CSV for the current filters. Pinned teams outside the filters remain identifiable in the table and map. The CSV contains just the filtered rows.
-- **Style Profile** and **Match evidence** open with the first team. Select a second team to see **Outcomes**, order the profile by gap, or open the full pair report. Outcome benchmarks show the mean of A’s five closest team means and the average across team-match records in the chosen scope. Select a match performance to overlay it on the map and profile, then open its replay or Match Lab.
+- With the first team selected, **Compare** shows its Style Profile and **Explain** shows its Match evidence. Select a second team to see **Outcomes**, order the profile by gap, or open the full pair report. Outcome benchmarks show the mean of A’s five closest team means and the average across team-match records in the chosen scope. Select a match performance to overlay it on the map and profile, then open its replay or Match Lab.
 
-Both workspace routes preserve selections, match scope, indicators, filters, heatmap order and map encodings in the URL. For example, `#/styles?team=ECU&compare=USA&scope=group&heatSort=near` opens a group-stage comparison. The ten canonical indicator IDs, the fitted groups and the full-tournament standardization stay fixed across views.
+Both workspace routes preserve the active mode, selections, match scope, indicators, filters, heatmap order and map encodings in the URL. For example, `#/styles?team=ECU&compare=USA&scope=group&mode=explain&evidence=outcomes` opens the Ecuador–United States group-stage waterfall with outcome benchmarks. Older links without a mode open in Explore. The ten canonical indicator IDs, the fitted groups and the full-tournament standardization stay fixed across views.
 
 ### Professional analysis workspaces
 
@@ -95,9 +101,10 @@ The workspace browser regression runs with the same server and Playwright setup:
 
 ```bash
 node scripts/verify-workspace-browser.cjs
+node scripts/verify-workspace-layout.cjs
 ```
 
-It checks all 480 heatmap values against the delivered records, linked selections, sorting, custom axis units, scoped outcome benchmarks, filtering, history and exports. For a slow SSH tunnel, either browser suite accepts a navigation timeout in milliseconds through `STYLE_TWINS_NAV_TIMEOUT_MS`. Desktop, laptop and phone screenshots are written to `STYLE_TWINS_QA_OUTPUT` or the system temporary directory.
+The layout suite measures document and chart bounds at four desktop viewport sizes and exercises the three modes on a touch-emulated phone. The workspace suite checks all 480 heatmap values against the delivered records, linked selections, sorting, custom axis units, scoped outcome benchmarks, filtering, history and exports. For a slow SSH tunnel, either browser suite accepts a navigation timeout in milliseconds through `STYLE_TWINS_NAV_TIMEOUT_MS`. Desktop, laptop and phone screenshots are written to `STYLE_TWINS_QA_OUTPUT` or the system temporary directory.
 
 ## Rebuild the data
 

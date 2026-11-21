@@ -1,6 +1,6 @@
 # Visual interactions in Style Twins
 
-The workspace opens on the tournament, with no team pinned. The investigation starts with a team, a measured indicator, or a region of the map. The explanatory views open once the viewer has chosen a comparison.
+The workspace opens on the tournament, with no team pinned. The investigation starts with a team, a measured indicator, or a region of the map. Explore, Compare and Explain share the same team selection. A single team has a profile and supporting match records. A pair adds signed indicator differences and an outcome waterfall.
 
 ## Interaction contract
 
@@ -20,3 +20,9 @@ The workspace opens on the tournament, with no team pinned. The investigation st
 - Hover, keyboard focus and an unfinished brush are temporary. Pinning, swapping and committing a filter use browser history. On coarse pointers, arming Brush distinguishes region selection from scrolling.
 - Changing the PCA inputs can change its basis. Replace the projected geometry without tweening from the old coordinates. Keep position fixed for a change in observed color. Prefer short, interruptible emphasis changes and disable discretionary motion under reduced motion.
 - Cumulative model contributions come from the six fields in each record’s decomposition. Scope averages those stored terms; indicator selection controls similarity. Goals minus xG and xGA minus goals conceded include variation from a small number of matches. Neither term identifies individual player skill or a causal effect.
+
+## Workspace navigation
+
+The mode is part of the shareable URL. Explore is the default for existing links. Compare and Explain keep the pinned teams, indicator selection, scope, filters and highlighted match. Switching modes leaves the distance ranking and PCA basis intact. A browser Back step restores the previous mode with its selections.
+
+On desktop the header, team pickers and current mode stay in view. Explore places map and matrix side by side. Compare places profile differences beside the ranking, and Explain places the waterfall beside match evidence or outcome benchmarks. The Team Table opens on demand. A shorter or narrower screen uses a single-column flow with document scrolling. The layout regression measures CSS viewport dimensions at normal browser zoom. [Measurements and screenshots](../review/viewport-workspace/README.md)
