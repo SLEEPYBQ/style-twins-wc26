@@ -10,6 +10,7 @@ HERE=${0:A:h}
 : ${DEPLOY_TARGET:?set DEPLOY_TARGET in pipeline/deploy.env}
 : ${DEPLOY_KEY:?set DEPLOY_KEY in pipeline/deploy.env}
 rsync -az --delete \
+  --chmod=D755,F644 \
   --exclude '.DS_Store' \
   --exclude 'img/gen/*.png' \
   --exclude 'img/avatars/*.png' \
