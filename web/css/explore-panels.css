@@ -100,6 +100,18 @@
 [data-kind="spread"] .xp-style-track i { background: #62768d; }
 [data-kind="pair"] .xp-style-row[data-sign="negative"] i { background: var(--ws-b); }
 
+#ws-outcome-preview .xp-head { align-items: center; }
+.xp-goals-controls {
+  margin-inline-start: auto;
+  max-width: 100%;
+}
+.xp-goals-controls button:disabled {
+  color: var(--ws-muted);
+  opacity: .7;
+  cursor: default;
+}
+.xp-goals-controls button { white-space: normal; }
+
 .xp-goals-plot {
   flex: 1;
   display: block;
@@ -135,10 +147,34 @@
 .xp-goals-pin.is-a { color: var(--ws-a-ink); }
 .xp-goals-pin.is-b { color: var(--ws-b-ink); }
 
+.xp-trend-series.is-a { color: var(--ws-a); }
+.xp-trend-series.is-b { color: var(--ws-b); }
+.xp-trend-line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.xp-trend-series.is-b .xp-trend-line { stroke-dasharray: 5 3; }
+.xp-trend-glyph { fill: currentColor; stroke: var(--ws-panel); stroke-width: 1; }
+.xp-trend-series.is-hover .xp-trend-line { stroke-width: 2.8; }
+.xp-trend-series.is-hover .xp-trend-glyph { stroke: currentColor; }
+.xp-trend-point { cursor: pointer; }
+.xp-trend-point:is(:hover, :focus-visible) .xp-trend-glyph {
+  stroke: var(--ws-ink);
+  stroke-width: 2;
+}
+.xp-trend-axis-title { fill: var(--ws-ink-2); font: 500 11px var(--sans); }
+.xp-trend-readout { align-content: start; }
+
 @media (min-width: 1000px) and (min-height: 560px) {
   .ws[data-mode="explore"] .ws-content {
     grid-template-rows: minmax(0, 1fr) clamp(128px, 17.8dvh, 200px);
     row-gap: 8px;
+  }
+  .ws[data-mode="explore"] .ws-content:has(.xp-trend-plot:not([hidden])) {
+    grid-template-rows: minmax(0, 1fr) clamp(178px, 22dvh, 240px);
   }
   /* Enhanced selects live inside the chart panel. Keep their scrollable lists
      inside its visible area after the additional row takes its share of space. */
@@ -182,14 +218,32 @@
 @media (min-width: 1000px) and (min-height: 560px) and (max-height: 699px) {
   body.ws-route:has(.ws[data-mode="explore"]) { min-height: 100dvh; height: auto; }
   .ws[data-mode="explore"] .ws-content { flex: none; grid-template-rows: minmax(470px, auto) minmax(138px, auto); }
+  .ws[data-mode="explore"] .ws-content:has(.xp-trend-plot:not([hidden])) {
+    grid-template-rows: minmax(470px, auto) minmax(180px, auto);
+  }
 }
 @media (max-width: 999px), (max-height: 559px) {
   .ws-explore-panel { min-height: 154px; }
   .xp-goals-plot { flex: none; height: 76px; }
+  .xp-trend-plot { height: 158px; }
   .xp-style-row { min-height: 28px; }
 }
 @media (max-width: 700px) {
   .ws-explore-panels { grid-template-columns: minmax(0, 1fr); }
+  #ws-outcome-preview .xp-head {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 3px 8px;
+  }
+  .xp-goals-controls {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    margin-inline-start: 0;
+    justify-self: start;
+  }
+  #ws-outcome-preview .xp-open { grid-column: 2; grid-row: 1; }
+  .xp-goals-controls button { min-height: 30px; }
+  .xp-trend-plot { margin-top: 4px; }
   .ws .xp-open { min-height: 32px; }
   .ws .xp-style-row { min-height: 32px; font-size: 13px; }
 }

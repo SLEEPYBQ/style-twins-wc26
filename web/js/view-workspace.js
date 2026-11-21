@@ -53,6 +53,7 @@
     return {
       mode: ["compare", "explain"].includes(p.mode) ? p.mode : "explore",
       evidence: compare && p.evidence === "outcomes" ? "outcomes" : "matches",
+      goalView: team && p.goalView === "trend" ? "trend" : "distribution",
       team, compare, dials, scope, heatSort: heatSort === "near" && !team ? "group" : heatSort,
       arch: Object.hasOwn(App.arch, p.arch) ? p.arch : "", search: p.search || "",
       view: ["pairs", "custom"].includes(p.view) ? p.view : "pca",
@@ -68,6 +69,7 @@
     const defaultEncoding = s.color === "dial0" && s.heatSort === "dial0";
     return `#/styles${A.query(s.dials, {
       mode: s.mode === "explore" ? null : s.mode, evidence: s.evidence === "outcomes" && s.compare ? "outcomes" : null,
+      goalView: s.team && s.goalView === "trend" ? "trend" : null,
       team: s.team, compare: s.compare, heatSort: defaultEncoding ? null : s.heatSort, scope: s.scope === "all" ? null : s.scope, arch: s.arch, search: s.search,
       view: s.view === "pca" ? null : s.view, x: s.view === "custom" ? s.x : null, y: s.view === "custom" ? s.y : null,
       pairRegion: s.view === "pairs" && s.pairRegion ? s.pairRegion.join(",") : null,
@@ -297,8 +299,12 @@
       },
     });
     const outcomePreview = App.exploreOutcomes(q("#ws-outcome-preview"), {
-      choose, highlight,
+      choose, highlight, setView: goalView => change({ goalView }),
       openEvidence() { openMode("explain", { evidence: "matches" }); },
+      openMatch(key) {
+        openMode("explain", { evidence: "matches", match: key, lens: "absolute" });
+        revealMatch(key);
+      },
     });
     const pairView = App.workspacePairs(q("#ws-pairs"), {
       choosePair(first, second) {
@@ -507,14 +513,18 @@
       outcomePreview.render({ state, summaries, ids, hover });
     }
 
+    function revealMatch(key) {
+      const row = q(`#ws-matches tr[data-match="${key}"]`);
+      row?.focus({ preventScroll: true });
+      row?.scrollIntoView({ block: "center" });
+    }
+
     function drawWaterfall() {
       if (state.mode === "explain" && state.compare) App.outcomeWaterfall(q("#ws-waterfall"), {
         a: state.team, b: state.compare, scope: state.scope, sums: [summaries[state.team], summaries[state.compare]],
         inspectMatch(key) {
           change({ match: key, lens: "absolute", evidence: "matches" });
-          const row = q(`#ws-matches tr[data-match="${key}"]`);
-          row?.focus({ preventScroll: true });
-          row?.scrollIntoView({ block: "center" });
+          revealMatch(key);
         },
       });
     }
@@ -1022,7 +1032,7 @@
         ? `<a class="ws-link" href="#/twins/${state.team}/${state.compare}${esc(A.query(state.dials, { scope: state.scope, return: stateUrl(state) }))}">Full pair report</a>`
         : `<a class="ws-link" href="#/team/${state.team}${esc(ret)}">Team report</a>`;
       q("#ws-match-actions").innerHTML = f
-        ? `<span class="ws-match-sel" title="Selected match">◇ <b>${f.team_id} ${f.goals}–${f.goals_opp} ${f.opp_id}</b> · ${esc(App.stageShort(f.stage))}</span><span class="ws-spacer"></span>
+        ? `<span class="ws-match-sel" title="Selected match">◇ <b>${f.team_id} ${f.goals}–${f.goals_opp} ${f.opp_id}</b> · <span dir="ltr" translate="no">xG ${fmt(f.xg)}–${fmt(f.xga)}</span> · ${esc(App.stageShort(f.stage))}</span><span class="ws-spacer"></span>
            <a class="ws-link" href="#/match/${f.match_id}${esc(ret)}">Replay</a><a class="ws-link" href="#/lab/${f.match_id}${esc(A.query(state.dials, { team: f.team_id, return: stateUrl(state) }))}">Match Lab</a><button type="button" class="ws-link" id="ws-clear-match">Clear</button>`
         : reports;
       q("#ws-clear-match")?.addEventListener("click", () => change({ match: null }));

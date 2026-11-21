@@ -1,18 +1,29 @@
-/* Each point is one team's mean goal difference in the active match scope.
- * Horizontal position is exact. Vertical stacking separates coincident teams. */
+/* The distribution compares team means. The trend follows individual match records. */
 (function () {
   "use strict";
   const App = window.App;
 
-  App.exploreOutcomes = function (host, { choose, highlight: linkTeam, openEvidence }) {
+  App.exploreOutcomes = function (host, { choose, highlight: linkTeam, openEvidence, openMatch, setView }) {
     host.innerHTML = `<header class="xp-head">
         <h2 id="ws-outcome-preview-title">Goal difference per match</h2>
+        <div class="xp-goals-controls ws-seg" role="group" aria-label="Goal difference view">
+          <button type="button" data-goal-view="distribution" aria-pressed="true">Tournament distribution</button>
+          <button type="button" data-goal-view="trend" aria-pressed="false" disabled>Match trend</button>
+        </div>
         <button class="xp-open" type="button" hidden>Match evidence</button>
       </header>
       <svg class="xp-goals-plot" role="group" aria-labelledby="ws-outcome-preview-title"></svg>
+      <svg class="xp-goals-plot xp-trend-plot" role="group" aria-labelledby="ws-outcome-preview-title" hidden></svg>
       <div class="xp-goals-readout" aria-live="polite"></div>`;
     const open = host.querySelector(".xp-open");
     open.onclick = () => openEvidence();
+
+    const controls = host.querySelector(".xp-goals-controls");
+    const title = host.querySelector("h2");
+    controls.onclick = event => {
+      const button = event.target.closest("button[data-goal-view]");
+      if (button && !button.disabled && model.state.goalView !== button.dataset.goalView) setView(button.dataset.goalView);
+    };
 
     const svg = d3.select(host.querySelector("svg"));
     const zero = svg.append("line").attr("class", "xp-goals-zero").attr("aria-hidden", true);
@@ -20,6 +31,8 @@
     const annotations = svg.append("g").attr("aria-hidden", true).attr("pointer-events", "none");
     const marks = svg.append("g");
     const readout = host.querySelector(".xp-goals-readout");
+    const trendSvg = host.querySelector(".xp-trend-plot");
+    const trend = App.exploreTrend(trendSvg, readout, { openMatch, linkTeam });
     let model, rows = [], shown = [], active = null, keyboardTeam = null;
 
     function side(id) {
@@ -49,6 +62,10 @@
     function highlight(id) {
       if (!model || active === id) return;
       active = id;
+      if (model.state.goalView === "trend") {
+        trend.highlight(id);
+        return;
+      }
       marks.selectAll(".xp-goals-mark").classed("is-hover", row => row.id === id);
       updateReadout();
     }
@@ -88,6 +105,10 @@
 
     function draw() {
       if (!model) return;
+      if (model.state.goalView === "trend") {
+        if (trendSvg.clientWidth && trendSvg.clientHeight) trend.render(model);
+        return;
+      }
       const W = svg.node().clientWidth, H = svg.node().clientHeight;
       if (!W || !H) return;
       const min = Math.min(0, Math.floor(rows[0]?.gd ?? -1));
@@ -156,15 +177,28 @@
         rows = Object.entries(summaries).filter(([, s]) => Number.isFinite(s.gd))
           .map(([id, s]) => ({ id, gd: s.gd })).sort((a, b) => a.gd - b.gd || d3.ascending(a.id, b.id));
       }
+      const isTrend = state.goalView === "trend";
+      if (state.goalView !== model?.state.goalView) {
+        title.textContent = isTrend ? "Goal difference by match" : "Goal difference per match";
+        svg.node().toggleAttribute("hidden", isTrend);
+        trendSvg.toggleAttribute("hidden", !isTrend);
+        readout.classList.toggle("xp-trend-readout", isTrend);
+        for (const button of controls.querySelectorAll("button")) {
+          button.setAttribute("aria-pressed", String(button.dataset.goalView === state.goalView));
+        }
+      }
+      controls.querySelector('[data-goal-view="trend"]').disabled = !state.team;
       model = { state, summaries, visible: new Set(ids) };
       shown = rows.filter(row => model.visible.has(row.id) || side(row.id));
       open.hidden = !state.team;
       draw();
-      updateReadout();
+      if (isTrend) trend.highlight(active);
+      else updateReadout();
     }
 
     const observer = new ResizeObserver(draw);
     observer.observe(svg.node());
+    observer.observe(trendSvg);
     return { render, highlight, destroy() { observer.disconnect(); } };
   };
 })();
