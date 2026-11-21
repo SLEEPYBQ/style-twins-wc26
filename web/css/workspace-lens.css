@@ -1,4 +1,10 @@
 /* Positions share one centred, left-to-right quantitative scale in every locale. */
+@media (min-width: 1101px) {
+  .ws-details.has-team:has([data-panel="E"]:not([hidden])) > :is([data-panel="B"], [data-panel="E"]) {
+    height: auto;
+    min-height: 360px;
+  }
+}
 .ws-details.has-team > [data-panel="D"] { height: auto; min-height: 360px; }
 [data-panel="D"] .ws-ph { flex-wrap: wrap; }
 [data-panel="D"] .ws-ph h2 { flex: 1 0 max-content; white-space: normal; max-width: 100%; }

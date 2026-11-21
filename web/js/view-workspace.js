@@ -113,6 +113,7 @@
         </div>
         <p class="ws-summary" id="ws-summary" aria-live="polite"></p>
         <button type="button" class="ws-link" id="ws-to-analysis" hidden>Similar teams</button>
+        <button type="button" class="ws-link" id="ws-to-waterfall" hidden>Explain outcome gap</button>
         <button type="button" class="ws-btn" id="ws-reset">Reset view</button>
       </div>
       <div class="ws-filters" role="region" aria-label="Team filters">
@@ -244,12 +245,14 @@
       setRegion: (region) => commitBrush({ pairRegion: region }), setupBrush, hasTouch,
     });
     q("#ws-clear-pair-region").onclick = () => change({ pairRegion: null });
-    q("#ws-to-analysis").onclick = () => {
-      const heading = q("#ws-B-title");
+    function focusPanel(id) {
+      const heading = q(`#ws-${id}-title`);
       heading.tabIndex = -1;
       heading.focus({ preventScroll: true });
       heading.scrollIntoView({ block: "start" });
-    };
+    }
+    q("#ws-to-analysis").onclick = () => focusPanel(state.compare && full.team[state.compare] && full.team[state.team] ? "D" : "B");
+    q("#ws-to-waterfall").onclick = () => focusPanel("W");
     q("#ws-swap").onclick = () => change({ team: state.compare, compare: state.team, match: null });
     const segBind = (id, key, extra = {}) => q(`#${id}`).addEventListener("click", (e) => { const b = e.target.closest("button[data-v]"); if (b && b.dataset.v !== state[key]) change({ [key]: b.dataset.v, ...extra }); });
     segBind("ws-scope", "scope", { pairRegion: null, cohort: null, match: null, xlo: null, xhi: null, glo: null, ghi: null });
@@ -392,6 +395,8 @@
       q("#ws-swap").disabled = !state.compare;
       q("#ws-to-analysis").hidden = !state.team;
       const hasPair = !!(full.team[state.team] && full.team[state.compare]);
+      q("#ws-to-analysis").textContent = hasPair ? "Compare profiles" : "Similar teams";
+      q("#ws-to-waterfall").hidden = !hasPair;
       q("#ws-lens").hidden = !hasPair;
       q(".lens-tools").hidden = !hasPair;
       q('#ws-order [data-v="gap"]').disabled = !hasPair;
