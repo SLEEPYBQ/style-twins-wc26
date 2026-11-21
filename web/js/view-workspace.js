@@ -748,7 +748,8 @@
       const marks = svg.append("g").selectAll("g").data(plotted).join("g").attr("class", "mark").attr("data-team", (id) => id)
         .attr("transform", (id) => `translate(${P(id)})`).attr("tabindex", 0).attr("role", "button")
         .attr("aria-label", (id) => App.team[id].name).attr("aria-pressed", (id) => [state.team, state.compare].includes(id));
-      marks.append("circle").attr("class", "halo").attr("r", (id) => radius[role(id)] + 4.5);
+      // The focus ring can overlap the center of a neighboring team.
+      marks.append("circle").attr("class", "halo").attr("pointer-events", "none").attr("r", (id) => radius[role(id)] + 4.5);
       marks.append("circle").attr("class", "team-fill").attr("r", (id) => radius[role(id)]);
       marks.on("click", (e, id) => choose(id, e.shiftKey ? "A" : undefined))
         .on("keydown", (e, id) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(id, e.shiftKey ? "A" : undefined); } })
