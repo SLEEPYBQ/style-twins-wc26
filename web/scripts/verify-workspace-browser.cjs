@@ -216,6 +216,22 @@ async function checkPairExplorer(page) {
   assert.equal(await points.count(), 1128);
   assert.equal(await page.locator(".ws-primary .hm-scale:visible").count(), 1, "Pair mode still explains heatmap colours");
   assert.equal(new Set(await points.evaluateAll(nodes => nodes.map(node => node.dataset.pair))).size, 1128);
+  const guide = page.locator("#ws-pairs .wp-guide-button");
+  const qualifying = await points.evaluateAll(nodes => nodes.filter(node => Number(node.dataset.sim) >= 90 && Number(node.dataset.gap) >= 1).map(node => node.dataset.pair).sort());
+  assert.equal(qualifying.length, 53, "Full-tournament guide has 53 observed pairs");
+  await guide.click();
+  const shown = () => page.locator(pointSelector + ":not(.is-out)").evaluateAll(nodes => nodes.map(node => node.dataset.pair).sort());
+  assert.deepEqual(await shown(), qualifying);
+  assert.equal(await guide.getAttribute("aria-pressed"), "true");
+  assert.equal(params(page).has("team"), false);
+  assert.equal(await page.locator(heatRows).count(), 48);
+  await page.reload();
+  await guide.waitFor();
+  assert.deepEqual(await shown(), qualifying, "Guide is restored by the same shareable pair region");
+  await guide.press("Enter");
+  assert.equal(await points.count(), 1128);
+  assert.equal(await guide.getAttribute("aria-pressed"), "false");
+  assert.equal(params(page).has("pairRegion"), false);
   await checkPairFilters(page, points);
 
   const pair = page.locator(pointSelector + "[data-pair='ECU-USA']");

@@ -4,6 +4,7 @@
   "use strict";
   const App = window.App;
   const pageSize = 8;
+  const guidePercentile = 90, guideGap = 1;
   const names = (pair, withFlags = false) => [pair.a, pair.b].map((id) => {
     const flag = withFlags ? `<span class="wp-flag" aria-hidden="true">${App.flag(id, 13)}</span>` : "";
     return `${flag}<span>${App.esc(App.team[id].name)}</span>`;
@@ -11,7 +12,11 @@
 
   App.workspacePairs = function (host, { choosePair, setRegion, setupBrush, hasTouch }) {
     host.classList.add("ws-pairs");
-    host.innerHTML = `<div class="wp-axis-title">Gap in goal difference per match</div>
+    host.innerHTML = `<div class="wp-guide">
+        <button type="button" class="ws-btn wp-guide-button" aria-pressed="false" aria-describedby="wp-thresholds">Example region</button>
+        <span id="wp-thresholds">Similarity percentile ≥ ${guidePercentile} · GD gap ≥ ${guideGap} goal/match</span>
+      </div>
+      <div class="wp-axis-title">Absolute gap in goal difference per match</div>
       <div class="wp-chart"></div>
       <div class="wp-axis-title wp-x-title"><span>Style similarity percentile</span> · <span>All pairs in match scope</span></div>
       <div class="wp-readout" aria-live="polite"></div>
@@ -24,6 +29,10 @@
     const get = (selector) => host.querySelector(selector);
     const chart = get(".wp-chart"), list = get(".wp-list"), readout = get(".wp-readout");
     let pairs = [], results = [], page = 0, dataKey, region, maxGap = 1, armed = false, active = null;
+
+    const guide = get(".wp-guide-button");
+    const guideBounds = () => [guidePercentile, 100, guideGap, Math.max(guideGap + 1, Math.ceil(maxGap))];
+    guide.onclick = () => setRegion(guide.getAttribute("aria-pressed") === "true" ? null : guideBounds());
 
     function showPair(pair) {
       active = pair || null;
@@ -98,6 +107,9 @@
       }
       results = pairs.filter((pair) => pair.inside).sort((a, b) =>
         b.sim - a.sim || b.gap - a.gap || d3.ascending(a.key, b.key));
+      const guideSelected = guideBounds().every((value, i) => value === region?.[i]);
+      guide.setAttribute("aria-pressed", String(guideSelected));
+      guide.disabled = !guideSelected && !pairs.some(pair => pair.sim >= guidePercentile && pair.gap >= guideGap);
       drawList();
       draw();
     }
@@ -122,6 +134,11 @@
       const grid = svg.append("g").attr("class", "grid");
       grid.selectAll("line").data(y.ticks(H < 160 ? 3 : 5).filter((v) => v > 0)).join("line")
         .attr("x1", left).attr("x2", right).attr("y1", y).attr("y2", y);
+      if (y.domain()[1] > guideGap) {
+        svg.append("rect").attr("class", "wp-reference")
+          .attr("x", x(guidePercentile)).attr("width", right - x(guidePercentile))
+          .attr("y", top).attr("height", y(guideGap) - top);
+      }
       if (region) {
         const x0 = x(Math.max(0, region[0])), x1 = x(Math.min(100, region[1]));
         const y0 = y(Math.min(y.domain()[1], region[3])), y1 = y(Math.max(0, region[2]));

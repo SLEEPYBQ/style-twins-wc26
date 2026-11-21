@@ -1,4 +1,8 @@
 .ws-pairs { flex: 1; display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+.wp-guide { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 8px; padding: 3px 10px; font-size: 12px; color: var(--ws-ink-2); }
+.wp-guide-button::before { content: ""; display: inline-block; width: .75em; height: .65em; margin-inline-end: .4em; background: #ecf2f6; border: 1px dashed #61798c; }
+.wp-guide-button[aria-pressed="true"] { box-shadow: inset 0 0 0 1px var(--ws-ink); }
+.wp-reference { fill: #d4e2eb; fill-opacity: .4; stroke: #61798c; stroke-dasharray: 4 3; pointer-events: none; }
 .wp-axis-title { flex: none; text-align: left; padding: 4px 12px 0; font-size: 12px; color: var(--ws-ink-2); }
 .wp-x-title { padding: 0 12px 3px; text-align: right; }
 .wp-chart { flex: 1 1 auto; min-width: 0; min-height: 92px; }
