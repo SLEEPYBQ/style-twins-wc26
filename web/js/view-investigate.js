@@ -85,7 +85,7 @@
         <section class="card review-section"><h2>Opponent strength</h2><p class="sub">Opponent context uses their other tournament games, excluding the selected encounter. Values use the full tournament, including games played later. This gives retrospective context for the comparison.</p>
           <div class="seg"><button type="button" class="on" data-context="attack">Creating chances</button><button type="button" data-context="defence">Limiting chances</button></div><div data-schedule-chart></div><p class="note" data-context-note></p>
           <details><summary>Inspect opponent reference values</summary><div data-opponents></div></details></section>
-        <section class="card review-section"><h2>Model decomposition of the goal-difference gap</h2><p class="sub">Positive favors ${App.esc(teams[0].name)}. Negative favors ${App.esc(teams[1].name)}. These stored estimates use the original ten-indicator model. Indicator selection changes similarity; scope changes which model estimates are averaged.</p><div data-model></div><p class="review-method-note">The six parts form an accounting decomposition. Their sum does not establish causal explanations or isolate player ability. <a href="#/method">Read the method →</a></p></section>
+        <section class="card review-section"><h2>Outcome gap waterfall</h2><div data-model></div><a class="review-method-note" href="#/method">Read the method →</a></section>
         <div class="card review-export"><div><h3>Save or export</h3><p class="note">The address preserves your teams, indicators, scope and question. Download the observed match rows used in this comparison.</p></div><button class="btn small" data-export>Download comparison CSV</button></div>` : '<div class="card review-section"><h2>No matches in this scope</h2><p>One selected team has no records for this stage. Change the scope or select another team.</p></div>'}`;
       root.querySelectorAll("[data-team-a], [data-team-b]").forEach((el) => { el.onchange = () => {
         const x = root.querySelector("[data-team-a]").value, y = root.querySelector("[data-team-b]").value;
@@ -132,10 +132,18 @@
         root.querySelectorAll("[data-context]").forEach((el) => el.classList.toggle("on", el === button));
         drawContext();
       }; });
+      App.outcomeWaterfall(root.querySelector("[data-model]"), { a, b, scope, sums,
+        inspectMatch(key) {
+          selectMatch(key);
+          const evidence = root.querySelector("[data-evidence]");
+          evidence.tabIndex = -1;
+          evidence.focus({ preventScroll: true });
+          evidence.scrollIntoView({ block: "start" });
+        },
+      });
       const draw = () => {
         drawStyles(root.querySelector("[data-style-chart]"), teams, rows, space, dials);
         drawSpread(root.querySelector("[data-spread]"), teams, rows, sums, metric, selectMatch);
-        drawModel(root.querySelector("[data-model]"), sums);
         drawContext();
       };
       draw(); App.onResize(root.querySelector("[data-spread]"), draw);
@@ -199,22 +207,6 @@
     });
     svg.append("text").attr("x", width / 2).attr("y", 205).attr("text-anchor", "middle").attr("class", "review-svg-label").text(metrics[metric][1]);
   }
-  function drawModel(el, sums) {
-    const diffs = App.components.map((c) => ({ ...c, value: sums[0].model[c.id] - sums[1].model[c.id] }));
-    const { svg, width } = chart(el, 285, "Signed model contributions to the goal difference gap");
-    const left = width < 500 ? 130 : 200, extent = Math.max(0.1, ...diffs.map((r) => Math.abs(r.value))) * 1.15;
-    const x = d3.scaleLinear().domain([-extent, extent]).range([left, width - 45]);
-    svg.append("line").attr("x1", x(0)).attr("x2", x(0)).attr("y1", 5).attr("y2", 243).attr("stroke", "#b8c5bb");
-    diffs.forEach((r, i) => {
-      const y = i * 40 + 12;
-      svg.append("text").attr("x", 0).attr("y", y + 16).attr("class", "review-svg-label").text(r.label);
-      svg.append("rect").attr("x", Math.min(x(0), x(r.value))).attr("y", y).attr("width", Math.abs(x(r.value) - x(0))).attr("height", 23).attr("rx", 3).attr("fill", r.value >= 0 ? colors[0] : colors[1]);
-      svg.append("text").attr("x", width).attr("y", y + 16).attr("text-anchor", "end").attr("class", "review-svg-label").text(App.signed(r.value));
-    });
-    svg.append("g").attr("transform", "translate(0,250)").call(d3.axisBottom(x).ticks(5));
-    svg.append("text").attr("x", left).attr("y", 281).attr("class", "review-svg-label").text(width < 500 ? "Goals per match" : "Difference in goals per match");
-  }
-
   function drawSchedule(el, rows, context, onSelect) {
     const attack = context === "attack", points = rows.flatMap((list, side) => list.map((row) => {
       const other = A.opponent(row);

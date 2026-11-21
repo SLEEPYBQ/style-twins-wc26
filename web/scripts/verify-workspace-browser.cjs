@@ -709,6 +709,7 @@ async function run() {
     await page.locator("#ws-search").fill("no such team");
     await page.waitForFunction(() => !document.querySelector("#ws-heat tbody tr[data-team]"));
     assert.equal(await page.locator("#ws-map .mark").count(), 32);
+    await require("./check-waterfall.cjs")(page, base, output);
     assert.deepEqual(errors, []);
     console.log("Workspace browser checks passed for overview, A/B selection, linked indicator colours, team-pair exploration, PCA and similarity ranks, indicator changes, sorting, group filters, direct mouse brushing, touch scrolling and brushing, raw units, scope references, match evidence, navigation and three viewport sizes.");
   } finally {

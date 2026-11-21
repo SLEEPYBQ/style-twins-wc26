@@ -1,0 +1,64 @@
+/* A shared horizontal running total, with signed component changes in the last column. */
+.ws-details.has-team > section[data-panel="W"] { grid-column: 1 / -1; height: auto; }
+.wf { --wf-a: #2f6bd8; --wf-b: #e0702a; --wf-row: 33px; color: var(--ink); min-width: 0; }
+#ws-waterfall { padding: 9px 14px 11px; }
+.wf-head, .wf-team { display: flex; align-items: center; flex-wrap: wrap; }
+.wf-head { gap: 4px 10px; margin-block: 3px 12px; }
+.wf-team { gap: 5px; font-weight: 600; }
+.wf-role { font-size: 11px; font-weight: 700; }
+.wf-a { color: var(--wf-a); } .wf-b { color: #a34e16; }
+.wf-scope, .wf-team small { color: var(--ink-2); font-size: 12px; font-weight: 400; }
+.wf-scope { margin-inline-start: auto; }
+.wf-grid { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 16px 28px; align-items: start; }
+.wf-plot { min-width: 0; --cols: minmax(5.25rem, 23%) minmax(0, 1fr) 3.5rem; }
+.wf-row, .wf-axis, .wf-colheads { display: grid; grid-template-columns: var(--cols); align-items: center; gap: 8px; }
+.wf-colheads { padding: 0 5px 5px; color: var(--ink-2); font-size: 12px; border-bottom: 1px solid var(--line); }
+.wf-colheads > :last-child { text-align: end; }
+.wf button.wf-row { width: 100%; min-height: var(--wf-row); border: 0; border-radius: 0; background: transparent; padding: 0 5px; font: 500 13px/1.22 var(--sans); color: var(--ink); text-align: start; cursor: pointer; }
+.wf button.wf-row:focus-visible, .wf-records button:focus-visible { outline: 2px solid var(--ink-2); outline-offset: -2px; }
+.wf button.wf-row.wf-inspected { background: var(--card-2); }
+.wf-row strong { text-align: end; font-variant-numeric: tabular-nums; }
+.wf button.wf-total { font-weight: 700; border-top: 1px solid var(--line); }
+.wf-track { display: block; position: relative; align-self: stretch; direction: ltr; }
+.wf-track::before { content: ""; position: absolute; top: 0; bottom: 0; left: var(--zero); border-left: 1px solid #808893; }
+.wf-bar, .wf-end, .wf-connector, .wf-from { position: absolute; }
+.wf-bar { top: calc(50% - 5px); height: 10px; }
+.wf-end { height: 14px; top: calc(50% - 7px); border-left: 1px solid var(--ink-2); }
+.wf-connector, .wf-from { border-left: 1px dashed #89929d; pointer-events: none; }
+.wf-connector { top: calc(50% + 5px); bottom: 0; }
+.wf-from { top: 0; bottom: calc(50% + 5px); }
+.wf-positive { background: var(--wf-a); } .wf-negative { background: var(--wf-b); } .wf-observed { background: var(--ink); }
+.wf-axis { padding: 0 5px; }
+.wf-ticks { position: relative; grid-column: 2; height: 22px; border-top: 1px solid var(--axis); direction: ltr; }
+.wf-ticks i { position: absolute; top: 0; height: 3px; border-left: 1px solid var(--axis); font-style: normal; }
+.wf-ticks i span { position: absolute; top: 2px; transform: translateX(-50%); color: var(--ink-2); font: 11px var(--sans); }
+.wf-inspect { border-inline-start: 1px solid var(--line); padding-inline-start: 16px; min-width: 0; }
+.wf-detail h3 { font: 650 15px/1.3 var(--sans); color: var(--ink); margin: 0; }
+.wf-contribution, .wf-means { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
+.wf-contribution { margin: 5px 0; }
+.wf-contribution b { font: 650 25px var(--sans); font-variant-numeric: tabular-nums; }
+.wf-contribution span, .wf-detail p, .wf-note, .wf-record-data p { color: var(--ink-2); font-size: 12px; line-height: 1.45; }
+.wf .wf-note { margin: 9px 0 0; }
+.wf-detail p, .wf-record-data p { margin: 0; }
+.wf-means { margin-top: 8px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.wf-records { margin-top: 12px; }
+.wf-records summary { cursor: pointer; font-size: 13px; font-weight: 550; }
+.wf-record-data { padding-block-start: 6px; }
+.wf-record-teams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.wf-record-teams h4 { margin: 8px 0 2px; font-size: 12px; }
+.wf-record-teams button { display: flex; justify-content: space-between; gap: 4px; width: 100%; padding: 4px 2px; font: 12px var(--sans); font-variant-numeric: tabular-nums; text-align: start; color: var(--ink); background: transparent; border: 0; border-bottom: 1px solid var(--line); cursor: pointer; }
+.wf-record-teams button:hover { background: var(--card-2); }
+@media (max-width: 800px) {
+  .wf-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .wf-row, .wf-axis, .wf-colheads { gap: 5px; }
+  .wf-inspect { border: 0; padding: 8px 0 0; border-top: 1px solid var(--line); }
+  .wf-scope { margin-inline-start: 0; }
+  .wf-plot { --cols: minmax(5.75rem, 32%) minmax(0, 1fr) 2.75rem; }
+}
+@media (pointer: coarse) {
+  .wf { --wf-row: 44px; }
+  .wf-record-teams button, .wf-records summary { min-height: 44px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .wf button.wf-row { transition: background-color 120ms ease-out; }
+}

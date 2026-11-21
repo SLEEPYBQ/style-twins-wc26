@@ -159,6 +159,7 @@
         ${panel("E", "Outcomes <span class=\"ws-count\">per match</span>", "",
           `<div class="ws-legend" id="ws-outcome-key"></div>
            <div class="ws-chart ws-outcomes" id="ws-outcomes"></div>`)}
+        ${panel("W", "Outcome gap waterfall", "", '<div id="ws-waterfall"></div>')}
         ${panel("F", 'Match evidence<span class="ws-count" id="ws-match-count"></span>', "",
           `<div class="ws-scroll"><table class="ws-table ws-matches" id="ws-matches"><thead><tr>
              <th scope="col">Team</th><th scope="col">Opponent</th><th scope="col">Stage</th><th scope="col">Score</th><th scope="col" class="num">xG diff.</th>
@@ -372,6 +373,16 @@
       }
       lastProjection = projection;
       lastPins = pins;
+      q('[data-panel="W"]').hidden = !state.compare;
+      if (state.compare) App.outcomeWaterfall(q("#ws-waterfall"), {
+        a: state.team, b: state.compare, scope: state.scope, sums: [summaries[state.team], summaries[state.compare]],
+        inspectMatch(key) {
+          change({ match: key, lens: "absolute" });
+          const row = q(`#ws-matches tr[data-match="${key}"]`);
+          row?.focus({ preventScroll: true });
+          row?.scrollIntoView({ block: "center" });
+        },
+      });
     }
 
     /* ---------- context bar ---------- */

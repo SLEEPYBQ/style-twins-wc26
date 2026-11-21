@@ -110,6 +110,25 @@
     return result;
   }
 
+  // Each stored team-match term was rounded to 0.001 goals. Subtracting two
+  // averages can accumulate at most 2 × 6 × 0.0005 goals of rounding error.
+  function outcomeGap(a, b) {
+    if (!a?.n || !b?.n || !finite(a.gd) || !finite(b.gd)) return { status: "missing" };
+    let level = 0;
+    const steps = [];
+    for (const { id, label } of App.components) {
+      const left = a.model[id], right = b.model[id];
+      if (!finite(left) || !finite(right)) return { status: "missing" };
+      const value = left - right, start = level;
+      level += value;
+      steps.push({ id, label, left, right, start, end: level, value });
+    }
+    const observed = a.gd - b.gd, residual = observed - level;
+    if (Math.abs(residual) > App.components.length * 0.001 + 1e-10) return { status: "mismatch", residual };
+    steps.push({ id: "gd", label: "Observed goal-difference gap", left: a.gd, right: b.gd, start: 0, end: observed, value: observed });
+    return { status: "ok", steps, residual };
+  }
+
   function vectorDistance(left, right) {
     if (!left || !right || !left.length || left.length !== right.length) return null;
     if (!left.every(finite) || !right.every(finite)) return null;
@@ -142,5 +161,5 @@
     };
   }
 
-  App.analysis = { records, inScope, readDials, query, rows, space, twinTable, summary, metric, distance, nearest, opponent };
+  App.analysis = { records, inScope, readDials, query, rows, space, twinTable, summary, metric, outcomeGap, distance, nearest, opponent };
 })();
