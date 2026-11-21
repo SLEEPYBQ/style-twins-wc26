@@ -117,6 +117,11 @@
       el: host,
       get: () => current,
       set(v) { current = v; paint(); },
+      setOptions(nextOptions) {
+        options = nextOptions;
+        paint();
+        if (!pop.hidden) renderList();
+      },
       close,
       contains: (node) => host.contains(node),
     };

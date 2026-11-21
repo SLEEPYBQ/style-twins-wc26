@@ -8,18 +8,20 @@
   App.dialInfo = Object.fromEntries(WC.dials.map((d) => [d.id, d]));
   // Display names follow pipeline/features.py. Source IDs stay stable in URLs, files and models.
   const indicators = {
-    "Ball share": { label: "Possession", unit: "%", help: "Share of match time with the ball. The reports count contested time separately." },
-    "Patient build-up": { label: "Build-up play", unit: "%", help: "Building from the back, with or without pressure, as a share of attacking phases." },
-    "Direct play": { label: "Long balls & counters", unit: "%", help: "Long balls and counterattacks as a share of attacking phases." },
-    "Transition attacks": { label: "Attacks after regains", unit: "%", help: "Attacking immediately after winning the ball, as a share of attacking phases." },
-    "Final-third camp": { label: "Final-third play", unit: "%", help: "Play in the third nearest the opponent’s goal, as a share of attacking phases." },
-    "Wing crosses": { label: "Crosses", unit: "per 50% possession", help: "Crosses per match, scaled to 50% team possession." },
-    "High press": { label: "Defending high", unit: "%", help: "Pressing or forming a block high up the pitch, as a share of defensive phases." },
-    "Deep block": { label: "Defending deep", unit: "%", help: "Pressing or forming a block near the team’s own goal, as a share of defensive phases." },
-    "Counter-press": { label: "Press after loss", unit: "%", help: "Pressing immediately after losing the ball, as a share of defensive phases." },
-    "Press intensity": { label: "Pressures", unit: "per 50% opponent possession", help: "Pressures per match, scaled to 50% opponent possession." },
+    "Ball share": { label: "Possession", short: "Possession", unit: "%", zone: "mid", help: "Share of match time with the ball. The reports count contested time separately." },
+    "Patient build-up": { label: "Build-up play", short: "Build-up", unit: "%", zone: "own", help: "Building from the back, with or without pressure, as a share of attacking phases." },
+    "Direct play": { label: "Long balls & counters", short: "Long & counter", unit: "%", zone: "mid", help: "Long balls and counterattacks as a share of attacking phases." },
+    "Transition attacks": { label: "Attacks after regains", short: "After regains", unit: "%", zone: "mid", help: "Attacking immediately after winning the ball, as a share of attacking phases." },
+    "Final-third camp": { label: "Final-third play", short: "Final third", unit: "%", zone: "opp", help: "Play in the third nearest the opponent’s goal, as a share of attacking phases." },
+    "Wing crosses": { label: "Crosses", short: "Crosses", unit: "per 50% possession", zone: "opp", help: "Crosses per match, scaled to 50% team possession." },
+    "High press": { label: "Defending high", short: "High press", unit: "%", zone: "mid", help: "Pressing or forming a block high up the pitch, as a share of defensive phases." },
+    "Deep block": { label: "Defending deep", short: "Deep block", unit: "%", zone: "own", help: "Pressing or forming a block near the team’s own goal, as a share of defensive phases." },
+    "Counter-press": { label: "Press after loss", short: "Counter-press", unit: "%", zone: "mid", help: "Pressing immediately after losing the ball, as a share of defensive phases." },
+    "Press intensity": { label: "Pressures", short: "Pressures", unit: "per 50% opponent possession", zone: "mid", help: "Pressures per match, scaled to 50% opponent possession." },
   };
   App.indicator = (id) => indicators[id];
+  App.CORR_DIAL_ORDER = [0, 6, 4, 1, 8, 9, 5, 7, 2, 3];
+  App.reducedMotion = () => Boolean(typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
   // Descriptive names summarize the stored full-tournament centroids.
   const groupLabels = {
     architects: "Possession build-up",
@@ -29,6 +31,31 @@
     fortress: "Deep and direct",
   };
   App.groupLabel = (id) => groupLabels[id] || "";
+  App.SPECTRUM_ORDER = ["fortress", "counterpunchers", "allrounders", "architects", "stormers"];
+  App.DIAL_GROUPS = { attack: [0, 1, 2, 3, 4, 5], defence: [6, 7, 8, 9] };
+  App.ARCH_SIGNATURES = {
+    fortress: ["Ball share", "Direct play", "Transition attacks", "Deep block"],
+    counterpunchers: ["Direct play", "Transition attacks", "Deep block", "Press intensity"],
+    allrounders: App.dials.slice(),
+    architects: ["Ball share", "Patient build-up", "High press", "Press intensity"],
+    stormers: ["Ball share", "Final-third camp", "Wing crosses", "High press", "Counter-press"],
+  };
+  const groupShortLabels = {
+    fortress: "Deep & direct",
+    counterpunchers: "Counterattacking",
+    allrounders: "Balanced",
+    architects: "Possession build-up",
+    stormers: "Final-third pressure",
+  };
+  const groupTips = {
+    fortress: "Sit deep near their box and break quickly with long balls.",
+    counterpunchers: "Absorb pressure in mid/deep zones and strike fast on turnover.",
+    allrounders: "Balanced mix across possession, pressing, and transitions.",
+    architects: "Keep possession, build patiently from the back, and press high.",
+    stormers: "Camp in the final third, cross often, and counter-press immediately.",
+  };
+  App.groupShort = (id) => groupShortLabels[id] || "";
+  App.groupTip = (id) => groupTips[id] || "";
   App.teams = WC.teams;
   App.team = Object.fromEntries(WC.teams.map((t) => [t.id, t]));
   // Muted style-group hues that stay clear of the A/B/closest-team state colours (see css/theme.css).
@@ -146,29 +173,38 @@
   App.ttRows = (rows) => rows.map(([k, v]) => `<div class="tt-row"><span class="tt-dim">${k}</span><span>${v}</span></div>`).join("");
 
   // style space ------------------------------------------------------------------------
-  /** z-scores of the chosen dials for every team-match (mean/sd over all 208 records). */
-  App.styleSpace = (dialIds) => {
+  /** z-scores of the chosen dials for every team-match (mean/sd over all 208 records), optionally weighted. */
+  App.styleSpace = (dialIds, weights = null) => {
     const idx = dialIds.map((d) => App.dials.indexOf(d));
     const ids = Object.keys(App.tm);
     const cols = idx.map((i) => ids.map((k) => App.tm[k].dials[i]));
     const mu = cols.map((c) => d3.mean(c)), sd = cols.map((c) => (d3.deviation(c) * Math.sqrt((c.length - 1) / c.length)) || 1);
+    const wArr = weights
+      ? dialIds.map((d, j) => {
+          const raw = Array.isArray(weights) ? weights[j] : weights[d];
+          return Number.isFinite(raw) ? Math.max(0, Math.min(3, raw)) : 1;
+        })
+      : null;
     const z = {};
-    ids.forEach((k, r) => { z[k] = idx.map((_, j) => (cols[j][r] - mu[j]) / sd[j]); });
+    ids.forEach((k, r) => {
+      z[k] = idx.map((_, j) => ((cols[j][r] - mu[j]) / sd[j]) * (wArr ? wArr[j] : 1));
+    });
     const team = {};
     for (const t of App.teams) {
       const rows = t.matches.map((m) => z[m]);
       team[t.id] = dialIds.map((_, j) => d3.mean(rows, (r) => r[j]));
     }
-    return { dialIds, match: z, team };
+    return wArr ? { dialIds, weights: wArr, match: z, team } : { dialIds, match: z, team };
   };
 
-  /** Top-two principal axes of the match-level z matrix (power iteration on the covariance). */
-  App.pca2 = (space) => {
+  /** Top-two principal axes of the match-level z matrix (power iteration + Procrustes sign anchoring). */
+  App.pca2 = (space, prevPca = null) => {
     const rows = Object.values(space.match);
     const p = space.dialIds.length;
     const C = Array.from({ length: p }, () => new Array(p).fill(0));
-    for (const r of rows) for (let i = 0; i < p; i++) for (let j = 0; j < p; j++) C[i][j] += (r[i] * r[j]) / rows.length;
+    for (const r of rows) for (let i = 0; i < p; i++) for (let j = 0; j < p; j++) C[i][j] += (r[i] * r[j]) / Math.max(1, rows.length);
     const total = d3.sum(C.map((r, i) => r[i]));
+    const safeTotal = total > 1e-12 ? total : 1;
     const comps = [], vars = [];
     let M = C.map((r) => r.slice());
     for (let k = 0; k < Math.min(2, p); k++) {
@@ -179,20 +215,39 @@
         v = w.map((x) => x / n);
       }
       const lambda = d3.sum(M.map((row, i) => v[i] * d3.sum(row.map((x, j) => x * v[j]))));
-      comps.push(v); vars.push(lambda / total);
+      comps.push(v); vars.push(total > 1e-12 ? lambda / safeTotal : 0);
       M = M.map((row, i) => row.map((x, j) => x - lambda * v[i] * v[j]));
     }
-    if (comps.length < 2) comps.push(new Array(p).fill(0));
-    // orient: +x towards more ball share (or the first dial), +y towards more crosses
-    const orient = (vec, pref) => {
-      const i = space.dialIds.indexOf(pref);
-      const sign = i >= 0 ? Math.sign(vec[i]) || 1 : Math.sign(vec[d3.maxIndex(vec.map(Math.abs))]) || 1;
+    if (comps.length < 2) {
+      comps.push(new Array(p).fill(0));
+      vars.push(0);
+    }
+    const orientFallback = (vec, prefs) => {
+      for (const [dialId, expectedSign] of prefs) {
+        const i = space.dialIds.indexOf(dialId);
+        if (i >= 0 && Math.abs(vec[i]) > 1e-4) {
+          const sign = (Math.sign(vec[i]) * expectedSign) || 1;
+          return vec.map((x) => x * sign);
+        }
+      }
+      const sign = Math.sign(vec[d3.maxIndex(vec.map(Math.abs))]) || 1;
       return vec.map((x) => x * sign);
     };
-    comps[0] = orient(comps[0], "Ball share");
-    comps[1] = orient(comps[1], "Wing crosses");
+    const orientAxis = (vec, axisIdx, fallbackPrefs) => {
+      if (prevPca?.comps?.[axisIdx] && prevPca?.dialIds) {
+        let dot = 0;
+        for (let j = 0; j < p; j++) {
+          const pj = prevPca.dialIds.indexOf(space.dialIds[j]);
+          if (pj >= 0) dot += vec[j] * (prevPca.comps[axisIdx][pj] || 0);
+        }
+        if (Math.abs(dot) > 1e-4) return dot < 0 ? vec.map((x) => -x) : vec;
+      }
+      return orientFallback(vec, fallbackPrefs);
+    };
+    comps[0] = orientAxis(comps[0], 0, [["Ball share", 1], ["Direct play", -1], ["Deep block", -1]]);
+    comps[1] = orientAxis(comps[1], 1, [["Wing crosses", 1], ["Final-third camp", 1]]);
     const project = (r) => [d3.sum(r.map((x, j) => x * comps[0][j])), d3.sum(r.map((x, j) => x * comps[1][j]))];
-    return { comps, vars, project };
+    return { comps, vars, dialIds: space.dialIds.slice(), project };
   };
 
   App.dist = (a, b) => Math.sqrt(d3.sum(a.map((x, i) => (x - b[i]) ** 2)));

@@ -29,6 +29,39 @@
     return normalizeDials(App.dials.filter((_, index) => indices.includes(index)));
   }
 
+  function readWeights(params = {}) {
+    const raw = params instanceof URLSearchParams ? params.get("w") : params.w;
+    if (typeof raw !== "string" || !raw.trim()) return null;
+    const out = {};
+    let has = false;
+    for (const part of raw.split(",")) {
+      const [iStr, vStr] = part.split(":");
+      if (!/^\d+$/.test(iStr || "")) continue;
+      const idx = Number(iStr), val = Number(vStr);
+      const dial = App.dials[idx];
+      if (!dial || !Number.isFinite(val)) continue;
+      const clamped = Math.round(Math.max(0.2, Math.min(2.5, val)) * 100) / 100;
+      if (Math.abs(clamped - 1) >= 0.04) {
+        out[dial] = clamped;
+        has = true;
+      }
+    }
+    return has ? out : null;
+  }
+
+  function encodeWeights(weights) {
+    if (!weights) return "";
+    const parts = [];
+    App.dials.forEach((dial, idx) => {
+      const v = weights[dial];
+      if (Number.isFinite(v) && Math.abs(v - 1) >= 0.04) {
+        const clamped = Math.round(Math.max(0.2, Math.min(2.5, v)) * 100) / 100;
+        parts.push(`${idx}:${Number(clamped.toFixed(2))}`);
+      }
+    });
+    return parts.join(",");
+  }
+
   function query(dials, extra = {}) {
     const params = new URLSearchParams();
     params.set("dials", normalizeDials(dials).map((dial) => App.dials.indexOf(dial)).join(","));
@@ -42,8 +75,8 @@
     return records.filter((row) => row.team_id === teamId && inScope(row, scope));
   }
 
-  function space(dials, scope = "all") {
-    const result = App.styleSpace(normalizeDials(dials));
+  function space(dials, scope = "all", weights = null) {
+    const result = App.styleSpace(normalizeDials(dials), weights);
     result.team = {};
     for (const team of App.teams) {
       const selected = rows(team.id, scope);
@@ -161,5 +194,5 @@
     };
   }
 
-  App.analysis = { records, inScope, readDials, query, rows, space, twinTable, summary, metric, outcomeGap, distance, nearest, opponent };
+  App.analysis = { records, inScope, readDials, readWeights, encodeWeights, query, rows, space, twinTable, summary, metric, outcomeGap, distance, nearest, opponent };
 })();

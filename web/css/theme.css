@@ -13,6 +13,16 @@
   --pos: #216e70;
   --neg: #a5692e;
   --mid: #f7f6f1;
+  --dna-neg: #9b5f1e;
+  --dna-pos: #1c736f;
+  --bkt-structure: #c8d1d6;
+  --bkt-structure-ink: #24333a;
+  --bkt-chances: #1c736f;
+  --bkt-chances-ink: #ffffff;
+  --bkt-finishing: #e2a930;
+  --bkt-finishing-ink: #24333a;
+  --star-gold: #c98510;
+  --star-gold-soft: rgba(226, 169, 48, 0.14);
   --team-a: #24639a;
   --team-a-ink: #194e7b;
   --team-a-soft: #e7f0f7;

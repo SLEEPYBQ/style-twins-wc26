@@ -131,7 +131,7 @@
     if (direct.complete) return leading + direct.text + trailing;
 
     // Translate complete segments only. Do not replace arbitrary substrings inside prose or names.
-    const pieces = core.split(/(\s*[·|•]\s*|\s+[—–]\s+|\s*[→↔←]\s*|[():]\s*)/u);
+    const pieces = core.split(/(\s*[·|•]\s*|\s+[—–]\s+|\s*[→↔←↑↓]\s*|[():]\s*)/u);
     let complete = pieces.length > 1;
     const output = pieces.map((piece, index) => {
       if (index % 2 || !piece.trim()) return piece;

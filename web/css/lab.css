@@ -122,6 +122,20 @@
 @media (max-width:600px) { .lab-page .lab-score small { max-width:90px;font-size:8px; }.lab-page .lab-score { max-width:90px; } }
 /* Mobile explanations and controls retain readable text rather than scaling
    with the dense desktop composition. The pass matrix scrolls internally. */
+.lab-page .lab-subcontrols { display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:0 16px 8px; }
+.lab-page .lab-dir-filter,.lab-page .lab-mat-sort { display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#8ba8ba; }
+.lab-page .lab-dir-filter button,.lab-page .lab-mat-sort button { border:1px solid #2b4a5d;background:#102938;color:#c2d9e6;padding:2px 6px;border-radius:3px;font-size:10px; }
+.lab-page .lab-dir-filter button.on,.lab-page .lab-mat-sort button.on { background:var(--lab-cyan);border-color:var(--lab-cyan);color:#06131f;font-weight:700; }
+.lab-page .lab-centrality-row { display:flex;justify-content:space-between;gap:6px;padding:8px 10px;margin:-10px 0 14px;background:#122d3e;border-radius:4px;font-size:10px;color:#8faaba; }
+.lab-page .lab-centrality-row b { color:#e1f1f8; }
+.lab-page .lab-pivot-grid { display:grid;grid-template-columns:1fr;gap:12px;padding:8px 14px 12px; }
+.lab-page .lab-pivot-card { border:1px solid #264354;border-radius:4px;padding:10px;background:#0e2534; }
+.lab-page .lab-pivot-head { display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px; }
+.lab-page .lab-pivot-shares { display:flex;gap:10px;font-size:10px;color:#9ab8ca;margin-bottom:6px; }
+.lab-page .lab-pivot-tbl { width:100%;border-collapse:separate;border-spacing:3px;font-size:11px; }
+.lab-page .lab-pivot-tbl th { font-size:10px;color:#8faaba; }
+.lab-page .lab-pivot-tbl td { text-align:center;padding:5px;border-radius:3px;font-weight:700; }
+.lab-page .lab-pivot-tbl td small { display:block;font-size:9px;opacity:.85; }
 .lab-page .lab-mobile-network-hint { padding:12px 12px 0;margin:0;font-size:11px;line-height:1.5;color:#9fbccc; }
 @media (max-width:600px) {
   .lab-page .lab-status,.lab-page .lab-match-picker label,.lab-page .lab-eyebrow { font-size:10px; }

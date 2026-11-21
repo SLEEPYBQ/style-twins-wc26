@@ -13,19 +13,14 @@
   <link rel="stylesheet" href="css/story-review.css?v=20261118-2">
   <link rel="stylesheet" href="css/duel.css?v=20261118-2">
   <link rel="stylesheet" href="css/robustness.css?v=20261119">
-  <link rel="stylesheet" href="css/lab.css?v=20261118-2" media="(max-width: 600px)">
+  <link rel="stylesheet" href="css/lab.css?v=20261121-v4" media="(max-width: 600px)">
   <link rel="stylesheet" href="css/lab-pulse.css?v=20261118-2" media="(max-width: 600px)">
   <link rel="stylesheet" href="css/i18n.css?v=20261119-linked">
   <link rel="stylesheet" href="css/desktop.css?v=20261119-nav" media="(min-width: 601px)">
-  <link rel="stylesheet" href="css/lab-desktop.css?v=20261121-palette" media="(min-width: 601px)">
-  <link rel="stylesheet" href="css/workspace.css?v=20261121-palette">
-  <link rel="stylesheet" href="css/workspace-lens.css?v=20261121-fit">
-  <link rel="stylesheet" href="css/heatmap.css?v=20261121-palette">
-  <link rel="stylesheet" href="css/workspace-pairs.css?v=20261121-palette">
-  <link rel="stylesheet" href="css/theme.css?v=20261121-palette">
+  <link rel="stylesheet" href="css/lab-desktop.css?v=20261121-v4" media="(min-width: 601px)">
+  <link rel="stylesheet" href="css/theme.css?v=20261121-v4">
   <link rel="stylesheet" href="css/outcome-waterfall.css?v=20261121-palette">
-  <link rel="stylesheet" href="css/workspace-shell.css?v=20261121-fit">
-  <link rel="stylesheet" href="css/explore-panels.css?v=20261121-palette">
+  <link rel="stylesheet" href="css/workspace-v2.css?v=20261121-v4">
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false">
@@ -44,7 +39,7 @@
   </svg>
   <header class="topbar">
     <a class="brand" href="#/story" aria-label="Style Twins home">
-      <span>Style Twins</span>
+      <span translate="no">Style Twins</span>
     </a>
     <nav class="tabs" aria-label="Sections">
       <a href="#/styles" data-tab="styles">Workspace</a>
@@ -79,10 +74,8 @@
   <main id="view" tabindex="-1"></main>
 
   <footer class="foot">
-    <p>Data: <a href="https://github.com/Alamyy/Worldcup26" target="_blank" rel="noopener">Worldcup26</a> (CC BY 4.0), derived from FIFA Training Centre post-match reports. Not affiliated with FIFA.
-      Player avatars are cartoon interpretations drawn from reference photos: freely licensed Wikimedia Commons photos where they exist, otherwise public press photos used only as a drawing reference (sources on each player card). Non-commercial course project.</p>
-    <p translate="no">Group 6 · Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang</p>
-    <p translate="no">Coder contributors: Baiqiao Zhang, Xuning Hu<span class="foot-github"> · <a href="https://github.com/SLEEPYBQ/style-twins-wc26" target="_blank" rel="noopener">GitHub</a></span></p>
+    <p>Data: <a href="https://github.com/Alamyy/Worldcup26" target="_blank" rel="noopener">Worldcup26</a> (CC BY 4.0) · <a href="#/method">Method &amp; credits</a></p>
+    <p translate="no">Group 6 · Chonghao Zhong, Zhixiang Zhang, Xuning Hu, Baiqiao Zhang · <a href="https://github.com/SLEEPYBQ/style-twins-wc26" target="_blank" rel="noopener">GitHub</a></p>
   </footer>
 
   <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
@@ -93,33 +86,30 @@
   <script src="data/sources.js"></script>
   <script src="data/avatars.js" onerror="window.WC_AVATARS = window.WC_AVATARS || {}"></script>
   <script src="data/avatar_credits.js" onerror="window.WC_AVATAR_CREDITS = window.WC_AVATAR_CREDITS || {}"></script>
-  <script src="js/util.js?v=20261119"></script>
+  <script src="js/util.js?v=20261121-v4"></script>
   <script src="js/i18n-catalogs.js"></script>
   <script src="js/i18n-glossary.js"></script>
-  <script src="js/i18n.js"></script>
+  <script src="js/i18n.js?v=20261121-v4"></script>
   <script src="js/explore-locales.js?v=20261116-workbench2"></script>
-  <script src="js/workspace-locales.js?v=20261121-boxplots"></script>
+  <script src="js/workspace-locales.js?v=20261121-v4"></script>
   <script src="js/copy-locales.js?v=20261118-4"></script>
-  <script src="js/analysis.js?v=20261121-interactions"></script>
+  <script src="js/analysis.js?v=20261121-v4"></script>
   <script src="js/robustness.js"></script>
   <script src="js/outcome-waterfall.js?v=20261121-interactions"></script>
   <script src="js/match-pulse-data.js"></script>
-  <script src="js/ui.js"></script>
+  <script src="js/ui.js?v=20261121-v4"></script>
   <script src="js/charts.js?v=20261121-palette"></script>
-  <script src="js/workspace-heatmap.js?v=20261121-palette"></script>
-  <script src="js/workspace-lens.js?v=20261121-interactions"></script>
-  <script src="js/workspace-pairs.js?v=20261121-interactions"></script>
-  <script src="js/style-boxplot.js?v=20261121-boxplots"></script>
-  <script src="js/explore-style.js?v=20261121-boxplots"></script>
-  <script src="js/explore-trend.js?v=20261121-cohort"></script>
-  <script src="js/explore-outcomes.js?v=20261121-cohort"></script>
-  <script src="js/view-workspace.js?v=20261121-palette"></script>
+  <script src="js/workspace-map.js?v=20261121-v4"></script>
+  <script src="js/workspace-dna.js?v=20261121-v4"></script>
+  <script src="js/workspace-quadrant.js?v=20261121-v4"></script>
+  <script src="js/workspace-fate.js?v=20261121-v4"></script>
+  <script src="js/view-workspace.js?v=20261121-v4"></script>
   <script src="js/view-team.js?v=20261119"></script>
   <script src="js/view-investigate.js?v=20261121-palette"></script>
   <script src="js/view-duel.js?v=20261121-palette"></script>
   <script src="js/view-robustness.js?v=20261121-palette"></script>
   <script src="js/lab-pulse.js?v=20261121-palette"></script>
-  <script src="js/view-lab.js?v=20261121-palette"></script>
+  <script src="js/view-lab.js?v=20261121-v4"></script>
   <script src="js/view-matches.js?v=20261119"></script>
   <script src="js/view-match.js?v=20261119"></script>
   <script src="js/view-method.js?v=20261119"></script>

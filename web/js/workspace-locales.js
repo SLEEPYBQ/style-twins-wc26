@@ -475,3 +475,473 @@
     }
   }
 })();
+
+/* Single-screen v2 workspace translations (zh-Hans & zh-Hant) */
+(function () {
+  const M = window.STYLE_TWINS_MESSAGES;
+  const G = window.STYLE_TWINS_GLOSSARY;
+  if (!M) return;
+  const pairs = {
+    "Possession": ["控球率", "控球率"],
+    "Build-up": ["组织推进", "組織推進"],
+    "Long & counter": ["长传反击", "長傳反擊"],
+    "After regains": ["夺回快攻", "奪回快攻"],
+    "Final third": ["进攻三区", "進攻三區"],
+    "High press": ["高位逼抢", "高位逼搶"],
+    "Deep block": ["深度防守", "深度防守"],
+    "Counter-press": ["丢球反抢", "失球反搶"],
+    "Same style, different fate?": ["打法相似，命运为何不同？", "打法相似，命運為何不同？"],
+    "Choose Team A": ["选择球队 A", "選擇球隊 A"],
+    "Compare with B": ["选择对比球队 B", "選擇對比球隊 B"],
+    "Clear Team A": ["清除球队 A", "清除球隊 A"],
+    "Full": ["全程", "全程"],
+    "Group": ["小组赛", "小組賽"],
+    "CSV": ["CSV", "CSV"],
+    "Team Table / Export CSV": ["球队数据表 / 导出 CSV", "球隊資料表 / 匯出 CSV"],
+    "Method & definitions": ["方法与指标说明", "方法與指標說明"],
+    "Table / CSV": ["数据表 / CSV", "資料表 / CSV"],
+    "Reset": ["重置", "重設"],
+    "Playstyle": ["打法光谱", "打法光譜"],
+    "Def.": ["防", "防"],
+    "Att.": ["攻", "攻"],
+    "Deep & direct": ["深守直攻", "深守直攻"],
+    "Balanced": ["均衡型", "均衡型"],
+    "Dials": ["风格维度", "風格維度"],
+    "All 10": ["全选 10 项", "全選 10 項"],
+    "Filter team…": ["筛选球队…", "篩選球隊…"],
+    "Style Twins": ["风格双胞胎", "風格雙胞胎"],
+    "Style DNA": ["风格 DNA", "風格 DNA"],
+    "Fate Quadrant": ["命运象限", "命運象限"],
+    "Why Did Their Fates Differ?": ["差距从何而来？", "差距從何而來？"],
+    "Biggest style-twin surprises": ["最反常的风格双胞胎", "最反常的風格雙胞胎"],
+    "Most similar": ["最相似", "最相似"],
+    "Biggest gap": ["差距最大", "差距最大"],
+    "Closest twins to": ["最像的球队：", "最像的球隊："],
+    "Closest twins to {0}": ["与 {0} 最像的球队", "與 {0} 最像的球隊"],
+    "Style spectrum": ["打法光谱排序", "打法光譜排序"],
+    "Nearest to A": ["与 A 最相似", "與 A 最相似"],
+    "Goal diff. / match": ["场均净胜球", "場均淨勝球"],
+    "xG diff. / match": ["场均 xG 差", "場均 xG 差"],
+    "Attack": ["进攻", "進攻"],
+    "Defence": ["防守", "防守"],
+    "Active ({0})": ["已选 ({0})", "已選 ({0})"],
+    "Other": ["其他", "其他"],
+    "Teams ({0})": ["球队 ({0})", "球隊 ({0})"],
+    "Clear tint": ["清除着色", "清除著色"],
+    "Twins": ["双胞胎", "雙胞胎"],
+    "Better GD": ["净胜球更佳", "淨勝球更佳"],
+    "Worse GD": ["净胜球更差", "淨勝球更差"],
+    "Click a flag to set Team A, or drag empty space to brush a group.": ["点击国旗设为 A，或在空白处框选球队。", "點擊國旗設為 A，或在空白處框選球隊。"],
+    "Click another flag to set B (Shift-click sets A). Drag empty space to brush.": ["点击另一面国旗设为 B（Shift 点击设为 A），空白处拖拽框选。", "點擊另一面國旗設為 B（Shift 點擊設為 A），空白處拖曳框選。"],
+    "Hover a column heading to preview on Style Map; click to sort & tint.": ["悬停列表头可在风格地图预览着色；点击排序并着色。", "懸停列表頭可在風格地圖預覽著色；點擊排序並著色。"],
+    "Each dot is one team pair. Click any ★ dot to inspect why similar styles got different results.": ["每个点代表一对球队，点击任意 ★ 点查看原因。", "每個點代表一對球隊，點擊任意 ★ 點查看原因。"],
+    "Style similarity percentile →": ["风格相似度百分位 →", "風格相似度百分位 →"],
+    "↑ Goal diff. gap / match": ["↑ 场均净胜球差距", "↑ 場均淨勝球差距"],
+    "★ Style twins · Different fate ({0})": ["★ 双胞胎 · 不同命运 ({0})", "★ 雙胞胎 · 不同命運 ({0})"],
+    "Different style · Different fate": ["打法不同 · 命运不同", "打法不同 · 命運不同"],
+    "Different style · Similar fate": ["打法不同 · 命运相近", "打法不同 · 命運相近"],
+    "Twins · Similar fate": ["双胞胎 · 命运相近", "雙胞胎 · 命運相近"],
+    "Style & Opponents": ["打法与对手", "打法與對手"],
+    "Playing style + opponent strength": ["风格基线 + 对手强弱", "風格基線 + 對手強弱"],
+    "Chance Quality": ["创造与阻止机会", "創造與阻止機會"],
+    "xG created & xG prevented": ["预期进球创造与防守阻止", "預期進球創造與防守阻止"],
+    "Finishing & Keeping": ["临门一脚与门将", "臨門一腳與門將"],
+    "Goals vs xG (shot conversion & saves)": ["实际进球/失球相对 xG 的转化", "實際進球/失球相對 xG 的轉化"],
+    "Why style twins isolate execution: share of GD gap": ["为何看双胞胎：净胜球差距构成对比", "為何看雙胞胎：淨勝球差距構成對比"],
+    "Style twins (≥90%)": ["风格双胞胎 (≥90%)", "風格雙胞胎 (≥90%)"],
+    "Dissimilar (<50%)": ["打法不同 (<50%)", "打法不同 (<50%)"],
+    "Try a pair:": ["试试这几组：", "試試這幾組："],
+    "Click any team or ★ dot above to inspect — or try:": ["点击上方任意球队或 ★ 点深入分析，或试试：", "點擊上方任意球隊或 ★ 點深入分析，或試試："],
+    "Beads": ["比赛珠串", "比賽珠串"],
+    "Table": ["表格", "表格"],
+    "Report ↗": ["完整报告 ↗", "完整報告 ↗"],
+    "Audit ↗": ["稳健性检验 ↗", "穩健性檢驗 ↗"],
+    "Observed GD gap": ["实际净胜球差距", "實際淨勝球差距"],
+    "Click any match bead to locate it on Style Map and open Match Lab.": ["点击任意比赛珠点，可在风格地图定位并进入比赛分析室。", "點擊任意比賽珠點，可在風格地圖定位並進入比賽分析室。"],
+    "Filtered Teams": ["筛选后的球队", "篩選後的球隊"],
+    "Method & credits": ["方法说明与致谢", "方法說明與致謝"],
+    "Story": ["演示剧本", "演示劇本"],
+    "Isolate": ["仅看此类", "僅看此類"],
+    "Reset zoom ×": ["重置缩放 ×", "重置縮放 ×"],
+    "Zoom ★": ["放大 ★ 区域", "放大 ★ 區域"],
+    "Trail": ["轨迹", "軌跡"],
+    "Steer": ["调权重", "調權重"],
+    "Off": ["关", "關"],
+    "53 ★": ["53 ★ 边", "53 ★ 邊"],
+    "Ego": ["单队邻域", "單隊鄰域"],
+    "Matrix": ["矩阵", "矩陣"],
+    "Bars": ["条形", "條形"],
+    "ParCoords": ["平行坐标", "平行坐標"],
+    "Pitch": ["球场三区", "球場三區"],
+    "Corr": ["相关性", "相關性"],
+    "Gap": ["差异序", "差異序"],
+    "Breakdown": ["结构分解", "結構分解"],
+    "Carryover": ["阶段延续", "階段延續"],
+    "Style→Real": ["预期→实际", "預期→實際"],
+    "Timeline": ["累计走势", "累計走勢"],
+    "Conn.": ["轨迹散点", "軌跡散點"],
+    "Outcomes": ["结果", "結果"],
+    "Fate": ["结果", "結果"],
+    "Own": ["后场", "後場"],
+    "Midfield": ["中场", "中場"],
+    "Opp": ["前场", "前場"],
+
+    // Football & stage terminology polish
+    "Style baseline": ["打法基线", "打法基線"],
+    "Opponent context": ["对手强弱", "對手強弱"],
+    "Chance creation": ["创造机会", "創造機會"],
+    "Chance prevention": ["防守遏制", "防守遏制"],
+    "Finishing vs xG": ["临门一脚 (vs xG)", "臨門一腳 (vs xG)"],
+    "Conceding vs xG": ["门将扑救 (vs xG)", "門將撲救 (vs xG)"],
+    "Champions": ["冠军", "冠軍"],
+    "Runners-up": ["亚军", "亞軍"],
+    "Third place": ["季军", "季軍"],
+    "Fourth place": ["殿军", "殿軍"],
+    "Round of {0}": ["{0} 强", "{0} 強"],
+    "Penalties {0}": ["点球大战 {0}", "點球大戰 {0}"],
+    "Hudl’s match pass-network guide": ["Hudl 比赛传球网络指南", "Hudl 比賽傳球網路指南"],
+    "Inspect {0} →": ["查看 {0} →", "查看 {0} →"],
+
+    // Topbar, Spectrum Bar & Story Beats 1–4
+    "Filter team": ["筛选球队", "篩選球隊"],
+    "Search": ["搜索", "搜尋"],
+    "Clear Team B": ["清除球队 B", "清除球隊 B"],
+    "Search options": ["搜索选项", "搜尋選項"],
+    "{0} teams · {1} matches": ["{0} 支球队 · {1} 场比赛", "{0} 支球隊 · {1} 場比賽"],
+    "Presentation story beats": ["演示故事线索", "演示故事線索"],
+    "Next beat →": ["下一步 →", "下一步 →"],
+    "Close story banner": ["关闭提示栏", "關閉提示欄"],
+    "Isolate selected playstyle teams instead of highlighting in context": ["仅单独显示该打法球队（而非在全局背景中高亮）", "僅單獨顯示該打法球隊（而非在全局背景中高亮）"],
+    "{0} teams · Selects {1} defining dials (highlights by default)": ["共 {0} 支球队 · 自动选中 {1} 项核心维度（默认高亮显示）", "共 {0} 支球隊 · 自動選取 {1} 項核心維度（預設高亮顯示）"],
+    "Deep and direct": ["深守直攻", "深守直攻"],
+    "Balanced profile": ["均衡型打法", "均衡型打法"],
+    "Sit deep near their box and break quickly with long balls.": ["深度退守禁区前沿，得球后快速长传反击。", "深度退守禁區前沿，得球後快速長傳反擊。"],
+    "Absorb pressure in mid/deep zones and strike fast on turnover.": ["在中后场承受压迫，夺回球权后迅速发动反击。", "在中後場承受壓迫，奪回球權後迅速發動反擊。"],
+    "Balanced mix across possession, pressing, and transitions.": ["在控球、压迫与攻防转换之间保持均衡。", "在控球、壓迫與攻防轉換之間保持均衡。"],
+    "Keep possession, build patiently from the back, and press high.": ["坚持控球与后场耐心传导，丢球后积极高位逼抢。", "堅持控球與後場耐心傳導，失球後積極高位逼搶。"],
+    "Camp in the final third, cross often, and counter-press immediately.": ["持续压上进攻三区、频繁传中并就地丢球反抢。", "持續壓上進攻三區、頻繁傳中並就地失球反搶。"],
+    "Beat 1 · Global Paradox": ["第 1 步 · 核心悖论", "第 1 步 · 核心悖論"],
+    "Across all {0} ★ style-twin pairs (≥{1} similar, ≥{2} GD/m gap), {3} of fate divergence is execution & finishing — only {4} is style or opponents.": [
+      "在全部 {0} 对 ★ 风格双胞胎中（相似度 ≥{1}、场均净胜球差 ≥{2}），{3} 的结果分化来自临场执行与把握机会，仅 {4} 源于打法与对手强弱。",
+      "在全部 {0} 對 ★ 風格雙胞胎中（相似度 ≥{1}、場均淨勝球差 ≥{2}），{3} 的結果分化來自臨場執行與把握機會，僅 {4} 源於打法與對手強弱。"
+    ],
+    "Beat 2 · False 2D Neighbor vs. True Twin": ["第 2 步 · 伪二维近邻 vs. 真双胞胎", "第 2 步 · 偽二維近鄰 vs. 真雙胞胎"],
+    "{0} & Turkey sit near each other visually in 2D, yet share only {1} {2}-dial similarity (2D hides {3}.42σ). Compare with true twins {4} vs. {5} ({6}).": [
+      "{0}与土耳其在二维投影上看似相邻，但按 {2} 维全指标计算的相似度其实只有 {1}（被二维投影隐藏了 {3}.42σ 差距）；反观{4}与{5}才是真正高达 {6} 相似的打法双胞胎。",
+      "{0}與土耳其在二維投影上看似相鄰，但按 {2} 維全指標計算的相似度其實只有 {1}（被二維投影隱藏了 {3}.42σ 差距）；反觀{4}與{5}才是真正高達 {6} 相似的打法雙胞胎。"
+    ],
+    "Spain & Türkiye sit near each other visually in 2D, yet share only {0} {1}-dial similarity (2D hides {2} σ). Compare with true twins {3} vs. {4} ({5}).": [
+      "西班牙与土耳其在二维投影上看似相邻，但按 {1} 维全指标计算的相似度其实只有 {0}（被二维投影隐藏了 {2}σ 差距）；反观{3}与{4}才是高达 {5} 相似的真双胞胎。",
+      "西班牙與土耳其在二維投影上看似相鄰，但按 {1} 維全指標計算的相似度其實只有 {0}（被二維投影隱藏了 {2}σ 差距）；反觀{3}與{4}才是高達 {5} 相似的真雙胞胎。"
+    ],
+    "Beat 3 · Same Style, Opposite Fate (ECU vs. USA)": ["第 3 步 · 同打法，异命运（ECU vs. USA）", "第 3 步 · 同打法，異命運（ECU vs. USA）"],
+    "{0} identical tactics yet {1} GD/m gap: {2} built {3} xGD by Game {4} while actual GD dropped to {5} after M{6} v {7} ({8} finishing).": [
+      "战术相似度高达 {0}，场均净胜球却相差 {1}：厄瓜多尔前 {4} 场累计创造 {3} xGD，却在 M{6} 对阵{7}后净胜球归 {5}（临门一脚转化亏损 {8}）。",
+      "戰術相似度高達 {0}，場均淨勝球卻相差 {1}：厄瓜多爾前 {4} 場累計創造 {3} xGD，卻在 M{6} 對陣{7}後淨勝球歸 {5}（臨門一腳轉化虧損 {8}）。"
+    ],
+    "Beat 4 · Final & Open Exploration (ESP vs. ARG)": ["第 4 步 · 决赛对比与自由探索（ESP vs. ARG）", "第 4 步 · 決賽對比與自由探索（ESP vs. ARG）"],
+    "Now explore live: inspect the World Cup Final, drag biplot spokes with Steer, brush ParCoords axes, or open any match in Match Lab.": [
+      "现在可自由交互探索：对比决赛两队（西班牙 vs 阿根廷）、点击「调权重」在地图上拖拽调整战术权重、在平行坐标轴刷选，或进入任意比赛的传球分析室。",
+      "現在可自由交互探索：對比決賽兩隊（西班牙 vs 阿根廷）、點擊「調權重」在地圖上拖曳調整戰術權重、在平行坐標軸刷選，或進入任意比賽的傳球分析室。"
+    ],
+    "Beat {0}: Global Proof ({1} vs {2})": ["第 {0} 步：全局结论验证（{1} vs {2}）", "第 {0} 步：全域結論驗證（{1} vs {2}）"],
+    "Beat {0}: False 2D Neighbor ({1} vs {2})": ["第 {0} 步：二维投影陷阱（{1} vs {2}）", "第 {0} 步：二維投影陷阱（{1} vs {2}）"],
+    "Beat {0}: True Twins, Opposite Fate ({1} vs {2})": ["第 {0} 步：相同打法的相反命运（{1} vs {2}）", "第 {0} 步：相同打法的相反命運（{1} vs {2}）"],
+    "Beat {0}: Final & Live Exploration ({1} vs {2})": ["第 {0} 步：决赛与自由探索（{1} vs {2}）", "第 {0} 步：決賽與自由探索（{1} vs {2}）"],
+
+    // Panel 1: Style Map & Steer
+    "1:1 PCA projection · click any flag to inspect or drag to brush a group.": [
+      "1:1 等比例 PCA 投影 · 点击任意国旗查看，或在空白处拖拽框选一组球队。",
+      "1:1 等比例 PCA 投影 · 點擊任意國旗查看，或在空白處拖曳框選一組球隊。"
+    ],
+    "Drag any tactic pill outward to boost its weight, inward to reduce it (or click to cycle).": [
+      "向外拖拽任意战术胶囊可加大该指标权重，向内拖可降低（点击可循环切换权重）。",
+      "向外拖曳任意戰術膠囊可加大該指標權重，向內拖可降低（點擊可循環切換權重）。"
+    ],
+    "Drag tactic pills on the map to re-weight style dimensions": [
+      "在地图上直接拖拽各指标胶囊以重设战术权重",
+      "在地圖上直接拖曳各指標膠囊以重設戰術權重"
+    ],
+    "Drag outward to boost weight, inward to reduce, or click to cycle": [
+      "向外拖拽加大权重，向内拖拽降低权重，或点击切换倍率",
+      "向外拖曳加大權重，向內拖曳降低權重，或點擊切換倍率"
+    ],
+    "Click another flag to set B (Shift-click sets A). Hover dense clusters to fan out.": [
+      "点击另一面国旗设为 B（按住 Shift 点击设为 A），悬停密集区域可自动散开国旗。",
+      "點擊另一面國旗設為 B（按住 Shift 點擊設為 A），懸停密集區域可自動散開國旗。"
+    ],
+    "Within archetype ★": ["同风格组 ★", "同風格組 ★"],
+    "Cross-archetype ★": ["跨风格组 ★", "跨風格組 ★"],
+    "Reset w ×": ["重置权重 ×", "重設權重 ×"],
+    "Reset custom dial weights": ["重置自定义指标权重", "重設自訂指標權重"],
+    "Brush ({0}) ×": ["框选 ({0}) ×", "框選 ({0}) ×"],
+    "X {0} · Y {1} · {2} dims": ["X {0} · Y {1} · {2} 维", "X {0} · Y {1} · {2} 維"],
+    "1:1 variance explained: horizontal {0}, vertical {1} across {2} indicators": [
+      "1:1 投影方差解释率：横轴 {0}，纵轴 {1}（共 {2} 项指标）",
+      "1:1 投影方差解釋率：橫軸 {0}，縱軸 {1}（共 {2} 項指標）"
+    ],
+    "2D vs {0}-dial guard": ["二维 vs {0} 维投影校验", "二維 vs {0} 維投影校驗"],
+    "{0}–{1} appear close in 2D (ortho": ["{0}–{1} 在二维地图看似接近（正交残差 ", "{0}–{1} 在二維地圖看似接近（正交殘差 "],
+    "σ), yet share only": ["σ），但真实风格相似度仅", "σ），但真實風格相似度僅"],
+    "style similarity.": ["。", "。"],
+    "2D trap: {0} true sim": ["二维陷阱：真实相似度 {0}", "二維陷阱：真實相似度 {0}"],
+    "2D close, {0}-dial differs (ortho {1} σ)": ["二维看似相近，{0} 维全指标实则不同（正交距 {1}σ）", "二維看似相近，{0} 維全指標實則不同（正交距 {1}σ）"],
+    "10d style sim": ["10 维相似度", "10 維相似度"],
+    "Horizontal loading": ["横轴载荷", "橫軸載荷"],
+    "Vertical loading": ["纵轴载荷", "縱軸載荷"],
+    "Weight": ["权重", "權重"],
+    "Show chronological 1..N match trajectory": ["显示按轮次 1..N 推进的风格轨迹", "顯示按輪次 1..N 推進的風格軌跡"],
+    "Brushing {0} teams — release to filter.": ["正在框选 {0} 支球队 —— 松开鼠标确认筛选。", "正在框選 {0} 支球隊 —— 放開滑鼠確認篩選。"],
+    "Twin #{0} ({1})": ["第 {0} 相似 ({1})", "第 {0} 相似 ({1})"],
+    "{0} similar · Δ {1} GD/m": ["相似度 {0} · 场均净胜球差 {1}", "相似度 {0} · 場均淨勝球差 {1}"],
+    "Match #{0} in trajectory": ["轨迹第 {0} 场", "軌跡第 {0} 場"],
+    "Goal diff. / m": ["场均净胜球", "場均淨勝球"],
+    "xG diff. / m": ["场均 xG 差", "場均 xG 差"],
+    "Matches": ["比赛场数", "比賽場數"],
+
+    // Panel 2: Style Twins
+    "{0} dims · {1}–{2}": ["{0} 维 · {1}–{2}", "{0} 維 · {1}–{2}"],
+    "{0} ★": ["{0} ★", "{0} ★"],
+    "{0} outperformed {1} by {2} goals/match": ["{0} 场均净胜球领先 {1} 达 {2} 球", "{0} 場均淨勝球領先 {1} 達 {2} 球"],
+    "Pair-by-pair cause breakdown": ["代表风格双胞胎归因拆解", "代表風格雙胞胎歸因拆解"],
+    "Click any pair to inspect matches": ["点击任意组合展开逐场拆解", "點擊任意組合展開逐場拆解"],
+    "Finishing": ["临门一脚", "臨門一腳"],
+    "Chances": ["机会质量", "機會品質"],
+    "Style": ["打法/对手", "打法/對手"],
+    "No ≥{0} similar pairs with ≥{1} GD/m gap in this filter. Click any flag or dot to explore.": [
+      "当前筛选下暂无相似度 ≥{0} 且场均净胜球差 ≥{1} 的组合，点击任意国旗或散点即可分析。",
+      "目前篩選下暫無相似度 ≥{0} 且場均淨勝球差 ≥{1} 的組合，點擊任意國旗或散點即可分析。"
+    ],
+    "{0} style similarity": ["打法相似度 {0}", "打法相似度 {0}"],
+    "Goal difference vs {0}": ["相对{0}的场均净胜球差", "相對{0}的場均淨勝球差"],
+
+    // Panel 3: Style DNA
+    "LineUp weighted score": ["加权综合评分", "加權綜合評分"],
+    "Map X axis": ["风格地图 X 轴", "風格地圖 X 軸"],
+    "Map Y axis": ["风格地图 Y 轴", "風格地圖 Y 軸"],
+    "LineUp score": ["加权综合分", "加權綜合分"],
+    "Hover a column to preview tint on Style Map; click to sort & lock tint.": [
+      "悬停指标列可在风格地图预览着色；点击列标题排序并锁定着色。",
+      "懸停指標列可在風格地圖預覽著色；點擊列標題排序並鎖定著色。"
+    ],
+    "ParCoords: drag vertically on any axis to brush · dashed = A/B matches.": [
+      "平行坐标：在任意纵轴上上下拖拽刷选球队 · 虚线为 A/B 单场波动。",
+      "平行坐標：在任意縱軸上上下拖曳刷選球隊 · 虛線為 A/B 單場波動。"
+    ],
+    "Showing {0} brushed teams.": ["当前显示框选的 {0} 支球队。", "目前顯示框選的 {0} 支球隊。"],
+    "Positional · Press (Yang '03)": ["控球推进与压迫组 (Yang '03)", "控球推進與壓迫組 (Yang '03)"],
+    "Direct · Deep": ["长传与深守反击组", "長傳與深守反擊組"],
+    "Largest |{0} − {1}| differences": ["|{0} − {1}| 差异最大指标", "|{0} − {1}| 差異最大指標"],
+    "Closest indicators": ["最接近指标", "最接近指標"],
+    "Group mean": ["该型均值", "該型均值"],
+    "{0} · Group mean": ["{0} · 该组均值", "{0} · 該組均值"],
+    "3-zone pitch order (Own → Midfield → Opp)": ["按球场三区排序（后场 → 中场 → 前场）", "按球場三區排序（後場 → 中場 → 前場）"],
+    "Correlated metrics clustered together (Yang '03)": ["按相关性聚类排列指标列 (Yang '03)", "按相關性聚類排列指標列 (Yang '03)"],
+    "Order columns by |A − B| difference": ["按 A 与 B 绝对差值由大到小排列列序", "按 A 與 B 絕對差值由大到小排列列序"],
+    "Sort by expected goal difference per match": ["按场均预期净胜球 (xGD) 排序", "按場均預期淨勝球 (xGD) 排序"],
+    "Sort by observed goal difference per match": ["按场均实际净胜球 (GD) 排序", "按場均實際淨勝球 (GD) 排序"],
+    "Sort by weighted LineUp composite style score": ["按加权综合评分排序", "按加權綜合評分排序"],
+    "xG diff./m": ["场均 xG 差", "場均 xG 差"],
+    "Goal diff./m": ["场均净胜球", "場均淨勝球"],
+    "xG diff/m: {0}": ["场均 xG 差：{0}", "場均 xG 差：{0}"],
+    "Goal diff/m: {0}": ["场均净胜球：{0}", "場均淨勝球：{0}"],
+    "LineUp weighted score: {0}σ": ["加权综合分：{0}σ", "加權綜合分：{0}σ"],
+    "Chameleon": ["变阵弹性", "變陣彈性"],
+
+    // Panel 4: Fate Quadrant
+    "{0} ★ / {1} pairs": ["{0} ★ / {1} 对", "{0} ★ / {1} 對"],
+    "★ Twins · Diff. fate ({0})": ["★ 双胞胎 · 命运迥异 ({0})", "★ 雙胞胎 · 命運迥異 ({0})"],
+    "Diff. style · Diff. fate": ["打法不同 · 命运不同", "打法不同 · 命運不同"],
+    "Diff. style · Sim. fate": ["打法不同 · 命运相近", "打法不同 · 命運相近"],
+    "Twins · Sim. fate": ["双胞胎 · 命运相近", "雙胞胎 · 命運相近"],
+    "Open circles = pairs · ★ Gold = same style, diff. fate. Click or drag to zoom.": [
+      "空心圆 = 球队对 · 金色 ★ = 同风格不同命运。点击散点查看或框选放大。",
+      "空心圓 = 球隊對 · 金色 ★ = 同風格不同命運。點擊散點查看或框選放大。"
+    ],
+    "Highlighting {0}'s pairs. Click any dot/star or drag to zoom.": [
+      "正在高亮{0}的所有配对，点击任意点查看或框选放大。",
+      "正在高亮{0}的所有配對，點擊任意點查看或框選放大。"
+    ],
+    "Zoomed ({0}–{1} · {2}–{3} GD/m)": ["已缩放 ({0}–{1} · {2}–{3} 场均净胜球差)", "已縮放 ({0}–{1} · {2}–{3} 場均淨勝球差)"],
+    "Zoomed to quadrant selection — drag again or Reset zoom × to show all pairs.": [
+      "已放大至所选象限区域 —— 可继续框选或点击「重置缩放 ×」恢复全景。",
+      "已放大至所選象限區域 —— 可繼續框選或點擊「重置縮放 ×」恢復全景。"
+    ],
+    "Zoom into the {0}–{1} similarity style-twin corridor": [
+      "聚焦放大 {0}–{1} 高相似风格双胞胎区域",
+      "聚焦放大 {0}–{1} 高相似風格雙胞胎區域"
+    ],
+    "Style similarity": ["风格相似度", "風格相似度"],
+    "Goal diff. gap": ["场均净胜球差距", "場均淨勝球差距"],
+    "{0} / match": ["{0} / 场", "{0} / 場"],
+    "Click to compare these two teams": ["点击对比这两支球队", "點擊對比這兩支球隊"],
+    "Similarity": ["相似度", "相似度"],
+    "GD gap": ["净胜球差", "淨勝球差"],
+
+    // Panel 5: Why Did Their Fates Differ?
+    "{0} ★ style-twin pairs": ["{0} 对 ★ 双胞胎", "{0} 對 ★ 雙胞胎"],
+    "{0} similar pairs (≥{1})": ["{0} 对高相似组合 (≥{1})", "{0} 對高相似組合 (≥{1})"],
+    "{0} visible pairs": ["{0} 对可见组合", "{0} 對可見組合"],
+    "of the gap between style twins comes from": ["的风格双胞胎命运差距来自", "的風格雙胞胎命運差距來自"],
+    "chances & finishing": ["机会质量与临门一脚", "機會品質與臨門一腳"],
+    "— only": ["—— 仅", "—— 僅"],
+    "from style & opponents.": ["源于打法与对手。", "源於打法與對手。"],
+    "Average across": ["均值统计自", "均值統計自"],
+    "high-similarity pairs (≥{0} similar, ≥{1} GD/m gap) · Mean GD gap": [
+      "对高相似双胞胎（相似度 ≥{0}，场均净胜球差 ≥{1}） · 平均净胜球差",
+      "對高相似雙胞胎（相似度 ≥{0}，場均淨勝球差 ≥{1}） · 平均淨勝球差"
+    ],
+    "filtered pairs · Mean GD gap": ["对当前筛选组合 · 平均净胜球差", "對目前篩選組合 · 平均淨勝球差"],
+    "/m": ["/场", "/場"],
+    "Component contribution (GD/m, 0 baseline)": ["分项贡献拆解（场均净胜球，0 基线）", "分項貢獻拆解（場均淨勝球，0 基線）"],
+    "Style twins ≥{0}": ["风格双胞胎 ≥{0}", "風格雙胞胎 ≥{0}"],
+    "Dissimilar <{0}": ["打法不同 <{0}", "打法不同 <{0}"],
+    "{0}/{1} top": ["{0}/{1} 项主导", "{0}/{1} 項主導"],
+    "vs": ["vs", "vs"],
+    "Group performance in": ["小组赛阶段的", "小組賽階段的"],
+    "chance quality carries into Knockouts": ["机会创造质量可延续至淘汰赛", "機會創造品質可延續至淘汰賽"],
+    "(r={0}) — finishing does not (r={1}).": ["（r={0}），而临门一脚并无延续性（r={1}）。", "（r={0}），而臨門一腳並無延續性（r={1}）。"],
+    "Execution (Chances): Group → KO": ["机会执行力：小组赛 → 淘汰赛", "機會執行力：小組賽 → 淘汰賽"],
+    "Finishing & Keeping: Group → KO": ["射门与扑救波动：小组赛 → 淘汰赛", "射門與撲救波動：小組賽 → 淘汰賽"],
+    "r = {0} · carries over": ["r = {0} · 可稳定延续", "r = {0} · 可穩定延續"],
+    "r = {0} · noise / resets": ["r = {0} · 随机波动 / 重置", "r = {0} · 隨機波動 / 重置"],
+    "Group → Knockout carryover data unavailable.": ["暂无小组赛→淘汰赛延续性数据。", "暫無小組賽→淘汰賽延續性資料。"],
+    "From": ["从", "從"],
+    "style-expected xGD": ["打法预期场均净胜球 (xGD)", "打法預期場均淨勝球 (xGD)"],
+    "to": ["到", "到"],
+    "actual tournament GD": ["实际赛事场均净胜球 (GD)", "實際賽事場均淨勝球 (GD)"],
+    "per match.": ["的变化斜率。", "的變化斜率。"],
+    "Style expectation vs. tournament reality (GD/match)": ["打法预期 vs. 实际表现（场均净胜球）", "打法預期 vs. 實際表現（場均淨勝球）"],
+    "Teal slope up = overperformed style xGD · Amber down = underperformed": [
+      "青色上斜 = 超额兑现打法预期 · 琥珀色下斜 = 低于打法预期",
+      "青色上斜 = 超額兌現打法預期 · 琥珀色下斜 = 低於打法預期"
+    ],
+    "Style Expected GD/m": ["打法预期 xGD/场", "打法預期 xGD/場"],
+    "Actual GD/m": ["实际 GD/场", "實際 GD/場"],
+    "Style expected": ["打法预期", "打法預期"],
+    "Net execution": ["实际净执行偏差", "實際淨執行偏差"],
+    "← Favors {0}": ["← 对{0}更有利", "← 對{0}更有利"],
+    "Favors {0} →": ["对{0}更有利 →", "對{0}更有利 →"],
+    "#1 twin": ["头号双胞胎", "頭號雙胞胎"],
+    "Pin B": ["锁定 B", "鎖定 B"],
+    "Gap (A−B)": ["净胜球差 (A−B)", "淨勝球差 (A−B)"],
+    "Estimated net xG from playing style": ["按双方比赛风格模型估算的预期净胜球", "按雙方比賽風格模型估算的預期淨勝球"],
+    "Adjustment for opponents' tournament strength": ["根据各对手在本届赛事整体强弱所作的修正", "根據各對手在本屆賽事整體強弱所作的修正"],
+    "Actual xG created minus style-predicted xG": ["实际创造的 xG 减去风格模型预测的 xG", "實際創造的 xG 減去風格模型預測的 xG"],
+    "Style-predicted xG allowed minus actual xG allowed": ["风格模型预测的失球 xG 减去实际被对手创造的 xG", "風格模型預測的失球 xG 減去實際被對手創造的 xG"],
+    "Goals scored minus xG created": ["实际进球数减去创造的 xG（临门一脚转化）", "實際進球數減去創造的 xG（臨門一腳轉化）"],
+    "xG allowed minus goals conceded": ["被对手创造的 xG 减去实际丢球数（门将扑救等）", "被對手創造的 xG 減去實際失球數（門將撲救等）"],
+    "Cumulative xGD vs. GD (G1..Gn)": ["逐场累计 xGD 与实际 GD 走势 (G1..Gn)", "逐場累計 xGD 與實際 GD 走勢 (G1..Gn)"],
+    "Dashed = expected xGD · Solid = actual GD · Shaded = finishing residual": [
+      "虚线 = 累计预期 xGD · 实线 = 累计实际 GD · 阴影 = 临门一脚偏差",
+      "虛線 = 累計預期 xGD · 實線 = 累計實際 GD · 陰影 = 臨門一腳偏差"
+    ],
+    "Connected Scatterplot (xGD → GD)": ["连接散点轨迹图 (xGD → GD)", "連接散點軌跡圖 (xGD → GD)"],
+    "Step-by-step match trajectory against y=x parity": ["相对于 y=x 均等线的逐场表现轨迹", "相對於 y=x 均等線的逐場表現軌跡"],
+    "Expected = Actual": ["预期 = 实际", "預期 = 實際"],
+    "Cum. xGD →": ["累计 xGD →", "累計 xGD →"],
+    "↑ Cum. GD": ["↑ 累计实际 GD", "↑ 累計實際 GD"],
+    "Cum. xGD": ["累计 xGD", "累計 xGD"],
+    "Cum. actual GD": ["累计实际 GD", "累計實際 GD"],
+    "Match Fin+Keep": ["单场射门+门将差值", "單場射門+門將差值"],
+    "Click any match node to locate it on Style Map and open Match Lab.": [
+      "点击任意比赛节点，可在风格地图高亮定位并进入比赛分析室。",
+      "點擊任意比賽節點，可在風格地圖高亮定位並進入比賽分析室。"
+    ],
+    "Click to locate on Style Map & open Match Lab": ["点击在风格地图定位并进入比赛分析室", "點擊在風格地圖定位並進入比賽分析室"],
+    "Full multi-section pair report": ["打开完整的双队对比深度报告", "開啟完整的雙隊對比深度報告"],
+    "Test sensitivity to removing metrics or matches": ["稳健性检验：剔除单项指标或单场比赛后的敏感度", "穩健性檢驗：剔除單項指標或單場比賽後的敏感度"],
+    "Open in Match Lab": ["在比赛分析室中打开", "在比賽分析室中開啟"],
+    "Replay ↗": ["比赛回放 ↗", "比賽回放 ↗"],
+    "Match Lab ↗": ["比赛分析室 ↗", "比賽分析室 ↗"],
+    "Lab ↗": ["分析室 ↗", "分析室 ↗"],
+    "Unpin match": ["取消锁定比赛", "取消鎖定比賽"],
+    "Switch to Full tournament": ["切换至全程赛事", "切換至全程賽事"],
+    "{0} has no matches in the selected scope.": ["{0}在当前所选比赛范围内没有出场记录。", "{0}在目前所選比賽範圍內沒有出賽紀錄。"],
+    "No comparison team available in this scope.": ["当前范围下暂无可对比球队。", "目前範圍下暫無可對比球隊。"],
+    "Select at least two teams with matches in this scope to analyze goal-difference gaps.": [
+      "请至少选择两支在当前范围内有比赛的球队以分析净胜球差距。",
+      "請至少選擇兩支在目前範圍內有比賽的球隊以分析淨勝球差距。"
+    ],
+
+    // Match Lab v3
+    "Group A": ["A 组", "A 組"],
+    "Group B": ["B 组", "B 組"],
+    "Group C": ["C 组", "C 組"],
+    "Group D": ["D 组", "D 組"],
+    "Group E": ["E 组", "E 組"],
+    "Group F": ["F 组", "F 組"],
+    "Group G": ["G 组", "G 組"],
+    "Group H": ["H 组", "H 組"],
+    "Group I": ["I 组", "I 組"],
+    "Group J": ["J 组", "J 組"],
+    "Group K": ["K 组", "K 組"],
+    "Group L": ["L 组", "L 組"],
+    "Explore progression across playing-line bands (GK → DF → MF → FW), 4×4 role summary, or pass matrix.": [
+      "查看跨阵位分带推进网络（门将 → 后卫 → 中场 → 前锋）、4×4 位置汇总或传球矩阵。",
+      "查看跨陣位分帶推進網路（門將 → 後衛 → 中場 → 前鋒）、4×4 位置彙總或傳球矩陣。"
+    ],
+    "Pitch bands": ["阵位分带", "陣位分帶"],
+    "Role 4×4": ["4×4 位置汇总", "4×4 位置彙總"],
+    "Circular": ["环形网络", "環形網路"],
+    "Sent by selected": ["选中球员传出", "選中球員傳出"],
+    "Received by selected": ["选中球员接球", "選中球員接球"],
+    "Links:": ["传球方向：", "傳球方向："],
+    "Fwd": ["向前", "向前"],
+    "Lateral": ["横向", "橫向"],
+    "Backward": ["回传", "回傳"],
+    "Forward passes": ["向前传球", "向前傳球"],
+    "Lateral passes": ["横向传球", "橫向傳球"],
+    "Backward passes": ["回传球", "回傳球"],
+    "Attack direction (GK → FW) →  · Dashed arcs = backward passes": [
+      "进攻方向 (GK → FW) →  · 虚线弧 = 回传",
+      "進攻方向 (GK → FW) →  · 虛線弧 = 回傳"
+    ],
+    "Attack direction (GK → FW) → · Dashed arcs = backward passes": [
+      "进攻方向 (GK → FW) →  · 虚线弧 = 回传",
+      "進攻方向 (GK → FW) →  · 虛線弧 = 回傳"
+    ],
+    "GK → DF → MF → FW schematic role bands (Semantic Substrates)": [
+      "GK → DF → MF → FW 语义分带阵位传球网络",
+      "GK → DF → MF → FW 語義分帶陣位傳球網路"
+    ],
+    "PivotGraph 4×4 role-to-role pass rollup": ["PivotGraph 4×4 位置间传球矩阵对比", "PivotGraph 4×4 位置間傳球矩陣對比"],
+    "Seriated / sortable adjacency matrix": ["可重排序的邻接传球矩阵", "可重排序的鄰接傳球矩陣"],
+    "Circular ring with role-bundled paths": ["按位置聚束连线的环形传球网络", "按位置聚束連線的環形傳球網路"],
+    "Adjusting the slider updates links live in real time. Player totals and centrality use the full recorded network.": [
+      "拖动滑块可实时筛选连线；球员传接总数与网络中心度始终基于全场完整数据计算。",
+      "拖動滑桿可即時篩選連線；球員傳接總數與網路中心度始終基於全場完整資料計算。"
+    ],
+    "Betweenness": ["枢纽度", "樞紐度"],
+    "Hub": ["组织核心", "組織核心"],
+    "Authority": ["接应核心", "接應核心"],
+    "Betweenness {0}": ["枢纽度 {0}", "樞紐度 {0}"],
+    "Hub {0}": ["组织核心 {0}", "組織核心 {0}"],
+    "Graph centrality within the passing network": ["整张传球网络中的图中心度指标", "整張傳球網路中的圖中心度指標"],
+    "Order:": ["排序：", "排序："],
+    "By role": ["按位置", "按位置"],
+    "Involv.": ["按参与度", "按參與度"],
+    "Seriated": ["按聚簇", "按聚簇"],
+    "From \\ To": ["传球 \\ 接球", "傳球 \\ 接球"],
+    "(below {0} hidden)": ["（少于 {0} 次的连线已隐藏）", "（少於 {0} 次的連線已隱藏）"],
+    "below {0} hidden": ["少于 {0} 次已隐藏", "少於 {0} 次已隱藏"],
+    "{0} passes": ["{0} 次传球", "{0} 次傳球"],
+    "{0} sent": ["{0} 次传出", "{0} 次傳出"],
+    "{0} received": ["{0} 次接球", "{0} 次接球"],
+    "{0} sent · {1} received": ["{0} 次传出 · {1} 次接球", "{0} 次傳出 · {1} 次接球"],
+    "Full match · All players": ["全场 · 全部登场球员", "全場 · 全部登場球員"],
+    "Network representation": ["网络视图切换", "網路視圖切換"],
+    "Pass direction filter": ["传球方向筛选", "傳球方向篩選"],
+    "Matrix seriation order": ["矩阵排序方式", "矩陣排序方式"],
+  };
+  for (const [k, [hs, ht]] of Object.entries(pairs)) {
+    if (typeof hs === "string") {
+      if (M["zh-Hans"]) M["zh-Hans"][k] = hs;
+      if (G?.["zh-Hans"] && (k === "Possession" || k === "Style Twins")) G["zh-Hans"][k] = hs;
+    }
+    if (typeof ht === "string") {
+      if (M["zh-Hant"]) M["zh-Hant"][k] = ht;
+      if (G?.["zh-Hant"] && (k === "Possession" || k === "Style Twins")) G["zh-Hant"][k] = ht;
+    }
+  }
+})();
