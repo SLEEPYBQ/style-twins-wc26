@@ -279,6 +279,15 @@
   if (!messages) return;
   const locales = ["zh-Hans", "zh-Hant", "es", "fr", "pt", "de", "it", "ar", "ja", "ko", "hi"];
   const labels = {
+    "Close": ["关闭", "關閉", "Cerrar", "Fermer", "Fechar", "Schließen", "Chiudi", "إغلاق", "閉じる", "닫기", "बंद करें"],
+    "Workspace modes": ["工作台模式", "工作臺模式", "Modos del espacio de trabajo", "Modes de l’espace de travail", "Modos da área de trabalho", "Arbeitsbereichsmodi", "Modalità di lavoro", "أوضاع مساحة العمل", "ワークスペースのモード", "작업 공간 모드", "कार्यस्थान के मोड"],
+    "Explore": ["探索", "探索", "Explorar", "Explorer", "Explorar", "Erkunden", "Esplora", "استكشف", "探索", "탐색", "खोजें"],
+    "Compare": ["比较", "比較", "Comparar", "Comparer", "Comparar", "Vergleichen", "Confronta", "قارن", "比較", "비교", "तुलना करें"],
+    "Explain": ["解释结果", "解釋結果", "Explicar", "Expliquer", "Explicar", "Erklären", "Spiega", "فسّر", "結果を説明", "결과 설명", "समझें"],
+    "Closest to A": ["与 A 最相似", "與 A 最相似", "Más cercanos a A", "Proches de A", "Mais próximos de A", "A am ähnlichsten", "Più simili ad A", "الأقرب إلى A", "A に最も近いチーム", "A와 가장 유사", "A के सबसे करीब"],
+    "Supporting evidence": ["结果依据", "結果依據", "Evidencia de apoyo", "Éléments à l’appui", "Evidências de apoio", "Belege", "Dati a supporto", "الأدلة الداعمة", "裏付けデータ", "근거 자료", "सहायक साक्ष्य"],
+    "Choose Team A to begin.": ["先选择球队 A。", "先選擇球隊 A。", "Elige el equipo A para empezar.", "Choisissez l’équipe A pour commencer.", "Escolha a equipe A para começar.", "Wähle zuerst Team A.", "Scegli la squadra A per iniziare.", "اختر الفريق A للبدء.", "まずチーム A を選択してください。", "먼저 팀 A를 선택하세요.", "शुरू करने के लिए टीम A चुनें।"],
+    "Credits and sources": ["制作人员与来源", "製作人員與來源", "Créditos y fuentes", "Crédits et sources", "Créditos e fontes", "Mitwirkende und Quellen", "Crediti e fonti", "المساهمون والمصادر", "クレジットと出典", "제작진 및 출처", "योगदानकर्ता और स्रोत"],
     "Build-up play": ["组织推进", "組織推進", "Salida de balón", "Construction du jeu", "Construção de jogo", "Spielaufbau", "Costruzione del gioco", "بناء اللعب", "ビルドアップ", "후방 빌드업", "पीछे से खेल बनाना"],
     "Long balls & counters": ["长传与反击", "長傳與反擊", "Balones largos y contras", "Jeu long et contres", "Bolas longas e contra-ataques", "Lange Bälle und Konter", "Lanci lunghi e contropiedi", "كرات طويلة وهجمات مرتدة", "ロングボールとカウンター", "롱볼과 역습", "लंबी गेंदें और पलटवार"],
     "Attacks after regains": ["夺回球权后进攻", "奪回球權後進攻", "Ataques tras recuperar", "Attaques après récupération", "Ataques após recuperar a bola", "Angriffe nach Ballgewinn", "Attacchi dopo il recupero", "هجوم بعد استرجاع الكرة", "奪った直後の攻撃", "공 탈취 직후 공격", "गेंद जीतने के बाद हमले"],

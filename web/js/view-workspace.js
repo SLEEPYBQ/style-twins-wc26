@@ -51,6 +51,8 @@
     // Older links offered possession both as an outcome and as the first style dial.
     const axis = (value, fallback) => value === "poss" ? "dial0" : Object.hasOwn(metricById, value) ? value : fallback;
     return {
+      mode: ["compare", "explain"].includes(p.mode) ? p.mode : "explore",
+      evidence: compare && p.evidence === "outcomes" ? "outcomes" : "matches",
       team, compare, dials, scope, heatSort: heatSort === "near" && !team ? "group" : heatSort,
       arch: Object.hasOwn(App.arch, p.arch) ? p.arch : "", search: p.search || "",
       view: ["pairs", "custom"].includes(p.view) ? p.view : "pca",
@@ -65,6 +67,7 @@
   function stateUrl(s) {
     const defaultEncoding = s.color === "dial0" && s.heatSort === "dial0";
     return `#/styles${A.query(s.dials, {
+      mode: s.mode === "explore" ? null : s.mode, evidence: s.evidence === "outcomes" && s.compare ? "outcomes" : null,
       team: s.team, compare: s.compare, heatSort: defaultEncoding ? null : s.heatSort, scope: s.scope === "all" ? null : s.scope, arch: s.arch, search: s.search,
       view: s.view === "pca" ? null : s.view, x: s.view === "custom" ? s.x : null, y: s.view === "custom" ? s.y : null,
       pairRegion: s.view === "pairs" && s.pairRegion ? s.pairRegion.join(",") : null,
@@ -112,9 +115,18 @@
           <div class="ws-pick" data-side="B"><b class="ws-side" translate="no">B</b><div id="ws-pick-b"></div></div>
         </div>
         <p class="ws-summary" id="ws-summary" aria-live="polite"></p>
-        <button type="button" class="ws-link" id="ws-to-analysis" hidden>Similar teams</button>
-        <button type="button" class="ws-link" id="ws-to-waterfall" hidden>Explain outcome gap</button>
         <button type="button" class="ws-btn" id="ws-reset">Reset view</button>
+      </div>
+      <div class="ws-modebar">
+        <div role="tablist" id="ws-modes" aria-label="Workspace modes">
+          ${[["explore", "Explore"], ["compare", "Compare"], ["explain", "Explain"]].map(([mode, label]) =>
+            `<button type="button" role="tab" id="ws-tab-${mode}" data-mode="${mode}" aria-controls="ws-content">${label}</button>`).join("")}
+        </div>
+        <div id="ws-near-strip" role="group" aria-label="Closest to A" hidden><span>Closest to A</span></div>
+        <div id="ws-utilities">
+          <button type="button" class="ws-btn" data-tool="similar" aria-haspopup="dialog" aria-controls="ws-tools-dialog">Similarity indicators</button>
+          <button type="button" class="ws-btn" data-tool="table" aria-haspopup="dialog" aria-controls="ws-tools-dialog">Team Table</button>
+        </div>
       </div>
       <div class="ws-filters" role="region" aria-label="Team filters">
         <label class="ws-search">${ICON.search}<span class="sr-only">Search teams</span><input id="ws-search" type="search" placeholder="Search teams" autocomplete="off"></label>
@@ -125,6 +137,7 @@
         <div class="ws-chips-row" id="ws-chips" hidden></div>
         <span id="ws-count" aria-live="polite"></span>
       </div>
+      <div class="ws-content" role="tabpanel" id="ws-content" tabindex="0">
       <div class="ws-primary">
         <div class="ws-overview-tools">
           <label id="ws-colour-control"><span>Map colour</span> <select id="ws-color" aria-label="Map colour">${selectOptions(colourOptions)}</select></label>
@@ -144,7 +157,10 @@
         <div class="ws-gutter" role="separator" aria-orientation="vertical" aria-label="Resize map and heatmap" aria-valuemin="32" aria-valuemax="65" tabindex="0" title="Drag to resize · double-click to reset"></div>
         ${panel("G", "Style DNA Heatmap", "", '<div id="ws-heat"></div>')}
       </div>
-      <div class="ws-details">
+        ${panel("D", "Style Profile <span class=\"ws-count\" title=\"Team mean, standard deviations from the tournament average\">z-score</span>",
+          seg("ws-lens", [["absolute", "Absolute profiles"], ["difference", "Difference view"]], "Style comparison mode"),
+          `<div class="lens-tools"><span class="ws-pc-label">Order</span>${seg("ws-order", [["fixed", "Fixed"], ["gap", "By gap"]], "Indicator order")}</div>
+           <div id="ws-profile"></div>`)}
         ${panel("B", "Similar teams", "",
           `<div class="ws-sim-input">
              <div class="ws-sim-head"><span>Similarity indicators <b id="ws-dial-count"></b></span><button type="button" class="ws-link" id="ws-dials-all">Select all</button></div>
@@ -153,26 +169,42 @@
            <div class="ws-twins-cap"><span>#</span><span id="ws-twins-title"></span><span>Similarity percentile</span></div>
            <div class="ws-scroll"><ol class="ws-twins" id="ws-twins"></ol></div>
            <p class="ws-reference" id="ws-sim-reference"></p>`)}
-        ${panel("D", "Style Profile <span class=\"ws-count\" title=\"Team mean, standard deviations from the tournament average\">z-score</span>",
-          seg("ws-lens", [["absolute", "Absolute profiles"], ["difference", "Difference view"]], "Style comparison mode"),
-          `<div class="lens-tools"><span class="ws-pc-label">Order</span>${seg("ws-order", [["fixed", "Fixed"], ["gap", "By gap"]], "Indicator order")}</div>
-           <div id="ws-profile"></div>`)}
+        ${panel("W", "Outcome gap waterfall", "", '<div id="ws-waterfall"></div>')}
+        <section class="ws-empty-mode" hidden>
+          <h2></h2><p></p><button type="button" class="ws-btn" id="ws-empty-pick">Choose team</button>
+        </section>
+        <div class="ws-explain-side">
+          ${seg("ws-evidence-view", [["matches", "Match evidence"], ["outcomes", "Outcomes"]], "Supporting evidence")}
         ${panel("E", "Outcomes <span class=\"ws-count\">per match</span>", "",
           `<div class="ws-legend" id="ws-outcome-key"></div>
            <div class="ws-chart ws-outcomes" id="ws-outcomes"></div>`)}
-        ${panel("W", "Outcome gap waterfall", "", '<div id="ws-waterfall"></div>')}
         ${panel("F", 'Match evidence<span class="ws-count" id="ws-match-count"></span>', "",
           `<div class="ws-scroll"><table class="ws-table ws-matches" id="ws-matches"><thead><tr>
              <th scope="col">Team</th><th scope="col">Opponent</th><th scope="col">Stage</th><th scope="col">Score</th><th scope="col" class="num">xG diff.</th>
            </tr></thead><tbody></tbody></table></div>
            <div class="ws-match-actions" id="ws-match-actions"></div>`)}
+        </div>
+
+      </div>
+      <dialog class="ws-tools-dialog" id="ws-tools-dialog">
+        <div class="ws-dialog-bar"><button type="button" class="ws-btn ws-dialog-close" autofocus>Close</button></div>
+        <div class="ws-dialog-body">
         ${panel("A", "Team Table", '<button type="button" class="ws-btn" id="ws-export" title="Download the filtered rows as CSV">Export CSV</button>',
           `<div class="ws-scroll" id="ws-team-scroll"><table class="ws-table" id="ws-teams"><colgroup><col class="c-pin"><col><col class="c-grp"><col class="c-n"><col class="c-xgd"><col class="c-gd"></colgroup><thead><tr>
              <th scope="col"><span class="sr-only">Pin</span></th>
              ${[["name", "Team", "Sort by name"], ["group", "Style group", "Original style group"], ["n", "Matches", "Matches in scope"], ["xgd", "xG diff.", "xG difference per match"], ["gd", "Goal diff.", "Goal difference per match"]].map(([id, t, tip]) => `<th scope="col" class="${["n", "xgd", "gd"].includes(id) ? "num" : ""}"><button type="button" data-sort="${id}" title="${tip}">${t}<span aria-hidden="true"></span></button></th>`).join("")}
            </tr></thead><tbody></tbody></table></div>`)}
-      </div>
+        </div>
+      </dialog>
     </div>`;
+
+    const footer = document.querySelector(".foot");
+    const credits = document.createElement("details");
+    credits.className = "ws-credits";
+    credits.innerHTML = "<summary>Credits and sources</summary><div></div>";
+    const creditBody = credits.lastElementChild;
+    creditBody.append(...footer.children);
+    footer.append(credits);
 
     // Persist the relative widths so the same split works at different desktop sizes.
     const primary = q(".ws-primary"), gutter = q(".ws-gutter");
@@ -245,15 +277,60 @@
       setRegion: (region) => commitBrush({ pairRegion: region }), setupBrush, hasTouch,
     });
     q("#ws-clear-pair-region").onclick = () => change({ pairRegion: null });
-    function focusPanel(id) {
-      const heading = q(`#ws-${id}-title`);
-      heading.tabIndex = -1;
-      heading.style.scrollMarginTop = `${document.querySelector(".topbar").getBoundingClientRect().bottom + 8}px`;
-      heading.focus({ preventScroll: true });
-      heading.scrollIntoView({ block: "start" });
+    const tabs = Array.from(qa("#ws-modes [role=tab]"));
+    const toolDialog = q("#ws-tools-dialog");
+    const similarPanel = q('[data-panel="B"]');
+    const tablePanel = q('[data-panel="A"]');
+    const similarAnchor = document.createComment("similar teams");
+    similarPanel.before(similarAnchor);
+    let activeTool = null;
+    function closeTool() {
+      activeTool = null;
+      similarAnchor.after(similarPanel);
+      if (toolDialog.open) toolDialog.close();
+      similarPanel.hidden = state.mode !== "compare" || !state.team;
     }
-    q("#ws-to-analysis").onclick = () => focusPanel(state.compare && full.team[state.compare] && full.team[state.team] ? "D" : "B");
-    q("#ws-to-waterfall").onclick = () => focusPanel("W");
+    q(".ws-dialog-close").onclick = closeTool;
+    toolDialog.addEventListener("cancel", event => { event.preventDefault(); closeTool(); });
+    toolDialog.addEventListener("click", event => {
+      if (event.target !== toolDialog) return;
+      const rect = toolDialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeTool();
+    });
+    q("#ws-utilities").onclick = event => {
+      const tool = event.target.closest("[data-tool]")?.dataset.tool;
+      if (!tool) return;
+      activeTool = tool;
+      tablePanel.hidden = tool !== "table";
+      if (tool === "similar") {
+        q(".ws-dialog-body").append(similarPanel);
+        similarPanel.hidden = false;
+      }
+      toolDialog.setAttribute("aria-labelledby", tool === "similar" ? "ws-B-title" : "ws-A-title");
+      toolDialog.showModal();
+    };
+    tabs.forEach((tab, i) => {
+      tab.onclick = () => {
+        if (state.mode !== tab.dataset.mode) {
+          const patch = { mode: tab.dataset.mode };
+          // Flush a pending debounced search before changing the route.
+          if (q("#ws-search").value !== state.search) patch.search = q("#ws-search").value;
+          change(patch);
+        }
+      };
+      tab.onkeydown = event => {
+        const rtl = getComputedStyle(tab).direction === "rtl" ? -1 : 1;
+        const step = { ArrowRight: rtl, ArrowLeft: -rtl }[event.key];
+        if (!step && event.key !== "Home" && event.key !== "End") return;
+        event.preventDefault();
+        const next = tabs[event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (i + step + tabs.length) % tabs.length];
+        next.focus({ preventScroll: true }); next.click();
+      };
+    });
+    q("#ws-empty-pick").onclick = () => {
+      const picker = q(state.team ? "#ws-pick-b .sel-btn" : "#ws-pick-a .sel-btn");
+      picker.focus({ preventScroll: true }); picker.click();
+    };
     q("#ws-swap").onclick = () => change({ team: state.compare, compare: state.team, match: null });
     const segBind = (id, key, extra = {}) => q(`#${id}`).addEventListener("click", (e) => { const b = e.target.closest("button[data-v]"); if (b && b.dataset.v !== state[key]) change({ [key]: b.dataset.v, ...extra }); });
     segBind("ws-scope", "scope", { pairRegion: null, cohort: null, match: null, xlo: null, xhi: null, glo: null, ghi: null });
@@ -264,6 +341,7 @@
     q("#ws-color").onchange = (e) => selectEncoding(e.target.value);
     segBind("ws-order", "order");
     segBind("ws-lens", "lens");
+    segBind("ws-evidence-view", "evidence");
     q("#ws-reset").onclick = () => {
       clearTimeout(searchTimer);
       touchBrushArmed = false;
@@ -328,20 +406,33 @@
     const focused = () => (state.match ? recordByKey[state.match] : null);
     const role = (id, population = visible) => (id === state.team ? "a" : id === state.compare ? "b" : !population.includes(id) ? "out" : twins.includes(id) ? "twin" : "in");
 
+    // Scope changes the records; indicator choices change only the similarity space.
+    let cachedScope, cachedDials, projectedSpace, projectionModel;
     function render() {
       brushPreview = null;
-      space = A.space(state.dials, state.scope);
-      full = A.space(App.dials, state.scope);
-      nearByTeam = A.twinTable(space).near;
+      const dialsKey = state.dials.join(",");
+      if (state.scope !== cachedScope) {
+        summaries = Object.fromEntries(App.teams.map(t => [t.id, A.summary(A.rows(t.id, state.scope))]));
+        scopeAvg = A.summary(A.records.filter(row => A.inScope(row, state.scope)));
+        full = A.space(App.dials, state.scope);
+      }
+      if (state.scope !== cachedScope || dialsKey !== cachedDials) {
+        space = state.dials.length === App.dials.length ? full : A.space(state.dials, state.scope);
+        nearByTeam = A.twinTable(space).near;
+        cachedScope = state.scope;
+        cachedDials = dialsKey;
+      }
       near = nearByTeam[state.team] || [];
-      twins = near.slice(0, K).map((n) => n.id);
-      summaries = Object.fromEntries(App.teams.map((t) => [t.id, A.summary(A.rows(t.id, state.scope))]));
-      scopeAvg = A.summary(A.records.filter((r) => A.inScope(r, state.scope)));
+      twins = near.slice(0, K).map(n => n.id);
       visible = matching();
       hover = null;
       previewIndicator = null;
       const isPairs = state.view === "pairs";
-      pca = state.view === "pca" ? App.pca2(space) : null;
+      if (state.view === "pca" && projectedSpace !== space) {
+        projectionModel = App.pca2(space);
+        projectedSpace = space;
+      }
+      pca = state.view === "pca" ? projectionModel : null;
       pos = isPairs ? {} : Object.fromEntries(Object.keys(space.team).map((id) =>
         [id, pca ? pca.project(space.team[id]) : [metric(id, state.x), metric(id, state.y)]]).filter(([, xy]) => xy.every(Number.isFinite)));
       // Rank in PCA coordinates, independent of the plot's aspect ratio and filters.
@@ -358,18 +449,19 @@
       q("#ws-clear-pair-region").hidden = !isPairs || !state.pairRegion;
       q("#ws-readout").classList.toggle("has-reference", !!space.team[state.team]);
       q("#ws-color").value = state.color;
-      q(".ws-details").classList.toggle("has-team", !!state.team);
-      for (const id of ["D", "F"]) q(`[data-panel="${id}"]`).hidden = !state.team;
-      q('[data-panel="E"]').hidden = !state.compare;
+      layoutMode(); drawNeighbors();
       drawContext(); drawCollection(); drawSimilarity(); heat.render({ state, full, visible, summaries, near, twins });
       if (isPairs) {
         heat.markIndicator(null);
         pairView.render({ visible, nearByTeam, summaries, region: state.pairRegion, touchArmed: touchBrushArmed, scope: state.scope, dials: state.dials });
       }
-      drawMap(!isPairs); drawProfile(); drawOutcomes(); drawMatches(); readout();
+      if (state.mode === "explore") drawMap(!isPairs);
+      if (state.mode === "compare") drawProfile();
+      if (state.mode === "explain" && state.evidence === "outcomes") drawOutcomes();
+      drawMatches(); readout();
       const projection = pca ? state.scope + "|" + state.dials.join(",") : "";
       const pins = [state.team, state.compare].join("|");
-      if (projection && lastProjection && projection !== lastProjection) {
+      if (state.mode === "explore" && projection && lastProjection && projection !== lastProjection) {
         // A refit changes the coordinate system. Reveal the new projection as a whole.
         q("#ws-map svg").classList.add("ws-reveal");
       } else if (state.team && lastPins !== undefined && pins !== lastPins) {
@@ -377,11 +469,14 @@
       }
       lastProjection = projection;
       lastPins = pins;
-      q('[data-panel="W"]').hidden = !state.compare;
-      if (state.compare) App.outcomeWaterfall(q("#ws-waterfall"), {
+      drawWaterfall();
+    }
+
+    function drawWaterfall() {
+      if (state.mode === "explain" && state.compare) App.outcomeWaterfall(q("#ws-waterfall"), {
         a: state.team, b: state.compare, scope: state.scope, sums: [summaries[state.team], summaries[state.compare]],
         inspectMatch(key) {
-          change({ match: key, lens: "absolute" });
+          change({ match: key, lens: "absolute", evidence: "matches" });
           const row = q(`#ws-matches tr[data-match="${key}"]`);
           row?.focus({ preventScroll: true });
           row?.scrollIntoView({ block: "center" });
@@ -389,15 +484,52 @@
       });
     }
 
+    function layoutMode() {
+      const { mode, team, compare, evidence } = state;
+      const explore = mode === "explore", explain = mode === "explain";
+      const selectedTab = tabs.find(tab => tab.dataset.mode === mode);
+      q(".ws").dataset.mode = mode;
+      for (const tab of tabs) {
+        tab.setAttribute("aria-selected", String(tab === selectedTab));
+        tab.tabIndex = tab === selectedTab ? 0 : -1;
+      }
+      q(".ws-content").setAttribute("aria-labelledby", selectedTab.id);
+      q(".ws-filters").hidden = primary.hidden = !explore;
+      q("#ws-near-strip").hidden = !explore || !twins.length;
+      q('[data-tool="similar"]').hidden = mode === "compare" && !!team;
+      similarPanel.hidden = !(mode === "compare" && team) && activeTool !== "similar";
+      q('[data-panel="D"]').hidden = mode !== "compare" || !team;
+      q('[data-panel="W"]').hidden = !explain || !compare;
+      q(".ws-explain-side").hidden = !explain || !team;
+      q('[data-panel="F"]').hidden = !explain || !team || evidence !== "matches";
+      q('[data-panel="E"]').hidden = !explain || !compare || evidence !== "outcomes";
+      q('#ws-evidence-view [data-v="outcomes"]').disabled = !compare;
+      qa("#ws-evidence-view button").forEach(button => button.setAttribute("aria-pressed", String(button.dataset.v === evidence)));
+      const empty = q(".ws-empty-mode");
+      empty.hidden = explore || (explain ? !!compare : !!team);
+      if (!empty.hidden) {
+        empty.querySelector("h2").textContent = explain ? "Outcome gap waterfall" : "Style Profile";
+        empty.querySelector("p").textContent = team ? "Select another team to compare." : "Choose Team A to begin.";
+      }
+    }
+
+    function drawNeighbors() {
+      const buttons = d3.select(q("#ws-near-strip")).selectAll("button").data(twins, id => id).join(enter =>
+        enter.append("button").attr("type", "button")
+          .on("focus pointerenter", (_, id) => highlight(id, { reveal: true }))
+          .on("blur pointerleave", () => highlight(null))
+          .on("click", (_, id) => choose(id)));
+      buttons.attr("data-team", id => id).attr("aria-label", (id, i) => `${i + 1}. ${App.team[id].name}`)
+        .attr("title", id => App.team[id].name).attr("aria-pressed", id => String(id === state.compare))
+        .html((id, i) => `<small translate="no">${i + 1}</small> ${App.flag(id, 14)} <span translate="no">${id}</span>`);
+    }
+
     /* ---------- context bar ---------- */
     function drawContext() {
       pickA.set(state.team || ""); pickB.set(state.compare || "");
       q("#ws-pick-b .sel-btn").disabled = !state.team;
       q("#ws-swap").disabled = !state.compare;
-      q("#ws-to-analysis").hidden = !state.team;
       const hasPair = !!(full.team[state.team] && full.team[state.compare]);
-      q("#ws-to-analysis").textContent = hasPair ? "Compare profiles" : "Similar teams";
-      q("#ws-to-waterfall").hidden = !hasPair;
       q("#ws-lens").hidden = !hasPair;
       q(".lens-tools").hidden = !hasPair;
       q('#ws-order [data-v="gap"]').disabled = !hasPair;
@@ -451,6 +583,8 @@
     }
 
     function drawTeamRows(ids) {
+      const focusedRow = document.activeElement?.closest("#ws-teams tr[data-team]");
+      const focusedSide = focusedRow && document.activeElement.dataset.pick;
       ids.sort((a, b) => {
         let c;
         if (state.sort === "name") c = App.team[a].name.localeCompare(App.team[b].name);
@@ -480,10 +614,15 @@
         row.onkeydown = (e) => { if ((e.key === "Enter" || e.key === " ") && e.target === row) { e.preventDefault(); choose(id, e.shiftKey ? "A" : undefined); } };
         row.onfocus = row.onpointerenter = () => highlight(id); row.onblur = row.onpointerleave = () => highlight(null);
       });
+      if (focusedRow) {
+        const selector = `#ws-teams tr[data-team="${focusedRow.dataset.team}"]`;
+        q(focusedSide ? `${selector} [data-pick="${focusedSide}"]` : selector)?.focus({ preventScroll: true });
+      }
     }
 
     /* ---------- B · similarity search ---------- */
     function drawSimilarity() {
+      const focusedTeam = document.activeElement?.closest("#ws-twins [data-team]")?.dataset.team;
       q("#ws-dial-count").textContent = `${state.dials.length} / ${App.dials.length}`;
       q("#ws-dials-all").hidden = state.dials.length === App.dials.length;
       q("#ws-dials").querySelectorAll("[data-i]").forEach((b) => {
@@ -508,6 +647,7 @@
         li.onclick = () => choose(id); li.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(id); } };
         li.onfocus = li.onpointerenter = () => highlight(id); li.onblur = li.onpointerleave = () => highlight(null);
       });
+      if (focusedTeam) q(`#ws-twins [data-team="${focusedTeam}"]`)?.focus({ preventScroll: true });
     }
 
     /* ---------- C · style map ---------- */
@@ -681,11 +821,11 @@
         .on("brush", ({ selection, sourceEvent }) => {
           const active = largeEnough(selection);
           brushLayer.classed("is-dragging", !!active);
-          if (sourceEvent && brushLayer.node().isConnected) preview?.(active ? selection : null);
+          if (sourceEvent && activeBrush === brushLayer.node() && brushLayer.node().isConnected) preview?.(active ? selection : null);
         })
         .on("end", ({ sourceEvent, selection }) => {
-          if (activeBrush === brushLayer.node()) activeBrush = null;
-          if (!sourceEvent || !brushLayer.node().isConnected) return;
+          if (!sourceEvent || activeBrush !== brushLayer.node() || !brushLayer.node().isConnected) return;
+          activeBrush = null;
           if (!largeEnough(selection) || sourceEvent.type === "touchcancel") {
             preview?.(null);
             if (selection) brushLayer.call(brush.move, null);
@@ -923,7 +1063,11 @@
       heat.highlight(id); readout(); updateProfilePreview();
     }
 
-    const redraw = () => { if (!root.isConnected) return; drawMap(); drawOutcomes(); };
+    const redraw = () => {
+      if (!root.isConnected) return;
+      if (state.mode === "explore") drawMap();
+      if (state.mode === "explain" && state.evidence === "outcomes") drawOutcomes();
+    };
     const schedule = () => { cancelAnimationFrame(frame); frame = requestAnimationFrame(redraw); };
     render();
     // Wrapping legends, translated labels and changes in match scope can change
@@ -937,13 +1081,23 @@
     ["#ws-map", "#ws-pairs .wp-chart", "#ws-outcomes"].forEach((selector) => observer.observe(q(selector)));
     const onLang = () => render();
     window.addEventListener("languagechange", onLang);
-    const onPointerChange = () => { touchBrushArmed = false; drawMap(); readout(); };
+    const onPointerChange = () => {
+      touchBrushArmed = false;
+      if (state.mode === "explore") { drawMap(); readout(); }
+    };
     coarsePointer.addEventListener("change", onPointerChange);
     const onEscape = (event) => {
       if (event.key !== "Escape" || event.defaultPrevented || event.repeat || event.isComposing ||
           event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
       // Editors and open listboxes own Escape while the user is typing or choosing an option.
       const target = event.target;
+      const disclosure = target.closest?.(".ws-credits[open], .ws-range-filters[open]");
+      if (disclosure) {
+        disclosure.open = false;
+        disclosure.querySelector("summary").focus({ preventScroll: true });
+        event.preventDefault();
+        return;
+      }
       if (target instanceof Element && (target.isContentEditable || target.closest("input, textarea, select, [role='listbox'], dialog[open]"))) return;
       if (activeBrush?.isConnected || touchBrushArmed) {
         activeBrush = null;
@@ -958,12 +1112,41 @@
     };
     document.addEventListener("keydown", onEscape);
     App._stop = () => {
+      if (toolDialog.open) closeTool();
+      credits.replaceWith(...creditBody.children);
       observer.disconnect(); clearTimeout(searchTimer); cancelAnimationFrame(frame);
       document.removeEventListener("keydown", onEscape);
       window.removeEventListener("languagechange", onLang);
       coarsePointer.removeEventListener("change", onPointerChange);
     };
-    return { update(p) { clearTimeout(searchTimer); touchBrushArmed = false; state = stateFrom(p); render(); } };
+    return { update(p) {
+      clearTimeout(searchTimer);
+      touchBrushArmed = false;
+      const next = stateFrom(p);
+      const switching = next.mode !== state.mode;
+      const presentationOnly = (switching || next.evidence !== state.evidence) &&
+        stateUrl({ ...state, mode: next.mode, evidence: next.evidence }) === stateUrl(next);
+      const focusedInPanel = q(".ws-content").contains(document.activeElement);
+      if (switching) {
+        if (toolDialog.open) closeTool();
+        clearBrushPreview();
+        activeBrush = null;
+        highlight(null);
+        inspectIndicator(null);
+        heat.markLensColumn(null);
+        credits.open = q(".ws-range-filters").open = false;
+      }
+      state = next;
+      if (presentationOnly) {
+        layoutMode();
+        if (state.mode === "compare") drawProfile();
+        if (state.mode === "explain") { drawMatches(); drawWaterfall(); }
+        redraw();
+      } else render();
+      if (switching && (focusedInPanel || q("#ws-modes").contains(document.activeElement))) {
+        q(`#ws-tab-${state.mode}`).focus({ preventScroll: true });
+      }
+    } };
   }
 
   App.views.story = workspace;

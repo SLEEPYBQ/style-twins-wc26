@@ -63,14 +63,6 @@ body.ws-route { background: #f5f6f7; }
 .ws-gutter::before { content: ""; position: absolute; inset-block: 8px; inset-inline-start: 50%; width: 1px; background: var(--ws-line); }
 .ws-gutter::after { content: ""; position: absolute; top: 47%; left: 4px; width: 2px; height: 26px; background: var(--ws-line-2); }
 .ws-gutter:hover::after, .ws-gutter:focus-visible::after { background: var(--ws-a); }
-.ws-details { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 12px; }
-.ws-details > section { height: 280px; }
-.ws-details.has-team { grid-template-columns: repeat(6,minmax(0,1fr)); }
-.ws-details.has-team > section { grid-column: span 2; height: 360px; }
-.ws-details.has-team > :is([data-panel="A"],[data-panel="F"]) { grid-column: span 3; height: 320px; }
-@media (min-width: 1101px) {
-  .ws-details.has-team:has([data-panel="E"][hidden]) > section { grid-column: span 3; }
-}
 .ws-sim-input, .ws-match-actions, .ws-readout, .ws-projection { flex: none; }
 .ws-map-controls, #ws-axes { padding: 7px 12px 2px; display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
 .ws-map-controls:not(:has(> :not([hidden]))) { display: none; }
@@ -282,9 +274,6 @@ body.ws-route { background: #f5f6f7; }
 /* Local scrolling keeps the heatmap labels and both overview titles in view. */
 @media (max-width: 1100px) {
   .ws { padding-inline: 14px; }
-  .ws-details.has-team { grid-template-columns: repeat(2, minmax(0,1fr)); }
-  .ws-details.has-team > section, .ws-details.has-team > :is([data-panel="A"],[data-panel="F"]) { grid-column: auto; }
-  .ws-details.has-team > [data-panel="A"] { grid-column: 1 / -1; }
 }
 @media (max-width: 800px) {
   #ws-readout.has-reference { height: 10.5em; }
@@ -313,8 +302,6 @@ body.ws-route { background: #f5f6f7; }
   .ws-pick .sel-pop { max-width: calc(100vw - 34px); }
   .ws-context .ws-summary { font-size: 12px; }
   .ws-primary > [data-panel="C"] { height: 420px; }
-  .ws-details, .ws-details.has-team { grid-template-columns: minmax(0,1fr); }
-  .ws-details > section, .ws-details.has-team > section { grid-column: 1; }
   .ws-filter-label > span { display: none; }
   .ws-search, .ws-filter-label { flex: 1 1 40%; min-width: 0; }
   .ws-filters .ws-filter-label > *:not(span), .ws-filter-label select { width: 100%; }
@@ -325,7 +312,7 @@ body.ws-route { background: #f5f6f7; }
   .ws-readout { min-height: 52px; align-content: center; }
   .ws-readout .sep { display: none; }
   #ws-teams { min-width: 560px; }
-  .ws-details [data-panel="F"] .ws-bar i { display: none; }
+  .ws-matches .ws-bar i { display: none; }
   #ws-matches th:nth-child(5) { width: 60px; }
   .ws-match-actions { gap: 8px; flex-wrap: wrap; }
 }

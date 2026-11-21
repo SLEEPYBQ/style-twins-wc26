@@ -1,5 +1,4 @@
 /* A shared horizontal running total, with signed component changes in the last column. */
-.ws-details.has-team > section[data-panel="W"] { grid-column: 1 / -1; height: auto; }
 .wf { --wf-a: #2f6bd8; --wf-b: #e0702a; --wf-row: 33px; color: var(--ink); min-width: 0; }
 #ws-waterfall { padding: 9px 14px 11px; }
 .wf-head, .wf-team { display: flex; align-items: center; flex-wrap: wrap; }
