@@ -47,6 +47,7 @@
 .hm-table tbody th { position: sticky; inset-inline-start: 0; z-index: 1; background: #fff; font-weight: 500; text-align: start; }
 .hm-table tbody tr[data-team] { cursor: pointer; }
 .hm-table tbody td[data-i] { height: 20px; border-inline-end: 1px solid white; border-bottom: 1px solid white; }
+.hm-table td.is-inspected { border-inline: 1px solid rgb(31 41 51 / .4); }
 .hm-team {
   width: 100%; display: flex; align-items: center; gap: 6px; min-height: 20px; padding: 2px 7px;
   border: 0; background: transparent; text-align: start; font: inherit; color: inherit;
@@ -80,7 +81,7 @@
   }
   .hm-table thead .hm-team-head { position: sticky; inset-inline-start: 0; z-index: 2; }
 }
-@container (min-width: 850px) {
+@container (min-width: 720px) {
   .hm-table thead th { height: 52px; }
   .hm-table thead th button, [dir="rtl"] .hm-table thead th button { position: static; transform: none; width: 100%; max-width: none; padding: 4px 1px; text-align: start; }
   .hm-table thead th button span { min-width: 0; hyphens: auto; overflow-wrap: anywhere; }

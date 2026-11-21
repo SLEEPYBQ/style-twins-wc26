@@ -15,7 +15,7 @@ const heatTeam = (page, id) => page.locator(heatRows + '[data-team="' + id + '"]
 const mapTeam = (page, id) => page.locator(mapMarks + '[data-team="' + id + '"]');
 
 async function overview(page) {
-  await page.goto(base + "/#/styles");
+  await page.goto(base + "/");
   await page.reload();
   await page.waitForFunction(() => document.querySelector("#ws-heat tbody tr[data-team]") || document.querySelector("#view .card h3"));
   assert.equal(await page.locator(heatRows).count(), 48, (await page.locator("#view").innerText()).slice(0,200));
@@ -27,6 +27,11 @@ async function overview(page) {
   assert.equal(await page.locator(mapMarks).count(), 48);
   assert.equal(await page.locator(heatRows + " td[data-i]").count(), 480);
   assert.equal(await page.locator("#ws-twins [data-team]:visible, #ws-profile [data-team]:visible, #ws-matches [data-match]:visible").count(), 0);
+  assert.equal(await page.locator("[data-panel='E']").isVisible(), false);
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial0");
+  assert.equal(await page.locator(".ws-primary .hm-scale:visible").count(), 1, "Both views share a quantitative scale");
+  await checkHeatOrder(page, 0);
+  await checkIndicatorFills(page, 0);
 }
 
 async function checkHeaderNavigation(page) {
@@ -54,9 +59,47 @@ async function checkIndicatorFills(page, index) {
   assert.deepEqual(wrongTeams, [], "Map colours should match heatmap column " + index);
 }
 
+async function checkHeatOrder(page, index) {
+  assert.equal(await page.locator("#ws-heat-sort").inputValue(), "dial" + index);
+  const column = await page.locator(heatRows + ' td[data-i="' + index + '"]').evaluateAll(cells => cells.map(c => Number(c.dataset.z)));
+  assert.deepEqual(column, [...column].sort((a,b) => b-a));
+  assert.ok(column[0] > 0 && column.at(-1) < 0);
+}
+
+async function checkLinkedOrdering(page) {
+  // Explicit group and outcome orders from shared links remain available independently of colour.
+  await page.goto(base + "/#/styles?color=dial2&heatSort=group");
+  assert.equal(await page.locator("#ws-heat-sort").inputValue(), "group");
+  await checkIndicatorFills(page, 2);
+  await page.locator("#ws-heat-sort").selectOption("gd");
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial2");
+  await page.reload();
+  assert.equal(await page.locator("#ws-heat-sort").inputValue(), "gd");
+  await checkIndicatorFills(page, 2);
+  const positions = () => page.locator(mapMarks).evaluateAll(marks => marks.map(m => [m.dataset.team, m.getAttribute("transform")]));
+  const original = await positions();
+  await page.locator("#ws-color").selectOption("dial5");
+  await checkHeatOrder(page, 5);
+  await checkIndicatorFills(page, 5);
+  await page.locator("#ws-heat-sort").selectOption("dial7");
+  await checkHeatOrder(page, 7);
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial7");
+  await checkIndicatorFills(page, 7);
+  await page.locator("#ws-heat thead [data-order='dial8']").click();
+  await page.locator("#ws-C-title").hover();
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial8");
+  await checkHeatOrder(page, 8);
+  await checkIndicatorFills(page, 8);
+  assert.deepEqual(await positions(), original, "Changing the observed indicator keeps PCA positions fixed");
+  await page.reload();
+  assert.equal(await page.locator("#ws-color").inputValue(), "dial8");
+  await checkHeatOrder(page, 8);
+}
+
 async function checkIndicatorPreview(page) {
   const header = page.locator("#ws-heat th[data-i='8'] button");
   const ranks = await ids(page, "#ws-twins [data-team]");
+  const rowOrder = await ids(page, heatRows);
   const url = page.url();
   const marks = page.locator(mapMarks);
   const positions = () => marks.evaluateAll(nodes => nodes.map(node => [node.dataset.team, node.getAttribute("transform")]));
@@ -65,6 +108,7 @@ async function checkIndicatorPreview(page) {
 
   await header.hover();
   await checkIndicatorFills(page, 8);
+  assert.deepEqual(await ids(page, heatRows), rowOrder, "Hovering an indicator should not reorder the heatmap");
   assert.deepEqual(await positions(), originalPositions, "Inspecting an indicator must keep points in place");
   assert.deepEqual(await ids(page, "#ws-twins [data-team]"), ranks);
   await page.locator(".ws-primary").screenshot({path:path.join(output, "workspace-indicator-preview.png")});
@@ -115,6 +159,7 @@ async function checkTouchIndicator(page) {
   await picker.selectOption("dial8");
   assert.equal(params(page).get("color"), "dial8");
   await checkIndicatorFills(page, 8);
+  await checkHeatOrder(page, 8);
   await page.reload();
   assert.equal(await picker.inputValue(), "dial8");
   await checkIndicatorFills(page, 8);
@@ -127,6 +172,7 @@ async function checkPairExplorer(page) {
   const pointSelector = "#ws-pairs .wp-chart circle[data-pair]";
   const points = page.locator(pointSelector);
   assert.equal(await points.count(), 1128);
+  assert.equal(await page.locator(".ws-primary .hm-scale:visible").count(), 1, "Pair mode still explains heatmap colours");
   assert.equal(new Set(await points.evaluateAll(nodes => nodes.map(node => node.dataset.pair))).size, 1128);
   await checkPairFilters(page, points);
 
@@ -242,10 +288,11 @@ async function topStrip(page) {
   return {start, end};
 }
 
-async function mouseDrag(page, start, end) {
+async function mouseDrag(page, start, end, beforeRelease) {
   await page.mouse.move(start.x, start.y);
   await page.mouse.down();
   await page.mouse.move(end.x, end.y, {steps:6});
+  if (beforeRelease) await beforeRelease();
   await page.mouse.up();
 }
 
@@ -338,9 +385,13 @@ async function run() {
       else await heatTeam(client, "ECU").locator("button").first().click();
       assert.equal(params(client).get("team"), "ECU");
       assert.equal(params(client).has("compare"), false);
+      assert.ok(await client.locator("[data-panel='D']").isVisible());
+      assert.ok(await client.locator("[data-panel='F']").isVisible());
+      assert.equal(await client.locator("[data-panel='E']").isVisible(), false);
       assert.equal(await client.locator("#ws-twins [data-team]").first().getAttribute("data-team"), "USA");
       await client.locator("#ws-twins [data-team]").first().click();
       assert.equal(params(client).get("compare"), "USA");
+      assert.ok(await client.locator("[data-panel='E']").isVisible());
       assert.equal(await client.locator("#ws-matches [data-match]").count(), 9);
       if (client === phone) {
         await checkTouchIndicator(client);
@@ -351,6 +402,7 @@ async function run() {
     }
 
     await page.setViewportSize({width:1440,height:900});
+    await checkLinkedOrdering(page);
     await checkPairExplorer(page);
     await checkTeamRanks(page);
     await overview(page);
@@ -373,6 +425,9 @@ async function run() {
     });
     assert.ok(maxError < 1e-8, "Heatmap raw means and population z-scores should match all 208 records");
     const initialUrl = page.url();
+    await mapTeam(page, "ESP").locator(".team-fill").hover();
+    assert.match(await page.locator("#ws-readout").innerText(), /Possession\s*57\.9%/);
+    assert.match(await page.locator("#ws-heat-value").innerText(), /Possession\s*57\.9%/);
     await heatTeam(page, "ECU").locator("td[data-i]").first().hover();
     assert.match(await mapTeam(page, "ECU").getAttribute("class"), /is-hover/);
     assert.equal(page.url(), initialUrl, "Hover must be transient");
@@ -394,6 +449,7 @@ async function run() {
     await page.locator("#ws-pick-b .sel-opt").filter({hasText:"Clear comparison"}).click();
     assert.equal(params(page).get("team"), "ECU");
     assert.equal(params(page).has("compare"), false);
+    assert.equal(await page.locator("[data-panel='E']").isVisible(), false);
     assert.equal(await page.locator("#ws-profile [data-team='ECU']").count(), 10);
     assert.equal(await page.locator("#ws-matches tr[data-match]").count(), 4);
     await page.locator("#ws-pick-b .sel-btn").click();
@@ -433,18 +489,26 @@ async function run() {
     await orderByPossession.focus();
     await orderByPossession.press("Enter");
     assert.equal(await page.evaluate(() => document.activeElement.dataset.order), "dial0");
-    assert.equal(params(page).get("heatSort"), "dial0");
-    const column = await page.locator(heatRows + " td[data-i='0']").evaluateAll(cells => cells.map(c => Number(c.dataset.z)));
-    assert.deepEqual(column, [...column].sort((a,b) => b-a));
-    assert.ok(column[0] > 0 && column.at(-1) < 0);
+    await checkHeatOrder(page, 0);
+    assert.equal(await page.locator("#ws-color").inputValue(), "dial0");
     const order = await ids(page, heatRows);
     await page.reload();
     assert.deepEqual(await ids(page, heatRows), order, "Column ordering should survive reload");
 
     // A brush changes the visible cohort in both tables while preserving pinned teams.
     const {start, end} = await topStrip(page);
-    await mouseDrag(page, start, end);
+    const beforeBrush = page.url();
+    let preview;
+    await mouseDrag(page, start, end, async () => {
+      await page.waitForFunction(() => [...document.querySelectorAll("#ws-heat tbody tr[data-team]")].filter(row => row.getClientRects().length).length < 48);
+      preview = await ids(page, heatRows + ":visible");
+      assert.ok(preview.includes("CAN") && preview.length < 48, "Heatmap should show the subset while dragging");
+      assert.match(await page.locator("#ws-heat .hm-count").innerText(), new RegExp("^" + preview.length + "\\s*/\\s*48\\b"));
+      assert.equal(page.url(), beforeBrush, "Drag previews should not add history entries");
+      await page.screenshot({path:path.join(output,"workspace-live-brush.png")});
+    });
     const brushedIds = await ids(page, heatRows);
+    assert.deepEqual(brushedIds, preview, "Releasing the brush commits the preview");
     assert.ok(brushedIds.includes("CAN") && brushedIds.length < 48, "Brush should restrict heatmap");
     assert.deepEqual((await ids(page, "#ws-teams tbody tr[data-team]:not(.is-out)")).sort(), brushedIds.sort());
     assert.equal(params(page).get("team"), "ECU");
@@ -454,6 +518,26 @@ async function run() {
     await page.mouse.click(blank.x, blank.y);
     await mouseDrag(page, blank, {x:blank.x + 3, y:blank.y + 1});
     assert.equal(page.url(), retainedCohort, "A blank click or a slight movement preserves the current cohort");
+    await mouseDrag(page, start, end);
+    assert.deepEqual(await ids(page, heatRows), preview, "Reapplying the same region restores the committed rows");
+    const plot = await page.locator("#ws-map .grid").boundingBox();
+    const algeria = await mapTeam(page, "ALG").locator(".team-fill").boundingBox();
+    const bottomLeft = {x:plot.x + 3, y:plot.y + plot.height - 3};
+    const bottomRight = {x:plot.x + plot.width - 3, y:bottomLeft.y};
+    await mouseDrag(page, bottomRight, {x:algeria.x - 3, y:algeria.y - 3}, async () => {
+      assert.deepEqual(await ids(page, heatRows + ":visible"), ["ALG"], "A replacement brush can reach teams outside the initial region");
+      assert.equal(page.url(), retainedCohort);
+    });
+    assert.deepEqual(await ids(page, heatRows), ["ALG"]);
+    assert.equal(params(page).get("cohort"), "ALG");
+    await mouseDrag(page, bottomLeft, {x:bottomLeft.x + 10, y:bottomLeft.y - 10}, async () => {
+      assert.equal(await page.locator(heatRows + ":visible").count(), 0);
+      assert.ok(await page.locator(".hm-empty").isVisible());
+      assert.equal(params(page).get("cohort"), "ALG", "Empty preview must preserve the previous region until release");
+    });
+    assert.equal(await page.locator(heatRows).count(), 0);
+    await page.reload();
+    assert.equal(await page.locator(heatRows).count(), 0, "An empty region survives reload");
     await page.locator("[data-clear='cohort']").click();
     assert.equal(await page.locator(heatRows).count(), 48);
 

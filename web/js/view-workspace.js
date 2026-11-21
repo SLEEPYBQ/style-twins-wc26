@@ -40,7 +40,12 @@
     const validTeam = (id) => Object.hasOwn(App.team, id);
     const team = validTeam(p.team) ? p.team : validTeam(p.compare) ? p.compare : null;
     const compare = validTeam(p.compare) && p.compare !== team ? p.compare : null;
-    const heatSort = App.workspaceHeatmap.sortKey(p.heatSort);
+    // With a single indicator in the link, both views open on that measure.
+    // When both encodings are specified, honour each independently.
+    const requestedOrder = App.workspaceHeatmap.sortKey(p.heatSort);
+    const color = colourOptions.some(([key]) => key === p.color) ? p.color
+      : requestedOrder.startsWith("dial") ? requestedOrder : "dial0";
+    const heatSort = App.workspaceHeatmap.sortKey(p.heatSort, color.startsWith("dial") ? color : "group");
     const match = recordByKey[p.match];
     // Older links offered possession both as an outcome and as the first style dial.
     const axis = (value, fallback) => value === "poss" ? "dial0" : Object.hasOwn(metricById, value) ? value : fallback;
@@ -49,7 +54,7 @@
       arch: Object.hasOwn(App.arch, p.arch) ? p.arch : "", search: p.search || "",
       view: ["pairs", "custom"].includes(p.view) ? p.view : "pca",
       pairRegion: p.view === "pairs" ? pairRegionFrom(p.pairRegion) : null, x: axis(p.x, "xgd"), y: axis(p.y, "gd"),
-      color: colourOptions.some(([key]) => key === p.color) ? p.color : "state", order: p.order === "gap" ? "gap" : "fixed",
+      color, order: p.order === "gap" ? "gap" : "fixed",
       cohort: p.cohort ? [...new Set(p.cohort.split(",").filter(validTeam))] : null,
       xlo: num(p.xlo), xhi: num(p.xhi), glo: num(p.glo), ghi: num(p.ghi),
       sort: ["name", "group", "n", "xgd", "gd"].includes(p.sort) ? p.sort : "xgd", desc: p.desc !== "0",
@@ -57,11 +62,12 @@
     };
   }
   function stateUrl(s) {
+    const defaultEncoding = s.color === "dial0" && s.heatSort === "dial0";
     return `#/styles${A.query(s.dials, {
-      team: s.team, compare: s.compare, heatSort: s.heatSort === "group" ? null : s.heatSort, scope: s.scope === "all" ? null : s.scope, arch: s.arch, search: s.search,
+      team: s.team, compare: s.compare, heatSort: defaultEncoding ? null : s.heatSort, scope: s.scope === "all" ? null : s.scope, arch: s.arch, search: s.search,
       view: s.view === "pca" ? null : s.view, x: s.view === "custom" ? s.x : null, y: s.view === "custom" ? s.y : null,
       pairRegion: s.view === "pairs" && s.pairRegion ? s.pairRegion.join(",") : null,
-      color: s.color === "state" ? null : s.color, order: s.order === "fixed" ? null : s.order,
+      color: defaultEncoding ? null : s.color, order: s.order === "fixed" ? null : s.order,
       cohort: s.cohort ? s.cohort.join(",") || "none" : null, xlo: s.xlo, xhi: s.xhi, glo: s.glo, ghi: s.ghi,
       sort: s.sort === "xgd" ? null : s.sort, desc: s.desc ? null : "0", match: s.match,
     })}`;
@@ -84,6 +90,7 @@
     let state = stateFrom(params);
     let space, full, twins, near, summaries, scopeAvg, visible = [], pos = {}, hover = null, touchBrushArmed = false, frame = null;
     let nearByTeam, pca, mapRanks = new Map(), previewIndicator = null;
+    let brushPreview = null;
     const coarsePointer = window.matchMedia("(any-pointer: coarse)");
     const hasTouch = () => coarsePointer.matches || navigator.maxTouchPoints > 0;
     const q = (s) => root.querySelector(s);
@@ -114,14 +121,17 @@
         <span id="ws-count" aria-live="polite"></span>
       </div>
       <div class="ws-primary">
+        <div class="ws-overview-tools">
+          <label id="ws-colour-control"><span>Map colour</span> <select id="ws-color" aria-label="Map colour">${selectOptions(colourOptions)}</select></label>
+          <div class="ws-legend ws-map-colour-key" id="ws-legend"></div>
+        </div>
         ${panel("C", "Style Map", seg("ws-view", [["pca", "PCA"], ["custom", "X / Y"], ["pairs", "Team pairs"]], "Map view"),
-          `<div class="ws-map-controls"><label id="ws-colour-control"><span>Colour</span> <select id="ws-color" aria-label="Colour points by">${selectOptions(colourOptions)}</select></label>
+          `<div class="ws-map-controls">
              <span class="ws-pc-label" id="ws-pair-unit" hidden>One dot per team pair.</span>
              <button type="button" class="ws-link" id="ws-clear-pair-region" hidden>Clear pair selection</button>
              <button type="button" class="ws-btn" id="ws-brush" hidden aria-pressed="false" title="Drag a rectangle to filter teams">${ICON.brush}Brush</button></div>
              <div id="ws-axes" hidden><label>X <select id="ws-x" aria-label="X axis">${selectOptions(measures.map((m) => [m.id, m.label]))}</select></label>
              <label>Y <select id="ws-y" aria-label="Y axis">${selectOptions(measures.map((m) => [m.id, m.label]))}</select></label></div>
-           <div class="ws-legend ws-map-colour-key" id="ws-legend"></div>
            <div id="ws-pairs" hidden></div>
            <div class="ws-chart ws-map" id="ws-map"></div>
            <p class="ws-projection" id="ws-projection"></p>
@@ -210,7 +220,14 @@
     });
     const pickA = picker("A", state.team, "Clear teams");
     const pickB = picker("B", state.compare, "Clear comparison");
-    const heat = App.workspaceHeatmap(q("#ws-heat"), { change, choose, highlight, inspectIndicator });
+    const selectEncoding = (value) => change(value.startsWith("dial") ? { color: value, heatSort: value } : { color: value });
+    const heat = App.workspaceHeatmap(q("#ws-heat"), {
+      choose, highlight, inspectIndicator,
+      sortBy(value) {
+        if (state.view !== "pairs" && value.startsWith("dial")) selectEncoding(value);
+        else change({ heatSort: value });
+      },
+    });
     const pairView = App.workspacePairs(q("#ws-pairs"), {
       choosePair(first, second) {
         const keepA = state.team === second;
@@ -233,7 +250,7 @@
       const view = e.target.closest("button[data-v]")?.dataset.v;
       if (view && view !== state.view) change({ view, pairRegion: null, cohort: view === "pairs" || state.view === "pairs" ? state.cohort : null });
     };
-    q("#ws-color").onchange = (e) => change({ color: e.target.value });
+    q("#ws-color").onchange = (e) => selectEncoding(e.target.value);
     segBind("ws-order", "order");
     q("#ws-reset").onclick = () => {
       clearTimeout(searchTimer);
@@ -286,20 +303,21 @@
     function recordMetric(row, key) { if (key.startsWith("dial")) return row.dials[+key.slice(4)]; if (key === "conceded") return row.goals_opp; return A.metric(row, key); }
     function distanceTo(id) { return space.team[state.team] && space.team[id] ? App.dist(space.team[state.team], space.team[id]) : null; }
     function rankOf(id) { const i = near.findIndex((n) => n.id === id); return i < 0 ? null : i + 1; }
-    function matching() {
+    function matching(cohort = state.cohort) {
       const needle = state.search.trim().toLocaleLowerCase();
       return Object.keys(space.team).filter((id) => {
         const t = App.team[id], s = summaries[id], local = App.i18n?.t(t.name) || t.name;
-        return (!state.arch || t.archetype === state.arch) && (!state.cohort || state.cohort.includes(id))
+        return (!state.arch || t.archetype === state.arch) && (!cohort || cohort.includes(id))
           && (!needle || `${t.name} ${local} ${id}`.toLocaleLowerCase().includes(needle))
           && (state.xlo === null || s.xgd >= state.xlo) && (state.xhi === null || s.xgd <= state.xhi)
           && (state.glo === null || s.gd >= state.glo) && (state.ghi === null || s.gd <= state.ghi);
       });
     }
     const focused = () => (state.match ? recordByKey[state.match] : null);
-    const role = (id) => (id === state.team ? "a" : id === state.compare ? "b" : !visible.includes(id) ? "out" : twins.includes(id) ? "twin" : "in");
+    const role = (id, population = visible) => (id === state.team ? "a" : id === state.compare ? "b" : !population.includes(id) ? "out" : twins.includes(id) ? "twin" : "in");
 
     function render() {
+      brushPreview = null;
       space = A.space(state.dials, state.scope);
       full = A.space(App.dials, state.scope);
       nearByTeam = A.twinTable(space).near;
@@ -322,14 +340,15 @@
           .sort((a, b) => a.d - b.d || a.id.localeCompare(b.id))
           .forEach(({ id }, i) => mapRanks.set(id, i + 1));
       }
-      for (const sel of ["#ws-map", "#ws-colour-control", "#ws-legend", "#ws-projection", "#ws-readout"]) q(sel).hidden = isPairs;
+      for (const sel of ["#ws-map", ".ws-overview-tools", "#ws-projection", "#ws-readout"]) q(sel).hidden = isPairs;
       q("#ws-pairs").hidden = !isPairs;
       q("#ws-pair-unit").hidden = !isPairs;
       q("#ws-clear-pair-region").hidden = !isPairs || !state.pairRegion;
       q("#ws-readout").classList.toggle("has-reference", !!space.team[state.team]);
       q("#ws-color").value = state.color;
       q(".ws-details").classList.toggle("has-team", !!state.team);
-      for (const id of ["D", "E", "F"]) q(`[data-panel="${id}"]`).hidden = !state.team;
+      for (const id of ["D", "F"]) q(`[data-panel="${id}"]`).hidden = !state.team;
+      q('[data-panel="E"]').hidden = !state.compare;
       drawContext(); drawCollection(); drawSimilarity(); heat.render({ state, full, visible, summaries, near });
       if (isPairs) {
         heat.markIndicator(null);
@@ -406,7 +425,7 @@
         const id = row.dataset.team;
         row.onclick = (e) => choose(id, e.target.closest("[data-pick]")?.dataset.pick || (e.shiftKey ? "A" : undefined));
         row.onkeydown = (e) => { if ((e.key === "Enter" || e.key === " ") && e.target === row) { e.preventDefault(); choose(id, e.shiftKey ? "A" : undefined); } };
-        row.onfocus = row.onmouseenter = () => highlight(id); row.onblur = row.onmouseleave = () => highlight(null);
+        row.onfocus = row.onpointerenter = () => highlight(id); row.onblur = row.onpointerleave = () => highlight(null);
       });
     }
 
@@ -434,12 +453,13 @@
       q("#ws-twins").querySelectorAll("[data-team]").forEach((li) => {
         const id = li.dataset.team;
         li.onclick = () => choose(id); li.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(id); } };
-        li.onfocus = li.onmouseenter = () => highlight(id); li.onblur = li.onmouseleave = () => highlight(null);
+        li.onfocus = li.onpointerenter = () => highlight(id); li.onblur = li.onpointerleave = () => highlight(null);
       });
     }
 
     /* ---------- C · style map ---------- */
     function drawMap(redrawPairs = true) {
+      clearBrushPreview();
       q("#ws-axes").hidden = state.view !== "custom";
       q("#ws-x").value = state.x; q("#ws-y").value = state.y;
       q("#ws-brush").hidden = !hasTouch();
@@ -484,7 +504,7 @@
 
       const order = { out: 0, in: 1, twin: 2, b: 3, a: 4 };
       const plotted = Object.keys(pos).sort((a, b) => order[role(a)] - order[role(b)]);
-      const radius = { a: 7.5, b: 7.5, twin: 6, in: 4.6, out: 4 };
+      const radius = { a: 7.5, b: 7.5, twin: 6, in: 5.3, out: 4 };
       // Keep points above the drag surface so a click or tap can select a team.
       const brushLayer = svg.append("g").attr("class", "brush");
       const marks = svg.append("g").selectAll("g").data(plotted).join("g").attr("class", "mark").attr("data-team", (id) => id)
@@ -494,14 +514,19 @@
       marks.append("circle").attr("class", "team-fill").attr("r", (id) => radius[role(id)]);
       marks.on("click", (e, id) => choose(id, e.shiftKey ? "A" : undefined))
         .on("keydown", (e, id) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(id, e.shiftKey ? "A" : undefined); } })
-        .on("mouseenter focus", (e, id) => highlight(id, { reveal: true })).on("mouseleave blur", () => highlight(null));
+        .on("pointerenter focus", (e, id) => highlight(id, { reveal: true })).on("pointerleave blur", () => highlight(null));
 
       // Give selected teams first choice of label position. Place the other codes
       // only where they cover neither another label nor a plotted point.
       const occupied = [];
       const codeLayer = svg.append("g").attr("class", "point-labels");
       const pointPositions = plotted.map((id) => ({ id, xy: P(id) }));
-      const priority = plotted.filter((id) => role(id) !== "out").reverse();
+      let priority = plotted.filter((id) => role(id) !== "out").reverse();
+      // In the overview label the visible extremes of each axis; hover/focus names any other point.
+      if (!state.team && priority.length > 12) {
+        priority = [...new Set([0, 1].flatMap((axis) =>
+          [d3.least(priority, (id) => pos[id][axis]), d3.greatest(priority, (id) => pos[id][axis])]))];
+      }
       for (const id of priority) {
         const [px, py] = P(id), selected = ["a", "b", "twin"].includes(role(id));
         const offsets = [[0,-11],[18,4],[-18,4],[0,18],[20,-8],[-20,-8]];
@@ -532,11 +557,28 @@
         svg.append("text").attr("class", "code").attr("x", px + 10).attr("y", py + 16).attr("fill", C.ink).text(`${f.team_id} v ${f.opp_id}`);
       }
       if (!plotted.length) svg.append("text").attr("x", W / 2).attr("y", H / 2).attr("text-anchor", "middle").attr("fill", C.muted).text("No team has matches in this scope");
-      setupBrush(brushLayer, [[m.l, m.t], [W - m.r, H - m.b]], ([[left, top], [right, bottom]]) => {
-        const cohort = pointPositions.filter(({ xy: [px, py] }) =>
+      const idsInBounds = ([[left, top], [right, bottom]]) =>
+        pointPositions.filter(({ xy: [px, py] }) =>
           px >= left && px <= right && py >= top && py <= bottom).map(({ id }) => id).sort();
-        commitBrush({ cohort });
-      }, touchBrushArmed);
+      setupBrush(brushLayer, [[m.l, m.t], [W - m.r, H - m.b]],
+        (bounds) => commitBrush({ cohort: idsInBounds(bounds) }), touchBrushArmed,
+        (bounds) => {
+          if (!bounds) { clearBrushPreview(); return; }
+          const cohort = idsInBounds(bounds), key = cohort.join(",");
+          if (brushPreview === key) return;
+          // A second drag replaces the old region. Keep search, group and outcome filters.
+          if (brushPreview === null && state.cohort) {
+            const candidates = matching(null);
+            heat.render({ state, full, visible: candidates, summaries, near });
+            paintMapColours(candidates);
+          }
+          brushPreview = key;
+          const ids = new Set(matching(cohort));
+          heat.previewRegion(ids);
+          q("#ws-count").textContent = `${ids.size} / ${Object.keys(space.team).length} teams`;
+          marks.classed("outside-brush", (id) => !ids.has(id));
+          codeLayer.selectAll("text").classed("outside-brush", function () { return !ids.has(this.dataset.labelFor); });
+        });
       paintMapColours();
       q("#ws-projection").textContent = pca
         ? `Two axes capture ${Math.round(d3.sum(pca.vars) * 100)}% of variation across ${state.dials.length} style indicators. Rankings use all selected indicators.`
@@ -544,15 +586,28 @@
       if (activeTeam) host.querySelector(`[data-team="${activeTeam}"]`)?.focus({ preventScroll: true });
     }
 
-    function setupBrush(brushLayer, extent, onBounds, touchArmed) {
+    function clearBrushPreview() {
+      if (brushPreview === null) return;
+      brushPreview = null;
+      heat.render({ state, full, visible, summaries, near });
+      paintMapColours();
+      q("#ws-count").textContent = `${visible.length} / ${Object.keys(space.team).length} teams`;
+      qa("#ws-map .outside-brush").forEach((el) => el.classList.remove("outside-brush"));
+    }
+    function setupBrush(brushLayer, extent, onBounds, touchArmed, preview) {
       if (touchArmed) brushLayer.raise();
       const largeEnough = (s) => s && Math.hypot(s[1][0] - s[0][0], s[1][1] - s[0][1]) >= 5;
       const brush = d3.brush().extent(extent)
         .touchable(touchArmed).keyModifiers(false).handleSize(0)
-        .on("brush", ({ selection }) => brushLayer.classed("is-dragging", !!largeEnough(selection)))
+        .on("brush", ({ selection, sourceEvent }) => {
+          const active = largeEnough(selection);
+          brushLayer.classed("is-dragging", !!active);
+          if (sourceEvent && brushLayer.node().isConnected) preview?.(active ? selection : null);
+        })
         .on("end", ({ sourceEvent, selection }) => {
           if (!sourceEvent || !brushLayer.node().isConnected) return;
           if (!largeEnough(selection) || sourceEvent.type === "touchcancel") {
+            preview?.(null);
             if (selection) brushLayer.call(brush.move, null);
             return;
           }
@@ -570,13 +625,13 @@
       previewIndicator = index;
       paintMapColours();
     }
-    function paintMapColours() {
+    function paintMapColours(population = visible) {
       const index = previewIndicator ?? (state.color.startsWith("dial") ? +state.color.slice(4) : null);
       const outlined = index !== null || state.color === "group";
       const roleColours = { a: C.a, b: C.b, twin: C.twin, in: C.dot, out: C.off };
       heat.markIndicator(index);
       d3.select(q("#ws-map")).selectAll("circle.team-fill").each(function (id) {
-        const r = role(id), filtered = r === "out";
+        const r = role(id, population), filtered = r === "out";
         let fill = roleColours[r];
         if (index !== null) fill = App.workspaceHeatmap.color(full.team[id][index]);
         else if (state.color === "group" && !filtered) fill = App.arch[App.team[id].archetype].color;
@@ -600,7 +655,12 @@
       let indicatorKey = "";
       if (index !== null) {
         const label = App.indicator(App.dials[index]).label;
-        indicatorKey = `<span class="ws-indicator-key"><b>${esc(label)}</b><span title="Standard deviations from the tournament mean">σ</span></span>${App.workspaceHeatmap.legend}`;
+        // Keep the heatmap's own scale in categorical map modes. This avoids
+        // moving the column headings underneath the pointer during a preview.
+        const sharedScale = state.color.startsWith("dial");
+        const previewLabel = previewIndicator !== null ? `<b>${esc(label)}</b>` : "";
+        indicatorKey = `<span class="ws-indicator-key">${previewLabel}${sharedScale ? "<span>Standard deviations from the tournament mean</span>" : ""}</span>`
+          + (sharedScale ? App.workspaceHeatmap.legend : "");
       }
       if (grouped) {
         // Let the full group legend reserve its natural wrapped height during inspection.
@@ -657,9 +717,14 @@
 
     /* ---------- E · outcomes ---------- */
     function drawOutcomes() {
-      if (!state.team) return;
+      if (!state.compare) return;
       const referenceLabel = { all: "Tournament average", group: "Group-stage average", knockout: "Knockout average" }[state.scope];
-      q("#ws-outcome-key").innerHTML = teamLegend()
+      const gd = [state.team, state.compare].map((id, i) => {
+        const s = summaries[id];
+        return `<span class="ws-outcome-team"><i class="lg-${i ? "b" : "a"}"></i><span>${esc(App.team[id].name)}</span>
+          <strong>${Number.isFinite(s.gd) ? App.signed(s.gd, 2) : "–"}</strong><small>${s.n} matches</small></span>`;
+      }).join("");
+      q("#ws-outcome-key").innerHTML = `<div class="ws-gd-comparison"><b>Goal difference per match</b>${gd}</div>`
         + (twins.length ? `<span><i class="lg-tick-twin"></i>Mean of A's ${K} closest</span>` : "")
         + `<span><i class="lg-tick-avg"></i>${referenceLabel}</span>`;
       const host = q("#ws-outcomes"), { svg, W, H } = svgFor(host, "Outcomes per match for A and B");
@@ -681,7 +746,7 @@
           const g = svg.append("g").attr("data-team", id);
           g.append("rect").attr("x", m.l).attr("y", yy).attr("width", ok ? Math.max(0, x(v) - m.l) : 0).attr("height", bh).attr("rx", 2).attr("fill", col);
           g.append("text").attr("x", (ok ? x(v) : m.l) + 5).attr("y", yy + bh - 1.5).attr("fill", col).attr("font-size", 11).attr("font-weight", 600).text(fmt(v));
-          g.on("mouseenter", () => highlight(id)).on("mouseleave", () => highlight(null));
+          g.on("pointerenter", () => highlight(id)).on("pointerleave", () => highlight(null));
         });
         const tick = (v, col, dash, title) => { if (!Number.isFinite(v)) return; svg.append("line").attr("x1", x(v)).attr("x2", x(v)).attr("y1", y(k) - 2).attr("y2", y(k) + y.bandwidth() + 2).attr("stroke", col).attr("stroke-width", 2).attr("stroke-dasharray", dash).append("title").text(`${title}: ${fmt(v)}`); };
         tick(scopeAvg[k], "#9aa3ae", "2 2", referenceLabel);
@@ -708,7 +773,7 @@
       q("#ws-matches tbody").querySelectorAll("tr[data-match]").forEach((row) => {
         const pick = () => change({ match: row.dataset.match === state.match ? null : row.dataset.match });
         row.onclick = pick; row.onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } };
-        row.onmouseenter = () => highlight(row.dataset.team); row.onmouseleave = () => highlight(null);
+        row.onpointerenter = () => highlight(row.dataset.team); row.onpointerleave = () => highlight(null);
       });
       const ret = A.query(state.dials, { return: stateUrl(state) });
       const reports = state.compare
@@ -749,8 +814,15 @@
         return;
       }
       const t = App.team[show], s = summaries[show];
-      el.innerHTML = `${App.flag(show, 14)}<b>${esc(t.name)}</b><span>${esc(groupName(t.archetype))}</span><span class="sep">|</span><span>${s.n} matches</span><span class="sep">|</span>
-        <span>xG diff. ${App.signed(s.xgd, 2)}</span><span class="sep">|</span><span>goal diff. ${App.signed(s.gd, 2)}</span>`;
+      let detail;
+      if (state.color.startsWith("dial")) {
+        const measure = metricById[state.color], value = fmt(metric(show, state.color), 1);
+        detail = `<span>${esc(measure.label)}</span><b>${value}${measure.unit === "%" ? "%" : ""}</b>`
+          + (measure.unit === "%" ? "" : `<span>${esc(measure.unit)}</span>`);
+      } else {
+        detail = `<span>xG diff. ${App.signed(s.xgd, 2)}</span><span class="sep">|</span><span>goal diff. ${App.signed(s.gd, 2)}</span>`;
+      }
+      el.innerHTML = `${App.flag(show, 14)}<b>${esc(t.name)}</b>${detail}<span class="sep">|</span><span>${esc(groupName(t.archetype))}</span><span class="sep">|</span><span>${s.n} matches</span>`;
     }
     function paintMapHover() {
       const svg = q("#ws-map svg");

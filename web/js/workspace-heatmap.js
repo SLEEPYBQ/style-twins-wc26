@@ -5,7 +5,7 @@
   const App = window.App;
   const esc = App.esc;
   const sortKeys = ["group", "near", "xgd", "gd", ...App.dials.map((_, i) => `dial${i}`)];
-  const sortKey = (value) => sortKeys.includes(value) ? value : "group";
+  const sortKey = (value, fallback = "dial0") => sortKeys.includes(value) ? value : fallback;
   const color = d3.scaleLinear().domain([-2, 0, 2]).range(["#985522", "#f4f3f2", "#594899"]).clamp(true);
   const legend = '<span class="hm-scale"><span>≤ −2</span><i class="hm-low" aria-hidden="true"></i><span>0</span><i class="hm-high" aria-hidden="true"></i><span>≥ +2</span></span>';
   const groupIndex = new Map(App.data.archetypes.map((group, i) => [group.id, i]));
@@ -28,16 +28,16 @@
     });
   }
 
-  function workspaceHeatmap(host, { change, choose, highlight, inspectIndicator }) {
+  function workspaceHeatmap(host, { sortBy, choose, highlight, inspectIndicator }) {
     host.classList.add("ws-heat");
     host.innerHTML = `<div class="hm-tools">
         <label for="ws-heat-sort">Row order</label><span id="ws-heat-sort-host"></span>
         <span class="hm-sort-direction" hidden>Highest first</span>
+        <span class="hm-excluded" hidden><i aria-hidden="true">○</i> <span>Outside similarity</span></span>
         <span class="hm-count"></span>
       </div>
       <div class="hm-legend"><span>Standard deviations from the tournament mean</span>
         ${legend}
-        <span class="hm-excluded" hidden><i aria-hidden="true">○</i> <span>Outside similarity</span></span>
       </div>
       <span class="sr-only" id="ws-heat-keys">Arrow keys inspect values. Enter selects a team.</span>
       <div class="hm-scroll" tabindex="0" aria-label="Style DNA Heatmap" aria-describedby="ws-heat-keys">
@@ -53,15 +53,16 @@
     let model, pickSort, canRank, previousLayout, focusTeam, currentCell, raw = {};
     let pointerColumn = null, markedColumn = null;
     const defaultReadout = () => {
-      get("#ws-heat-value").textContent = model.state.view !== "pairs" && window.matchMedia("(hover: hover)").matches
-        ? "Hover or focus a column heading to colour the map. Select it to sort teams."
-        : "Inspect a cell for its team average.";
+      get("#ws-heat-value").textContent = model.state.view === "pairs" ? "Select a column heading to sort teams."
+        : window.matchMedia("(hover: hover)").matches ? "Hover or focus a column heading to preview. Select it to colour the map and sort teams."
+        : "Select a column heading to colour the map and sort teams.";
     };
 
     function markIndicator(index) {
+      if (markedColumn === index) return;
+      table.querySelectorAll(".is-inspected").forEach((cell) => cell.classList.remove("is-inspected"));
       markedColumn = index;
-      table.tHead.querySelector(".is-inspected")?.classList.remove("is-inspected");
-      if (index != null) table.tHead.querySelector(`th[data-i="${index}"]`)?.classList.add("is-inspected");
+      if (index != null) table.querySelectorAll(`[data-i="${index}"]`).forEach((cell) => cell.classList.add("is-inspected"));
     }
     function compareHover(teamA, other, index) {
       for (const el of body.querySelectorAll(".is-compared, .is-gap")) el.classList.remove("is-compared", "is-gap");
@@ -80,7 +81,7 @@
       get("#ws-heat-sort-host").innerHTML = `<select id="ws-heat-sort" aria-label="Row order">${options.map(([key, label]) =>
         `<option value="${key}">${esc(label)}</option>`).join("")}</select>`;
       pickSort = get("#ws-heat-sort");
-      pickSort.onchange = () => change({ heatSort: pickSort.value });
+      pickSort.onchange = () => sortBy(pickSort.value);
       canRank = hasRank;
     }
     const rawText = (n, i) => `${App.fix(n, 1)}${info[i].unit === "%" ? "%" : ` ${info[i].unit}`}`;
@@ -111,6 +112,7 @@
       get(".hm-sort-direction").hidden = order === "group" || order === "near";
       get(".hm-count").textContent = `${visible.length} / ${Object.keys(full.team).length} teams`;
       get(".hm-excluded").hidden = state.dials.length === App.dials.length;
+      get(".hm-legend").hidden = state.view !== "pairs" && state.color.startsWith("dial");
       const ids = ordered(visible, order, model);
       const previousFocus = document.activeElement;
       const priorRow = previousFocus?.closest("tr[data-team]")?.dataset.team;
@@ -132,7 +134,6 @@
           <button type="button" data-order="dial${i}" title="${esc(measure.help)}"><span>${esc(measure.label)}</span>${!included ? '<i aria-label="Outside similarity">○</i>' : ""}</button>
           </th>`;
       }).join("")}</tr>`;
-      markIndicator(markedColumn);
       const heading = (arch, count) => `<tr class="hm-group-heading"><th scope="row" colspan="${info.length + 1}">
         <span class="hm-group-title"><span>${esc(App.groupLabel(arch))}</span><span class="hm-group-count">${count}</span></span></th></tr>`;
       const sections = [];
@@ -150,6 +151,10 @@
         lastGroup = arch;
       }
       body.innerHTML = sections.join("") || `<tr><td class="hm-empty" colspan="${info.length + 1}">No team matches these filters.</td></tr>`;
+      // The header and cells above are new DOM nodes. Apply the persisted
+      // colour immediately; hovering a heading can temporarily replace it.
+      markedColumn = null;
+      markIndicator(state.view !== "pairs" && state.color.startsWith("dial") ? +state.color.slice(4) : null);
       const layout = `${order}|${state.scope}|${state.arch}|${ids.join("|")}`;
       if (layout !== previousLayout) viewport.scrollTop = 0;
       previousLayout = layout;
@@ -211,7 +216,7 @@
     });
     table.addEventListener("click", (e) => {
       const order = e.target.closest("button[data-order]");
-      if (order) { change({ heatSort: order.dataset.order }); return; }
+      if (order) { sortBy(order.dataset.order); return; }
       const row = e.target.closest("tr[data-team]");
       if (!row) return;
       const i = e.target.closest("td[data-i]")?.dataset.i;
@@ -255,12 +260,36 @@
         else if (item.right > right) viewport.scrollLeft += item.right - right;
       }
     });
+    // While dragging, keep the sorted DOM and scroll position instead of rebuilding up to 480 cells per move.
+    function previewRegion(ids) {
+      for (const row of body.querySelectorAll("tr[data-team]")) row.hidden = !ids.has(row.dataset.team);
+      for (const group of body.querySelectorAll(".hm-group-heading")) {
+        let shown = 0;
+        for (let row = group.nextElementSibling; row && !row.classList.contains("hm-group-heading"); row = row.nextElementSibling) {
+          if (row.dataset.team && !row.hidden) shown++;
+        }
+        group.hidden = shown === 0;
+        if (!model.state.arch) group.querySelector(".hm-group-count").textContent = shown;
+      }
+      const mean = body.querySelector(".hm-group-mean");
+      if (mean) mean.hidden = ids.size === 0;
+      let empty = body.querySelector(".hm-empty");
+      if (!ids.size && !empty) {
+        empty = body.insertRow().insertCell();
+        empty.className = "hm-empty";
+        empty.colSpan = info.length + 1;
+        empty.textContent = "No team matches these filters.";
+      }
+      if (empty) empty.parentElement.hidden = ids.size > 0;
+      get(".hm-count").textContent = `${ids.size} / ${Object.keys(model.full.team).length} teams`;
+    }
     return {
-      render, markIndicator, compareHover,
+      render, previewRegion, markIndicator, compareHover,
       highlight(id) {
         const row = id && body.querySelector(`tr[data-team="${id}"]`);
         if (row && !row.matches(":hover, :focus-within")) revealRow(row);
-        inspect(row || null);
+        const observedCell = row && markedColumn != null ? row.querySelector(`td[data-i="${markedColumn}"]`) : null;
+        inspect(row || null, observedCell);
       },
     };
   }
