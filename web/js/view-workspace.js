@@ -509,7 +509,7 @@
     }
 
     function drawExplorePanels(ids) {
-      stylePreview.render({ state, full, ids });
+      stylePreview.render({ state, full, ids, hover });
       outcomePreview.render({ state, summaries, ids, hover });
     }
 
@@ -1104,7 +1104,10 @@
       hover = id;
       if (id) qa(`[data-team="${id}"], .relationship[data-to="${id}"]`).forEach((el) => el.classList.add("is-hover"));
       paintMapHover();
-      if (state.mode === "explore") outcomePreview.highlight(id);
+      if (state.mode === "explore") {
+        stylePreview.highlight(id);
+        outcomePreview.highlight(id);
+      }
       if (reveal && id) {
         const row = q(`#ws-teams tr[data-team="${id}"]`), box = q("#ws-team-scroll");
         if (row && box) { const r = row.getBoundingClientRect(), s = box.getBoundingClientRect(); if (r.top < s.top + 30) box.scrollTop -= s.top + 30 - r.top; else if (r.bottom > s.bottom) box.scrollTop += r.bottom - s.bottom; }
